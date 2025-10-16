@@ -1,0 +1,25 @@
+<div class="page-content-dimensions">
+  <app-system-information class="left-panel-dimensions" />
+  <div class="content">
+    <div class="title">
+      <h1>User Input</h1>
+
+      <div class="right-buttons">
+        <button class="btn" disabled>
+          <fa-icon [icon]="importIcon"></fa-icon>
+          Import
+        </button>
+        <button class="btn" disabled>
+          <fa-icon [icon]="exportIcon"></fa-icon>
+          Export
+        </button>
+      </div>
+    </div>
+
+    <form *ngIf="formGroup" [formGroup]="formGroup" (ngSubmit)="onSubmit()">
+      <!-- TODO add form group -->
+
+      <button type="submit">Run</button>
+    </form>
+  </div>
+</div>

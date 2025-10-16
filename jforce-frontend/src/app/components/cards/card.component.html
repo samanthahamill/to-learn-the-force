@@ -1,0 +1,16 @@
+<div class="panel">
+  <span class="card-title">
+    <h3>
+      {{ header }}
+    </h3>
+
+    <span *ngIf="icon !== undefined">
+      <fa-icon
+        [icon]="getIconDefinition()"
+        class="icon-button"
+        (click)="handleIconClicked()"
+      ></fa-icon>
+    </span>
+  </span>
+  <ng-content></ng-content>
+</div>
