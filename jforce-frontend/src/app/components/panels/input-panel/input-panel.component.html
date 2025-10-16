@@ -1,5 +1,4 @@
-<div class="page-content-dimensions">
-  <app-system-information class="left-panel-dimensions" />
+<div class="panel-style panel-dimensions">
   <div class="content">
     <div class="title">
       <h1>User Input</h1>
@@ -7,19 +6,25 @@
       <div class="right-buttons">
         <button class="btn" disabled>
           <fa-icon [icon]="importIcon"></fa-icon>
-          Import
+          Import Config
         </button>
         <button class="btn" disabled>
           <fa-icon [icon]="exportIcon"></fa-icon>
-          Export
+          Export Config
         </button>
       </div>
     </div>
 
     <form *ngIf="formGroup" [formGroup]="formGroup" (ngSubmit)="onSubmit()">
       <!-- TODO add form group -->
+      <div class="inputs">
+        <app-platform-card />
+        <app-tools-card />
+      </div>
 
-      <button type="submit">Run</button>
+      <div class="bottom-button">
+        <button class="submit" type="submit">Generate Scenario</button>
+      </div>
     </form>
   </div>
 </div>

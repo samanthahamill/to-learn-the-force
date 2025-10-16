@@ -18,17 +18,6 @@ input {
   border-radius: 5px;
 }
 
-.content {
-  flex-direction: column;
-  flex: 1;
-  width: 100%;
-  height: 100%;
-}
-
-.formGroup {
-  display: flex;
-}
-
 // shared styling for child components to access
 .container {
   margin: 2px;
@@ -45,7 +34,28 @@ input {
   display: flex;
   flex-direction: column;
   flex: 1;
-  margin-left: style.$left-right-panel-margin;
+  margin-left: style.$panel-margin;
+  width: 100%;
+  min-height: 100%;
+  height: 100%;
+  max-height: 100%;
+}
+
+.formGroup {
+  display: flex;
+}
+
+// styling to apply to an entire page, such as SystemControl or Reports
+.panel-style {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  min-width: 0px;
+  border-radius: 5px;
+  padding: 4px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: style.$secondary-dark;
 }
 
 .parent {

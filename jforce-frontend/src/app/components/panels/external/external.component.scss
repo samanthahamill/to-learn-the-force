@@ -1,0 +1,8 @@
+@use "styles" as style;
+@use "../panel.scss";
+
+.external-panel {
+  height: calc(50vh - (4px * 2));
+  margin-left: style.$panel-margin;
+  width: calc(100% - 4px);
+}

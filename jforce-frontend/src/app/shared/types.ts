@@ -10,4 +10,7 @@ export interface UserInputFormData {
   tool: {
     isTool: boolean;
   };
+  external: {
+    name: string;
+  };
 }

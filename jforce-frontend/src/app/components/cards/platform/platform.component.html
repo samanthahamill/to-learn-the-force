@@ -1,15 +1,24 @@
-<app-card header="PLATFORM" icon="">
-  <form class="formGroup" [formGroup]="areaOfInterest">
+<app-card header="PLATFORM">
+  <form class="formGroup" [formGroup]="platform">
     <div class="container">
       <div class="row row-col-3">
         <div class="col">
+          <label title="isPlaform" for="isPlaform">IsPlatform</label>
+          <input
+            type="checkbox"
+            id="isPlaform"
+            formControlName="isPlaform"
+            placeholder="IsPlatform"
+            class="checkbox"
+          />
+        </div>
+        <!-- <div class="col">
           <label title="label" for="label">Label</label>
           <input
             type="text"
             id="label"
             formControlName="label"
             placeholder="Label"
-            (blur)="createToast('Label Updated')"
           />
         </div>
         <div class="col">
@@ -19,7 +28,6 @@
             id="lat"
             formControlName="lat"
             placeholder="Latitude"
-            (blur)="createToast('Latitude Updated')"
           />
 
           <label title="Longitude" for="lon">Longitude</label>
@@ -28,7 +36,6 @@
             id="lon"
             formControlName="lon"
             placeholder="Longitude"
-            (blur)="createToast('Longitude Updated')"
           />
         </div>
         <div class="col">
@@ -38,7 +45,6 @@
             id="elevation"
             formControlName="elevation"
             placeholder="Elevation (km)"
-            (blur)="createToast('Elevation Updated')"
           />
 
           <label title="Radius of Area (nmi)" for="radius"
@@ -49,9 +55,8 @@
             id="radius"
             formControlName="radius"
             placeholder="Radius of Area (nmi)"
-            (blur)="createToast('Radius of Area Updated')"
           />
-        </div>
+        </div> -->
       </div>
     </div>
   </form>

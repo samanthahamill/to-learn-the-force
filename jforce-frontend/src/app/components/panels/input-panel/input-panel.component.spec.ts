@@ -1,18 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { InputPageComponent } from './input-page.component';
+import { InputPanelComponent } from './input-panel.component';
 
 describe('InputPageComponent', () => {
-  let component: InputPageComponent;
-  let fixture: ComponentFixture<InputPageComponent>;
+  let component: InputPanelComponent;
+  let fixture: ComponentFixture<InputPanelComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [InputPageComponent]
-    })
-    .compileComponents();
+      imports: [InputPanelComponent],
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(InputPageComponent);
+    fixture = TestBed.createComponent(InputPanelComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

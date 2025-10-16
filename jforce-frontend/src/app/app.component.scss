@@ -1,0 +1,21 @@
+@use "styles" as style;
+
+.app-content {
+  height: style.$panel-height;
+  max-height: style.$panel-height;
+  min-height: style.$panel-height;
+  top: style.$classification-banner-height;
+  width: 100vw;
+  position: absolute;
+
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+.main-div {
+  height: 100vh;
+  width: 100vw;
+
+  overflow: hidden;
+  position: absolute;
+}

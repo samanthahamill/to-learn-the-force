@@ -30,7 +30,8 @@
               "node_modules/bootswatch/dist/darkly/bootstrap.min.css",
               "node_modules/primeicons/primeicons.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css",
-              "src/styles/styles.scss"
+              "src/styles/styles.scss",
+              "node_modules/ol/ol.css"
             ],
             "stylePreprocessorOptions": {
               "includePaths": ["src/styles"]
@@ -102,7 +103,8 @@
               "node_modules/bootswatch/dist/darkly/bootstrap.min.css",
               "node_modules/primeicons/primeicons.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css",
-              "src/styles/styles.scss"
+              "src/styles/styles.scss",
+              "node_modules/ol/ol.css"
             ],
             "stylePreprocessorOptions": {
               "includePaths": ["src/styles"]

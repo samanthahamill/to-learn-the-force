@@ -1,5 +1,5 @@
 import { CommonModule, NgIf } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faFilter,
@@ -10,9 +10,10 @@ import {
 
 @Component({
   selector: 'app-card',
-  imports: [],
+  imports: [CommonModule, NgIf],
   templateUrl: './card.component.html',
   styleUrl: './card.component.scss',
+  schemas: [NO_ERRORS_SCHEMA],
 })
 export class CardComponent {
   @Input() header: string = '';
