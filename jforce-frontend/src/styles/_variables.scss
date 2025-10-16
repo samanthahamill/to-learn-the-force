@@ -1,0 +1,34 @@
+$web-font-path: false;
+
+$font-family-sans-serif:
+  system-ui,
+  -apple-system,
+  "Segoe UI",
+  Roboto,
+  "Helvetica Neue",
+  Ariel,
+  "Noto Sans",
+  "Liberation Sans",
+  sans-serif,
+  "Apple Color Emoji",
+  "Segoe UI Emoji",
+  "Sego UI Symbol",
+  "Noto Color Emoji";
+$font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", Monospace;
+
+$font-size-root: null !default;
+$font-size-base: 13px;
+$font-size-big: 24px;
+$line-height-base: 1.5rem !default;
+$line-height-lg: 2 !default;
+
+$navbar-padding-y: 0.25rem;
+
+$navbar-brand-font-size: 1.5rem;
+$navbar-brand-padding-y: $navbar-padding-y;
+$navlink-padding-x: 1rem;
+
+$card-bg-color: #3a3f44 !default;
+$card-border-color: rgba(0, 0, 0, 0.125);
+$card-padding: 0.5rem !default;
+$card-margin-bottom: 0.5rem !default;
