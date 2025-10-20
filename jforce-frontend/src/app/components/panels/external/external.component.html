@@ -31,104 +31,106 @@
 
     <form class="formGroup" [formGroup]="formGroup">
       <div class="container">
-        <div *ngIf="importData; else uploadData" class="row">
-          <app-card header="Import Original Input">
-            <div class="container">
-              <div class="row">
-                <div class="col">
-                  <label name="ogStartTime" for="ogStartTime">
-                    Original Start Time
-                  </label>
-                  <div class="input-group">
-                    <input
-                      class="form-control button-background"
-                      placeholder="yyyy-mm-dd"
-                      name="ogStartTime"
-                      [(ngModel)]="ogStartTime"
-                      [ngModelOptions]="{ standalone: true }"
-                      ngbDatepicker
-                      #s="ngbDatepicker"
-                    />
-                    <button
-                      class="btn btn-outline-tertiary bi bi-calendar3 button-background icon"
-                      (click)="s.toggle()"
-                      type="button"
-                    ></button>
-                  </div>
-
-                  <label name="ogEndTime" for="ogEndTime">
-                    Original End Time
-                  </label>
-                  <div class="input-group">
-                    <input
-                      class="form-control button-background"
-                      placeholder="yyyy-mm-dd"
-                      name="ogEndTime"
-                      [(ngModel)]="ogEndTime"
-                      [ngModelOptions]="{ standalone: true }"
-                      ngbDatepicker
-                      #e="ngbDatepicker"
-                    />
-                    <button
-                      class="btn btn-outline-tertiary bi bi-calendar3 button-background icon"
-                      (click)="e.toggle()"
-                      type="button"
-                    ></button>
-                  </div>
+        <app-card
+          *ngIf="importData; else uploadData"
+          formGroupName="import"
+          header="Import Original Input"
+        >
+          <div class="container">
+            <div class="row">
+              <div class="col">
+                <label name="ogStartTime" for="ogStartTime">
+                  Original Start Time
+                </label>
+                <div class="input-group">
+                  <input
+                    class="form-control button-background"
+                    placeholder="yyyy-mm-dd"
+                    name="ogStartTime"
+                    [(ngModel)]="ogStartTime"
+                    [ngModelOptions]="{ standalone: true }"
+                    ngbDatepicker
+                    #s="ngbDatepicker"
+                  />
+                  <button
+                    class="btn btn-outline-tertiary bi bi-calendar3 button-background icon"
+                    (click)="s.toggle()"
+                    type="button"
+                  ></button>
                 </div>
 
-                <div class="col">
-                  <div class="col downwards">
-                    <label title="feeds">Data Feeds</label>
+                <label name="ogEndTime" for="ogEndTime">
+                  Original End Time
+                </label>
+                <div class="input-group">
+                  <input
+                    class="form-control button-background"
+                    placeholder="yyyy-mm-dd"
+                    name="ogEndTime"
+                    [(ngModel)]="ogEndTime"
+                    [ngModelOptions]="{ standalone: true }"
+                    ngbDatepicker
+                    #e="ngbDatepicker"
+                  />
+                  <button
+                    class="btn btn-outline-tertiary bi bi-calendar3 button-background icon"
+                    (click)="e.toggle()"
+                    type="button"
+                  ></button>
+                </div>
+              </div>
 
-                    <div class="row-1">
-                      <input
-                        type="checkbox"
-                        class="checkbox"
-                        id="type1"
-                        formControlName="type1"
-                        placeholder="type1"
-                      />
-                      <label title="feeds" for="type1">Type 1</label>
-                    </div>
-                    <div class="row-1">
-                      <input
-                        type="checkbox"
-                        class="checkbox"
-                        id="type2"
-                        formControlName="type2"
-                        placeholder="type2"
-                      />
-                      <label title="feeds" for="type2">Type 2</label>
-                    </div>
-                    <div class="row-1">
-                      <input
-                        type="checkbox"
-                        class="checkbox"
-                        id="type3"
-                        formControlName="type3"
-                        placeholder="type3"
-                      />
-                      <label title="feeds" for="type3">Type 3</label>
-                    </div>
-                    <div class="row-1">
-                      <input
-                        type="checkbox"
-                        class="checkbox"
-                        id="type4"
-                        formControlName="type4"
-                        placeholder="type4"
-                      />
-                      <label title="feeds" for="type4">Type 4</label>
-                    </div>
+              <div class="col">
+                <div class="col downwards">
+                  <label title="feeds">Data Feeds</label>
+
+                  <div class="row-1">
+                    <input
+                      type="checkbox"
+                      class="checkbox"
+                      id="type1"
+                      formControlName="type1"
+                      placeholder="type1"
+                    />
+                    <label title="feeds" for="type1">Type 1</label>
+                  </div>
+                  <div class="row-1">
+                    <input
+                      type="checkbox"
+                      class="checkbox"
+                      id="type2"
+                      formControlName="type2"
+                      placeholder="type2"
+                    />
+                    <label title="feeds" for="type2">Type 2</label>
+                  </div>
+                  <div class="row-1">
+                    <input
+                      type="checkbox"
+                      class="checkbox"
+                      id="type3"
+                      formControlName="type3"
+                      placeholder="type3"
+                    />
+                    <label title="feeds" for="type3">Type 3</label>
+                  </div>
+                  <div class="row-1">
+                    <input
+                      type="checkbox"
+                      class="checkbox"
+                      id="type4"
+                      formControlName="type4"
+                      placeholder="type4"
+                    />
+                    <label title="feeds" for="type4">Type 4</label>
                   </div>
                 </div>
               </div>
             </div>
-          </app-card>
-        </div>
+          </div>
+        </app-card>
 
-        <ng-template #uploadData>
+        <ng-template #uploadData formGroupName="upload">
           <div class="row">
             <app-card header="Upload Original Input">
               <label for="uploadFromFile">Upload From CSV</label>
@@ -137,33 +139,31 @@
           </div>
         </ng-template>
 
-        <div class="row">
-          <app-card header="Modified Input">
-            <div class="labelAndTooltip">
-              <label name="ogStartTime" for="ogStartTime">New Start Time</label>
-              <i
-                class="bi bi-info-circle info"
-                title="All times will be modified based on the difference between 'Original Start Time' and 'New Start Time'"
-              ></i>
-            </div>
-            <div class="input-group">
-              <input
-                class="form-control button-background"
-                placeholder="yyyy-mm-dd"
-                name="ogStartTime"
-                [(ngModel)]="ogStartTime"
-                [ngModelOptions]="{ standalone: true }"
-                ngbDatepicker
-                #s="ngbDatepicker"
-              />
-              <button
-                class="btn btn-outline-tertiary bi bi-calendar3 button-background icon"
-                (click)="s.toggle()"
-                type="button"
-              ></button>
-            </div>
-          </app-card>
-        </div>
+        <app-card header="Modified Input">
+          <div class="labelAndTooltip">
+            <label name="ogStartTime" for="ogStartTime">New Start Time</label>
+            <i
+              class="bi bi-info-circle info"
+              title="All times will be modified based on the difference between 'Original Start Time' and 'New Start Time'"
+            ></i>
+          </div>
+          <div class="input-group">
+            <input
+              class="form-control button-background"
+              placeholder="yyyy-mm-dd"
+              name="ogStartTime"
+              [(ngModel)]="ogStartTime"
+              [ngModelOptions]="{ standalone: true }"
+              ngbDatepicker
+              #s="ngbDatepicker"
+            />
+            <button
+              class="btn btn-outline-tertiary bi bi-calendar3 button-background icon"
+              (click)="s.toggle()"
+              type="button"
+            ></button>
+          </div>
+        </app-card>
       </div>
     </form>
   </div>

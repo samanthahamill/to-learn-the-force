@@ -37,7 +37,7 @@ export class ExternalComponent {
   // TODO set up actual connections
 
   constructor() {
-    this.importData = false;
+    this.importData = true;
   }
 
   toggleImportData() {

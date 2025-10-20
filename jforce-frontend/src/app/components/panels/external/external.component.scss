@@ -8,6 +8,11 @@ h1 {
   width: 100%;
 }
 
+.col {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
 .form-control {
   background-color: style.$secondary-dark;
 }
