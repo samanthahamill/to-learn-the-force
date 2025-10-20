@@ -8,6 +8,11 @@ h3 {
   margin: 1px;
 }
 
+.col {
+  display: flex;
+  align-items: center;
+}
+
 .icon-button {
   display: inline-block;
   font-weight: bold;
@@ -19,13 +24,20 @@ h3 {
   cursor: pointer;
 }
 
-.panel {
+.card {
   padding: customVars.$card-padding;
   border-width: 1px;
   border-radius: 5px;
   margin-bottom: 4px;
   border-style: solid;
   border-color: style.$light;
+}
+
+.inner-card {
+  background: style.$secondary-dark;
+}
+
+.default-card {
   background: style.$primary-dark;
 }
 
@@ -44,5 +56,5 @@ h3 {
 }
 
 .checkbox {
-  margin-left: 4px;
+  margin-right: 4px;
 }

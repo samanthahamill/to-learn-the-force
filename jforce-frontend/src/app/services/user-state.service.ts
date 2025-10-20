@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { createStore, select, withProps } from '@ngneat/elf';
-import { UserInputType } from '../shared/types';
+import { UserInputFormData } from '../shared/types';
 
 interface UserStoreState {
-  input: UserInputType | undefined;
+  input: UserInputFormData | undefined;
 }
 
 const store = createStore(
@@ -21,7 +21,7 @@ export class UserStateService {
 
   constructor() {}
 
-  updateInput(input: UserInputType) {
+  updateInput(input: UserInputFormData) {
     store.update((state) => ({ ...state, input: input }));
   }
 }

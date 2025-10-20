@@ -18,8 +18,8 @@
     <form *ngIf="formGroup" [formGroup]="formGroup" (ngSubmit)="onSubmit()">
       <!-- TODO add form group -->
       <div class="inputs">
-        <app-platform-card />
-        <app-tools-card />
+        <app-scenario-card [scenarioInfo]="getFormGroup('scenarioInfo')" />
+        <app-tools-card [tools]="getFormGroup('tools')" />
       </div>
 
       <div class="bottom-button">

@@ -1,0 +1,73 @@
+@use "../card.component.scss" as card;
+@use "../../panels/panel.scss";
+@use "styles" as style;
+@use "variables" as customVars;
+
+label {
+  white-space: nowrap;
+}
+
+.button {
+  border-width: 0px;
+  border-radius: 5px;
+  margin-left: 4px;
+  margin-bottom: 4px;
+  background-color: style.$success;
+
+  :hover {
+    background-color: green !important;
+  }
+}
+
+.container {
+  flex-direction: column;
+}
+
+.detailRow {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.details {
+  height: 250px;
+  text-align: start;
+  vertical-align: top;
+  overflow: auto;
+  max-height: 250px;
+  border-radius: 5px;
+  background-color: style.$primary-dark;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.input {
+  margin-left: 4px;
+  width: 100%;
+}
+
+.inner-card {
+  width: 100%;
+  background-color: style.$secondary-dark;
+  margin-top: 4px;
+}
+
+.readonly {
+  background-color: style.$disabled;
+  color: rgb(168, 168, 168);
+}
+
+.row {
+  display: flex;
+  width: 100%;
+  padding-top: 4px;
+}
+
+.title {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}

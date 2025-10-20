@@ -1,19 +1,14 @@
-import {
-  Component,
-  CUSTOM_ELEMENTS_SCHEMA,
-  inject,
-  Input,
-} from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, Input } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { faUpload } from '@fortawesome/free-solid-svg-icons';
 import {
-  NgbCalendar,
   NgbDatepickerModule,
   NgbDateStruct,
   NgbTimepickerModule,
 } from '@ng-bootstrap/ng-bootstrap';
-import { start } from 'repl';
 import { CardComponent } from '../../cards/card.component';
+import { NgClass, NgIf } from '@angular/common';
+import { ButtonModule } from 'primeng/button';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 
 @Component({
   selector: 'app-external-card',
@@ -23,6 +18,10 @@ import { CardComponent } from '../../cards/card.component';
     FormsModule,
     ReactiveFormsModule,
     CardComponent,
+    NgIf,
+    NgClass,
+    ButtonModule,
+    ButtonGroupModule,
   ],
   templateUrl: './external.component.html',
   styleUrl: './external.component.scss',
@@ -30,10 +29,18 @@ import { CardComponent } from '../../cards/card.component';
 })
 export class ExternalComponent {
   @Input() formGroup!: FormGroup;
-  importIcon = faUpload; // TODO change this icon to be something idfferent
+  importData: boolean;
 
   ogStartTime!: NgbDateStruct;
   ogEndTime!: NgbDateStruct;
 
-  constructor() {}
+  // TODO set up actual connections
+
+  constructor() {
+    this.importData = false;
+  }
+
+  toggleImportData() {
+    this.importData = !this.importData;
+  }
 }

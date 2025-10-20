@@ -1,4 +1,4 @@
-import { CommonModule, NgIf } from '@angular/common';
+import { CommonModule, NgClass, NgIf } from '@angular/common';
 import { Component, Input, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -10,7 +10,7 @@ import {
 
 @Component({
   selector: 'app-card',
-  imports: [CommonModule, NgIf],
+  imports: [CommonModule, NgIf, NgClass],
   templateUrl: './card.component.html',
   styleUrl: './card.component.scss',
   schemas: [NO_ERRORS_SCHEMA],
@@ -19,6 +19,8 @@ export class CardComponent {
   @Input() header: string = '';
   @Input() icon: IconDefinition | undefined = undefined;
   @Input() onIconClick: (() => void) | undefined = undefined;
+
+  @Input() innerCard: boolean = false;
 
   refreshIcon = faRotate;
   filterIcon = faFilter;

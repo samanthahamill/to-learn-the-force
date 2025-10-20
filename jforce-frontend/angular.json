@@ -33,6 +33,7 @@
               "node_modules/bootswatch/dist/darkly/bootstrap.min.css",
               "node_modules/primeicons/primeicons.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css",
+              "node_modules/@fortawesome/fontawesome-svg-core/styles.css" ,
               "src/styles/styles.scss",
               "node_modules/ol/ol.css"
             ],
@@ -106,6 +107,7 @@
               "node_modules/bootswatch/dist/darkly/bootstrap.min.css",
               "node_modules/primeicons/primeicons.css",
               "node_modules/@ng-select/ng-select/themes/default.theme.css",
+              "node_modules/@fortawesome/fontawesome-svg-core/styles.css" ,
               "src/styles/styles.scss",
               "node_modules/ol/ol.css"
             ],

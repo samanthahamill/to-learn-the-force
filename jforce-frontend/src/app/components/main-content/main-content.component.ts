@@ -3,15 +3,18 @@ import { InputPanelComponent } from '../panels/input-panel/input-panel.component
 import { MapComponent } from '../panels/map/map.component';
 import { CommonModule, NgIf } from '@angular/common';
 import {
+  FormArray,
   FormBuilder,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ToastService } from '../../services/toast.service';
 import { UserStateService } from '../../services/user-state.service';
 import { ExternalComponent } from '../panels/external/external.component';
+import { Platform, UserInputFormData, UserInputType } from '../../shared/types';
 
 @UntilDestroy()
 @Component({
@@ -38,7 +41,7 @@ export class MainContentComponent {
   constructor(private fb: FormBuilder) {
     this.userStateService.input$
       .pipe(untilDestroyed(this))
-      .subscribe((data) => {
+      .subscribe((data: UserInputFormData | undefined) => {
         if (data !== undefined) {
           this.updateInput(data);
         }
@@ -47,29 +50,49 @@ export class MainContentComponent {
 
   ngOnInit(): void {
     if (this.formGroup == null) {
-      this.updateInput({});
+      this.updateInput({} as UserInputFormData);
     }
   }
 
-  updateInput(input: any) {
+  updateInput(input: UserInputFormData) {
     if (input !== null) {
-      console.log('form initiated');
+      console.log('blank form initiated');
       this.formGroup = this.fb.group({
         input: this.fb.group({
-          platform: this.fb.group({
-            isPlaform: [input.platform ?? ''],
+          scenarioInfo: this.fb.group({
+            scenarioName: [
+              input.scenarioInfo?.scenarioName ?? 'Default Scenario',
+            ],
+            scenarioAuthor: [input.scenarioInfo?.scenarioAuthor ?? 'TBD'], // TODO eventually pull this from user profile and don't allow to be edited
+            dateOfCreation: [
+              input.scenarioInfo?.dateOfCreation ??
+                `${new Date().toLocaleString()} MST`, // TODO eventually don't hardcode this
+            ],
+            details: [input.scenarioInfo?.details ?? ''],
+            platforms: [
+              input.scenarioInfo?.platforms
+                ? this.fb.array([
+                    ...input.scenarioInfo.platforms.map((platform: Platform) =>
+                      this.fb.control(platform, Validators.required),
+                    ),
+                  ])
+                : this.fb.array([]),
+            ],
           }),
           tools: this.fb.group({
             isTool: [input.tool ?? ''],
           }),
         }),
         external: this.fb.group({
-          startTime: [input.external?.startTime ?? new Date()],
-          endTime: [input.external?.endTime ?? new Date()],
-          type1: [input.external?.type1 ?? false],
-          type2: [input.external?.type2 ?? false],
-          type3: [input.external?.type3 ?? false],
-          type4: [input.external?.type4 ?? false],
+          import: this.fb.group({
+            startTime: [input.external?.import?.startTime ?? new Date()],
+            endTime: [input.external?.import?.endTime ?? new Date()],
+            type1: [input.external?.import?.type1 ?? false],
+            type2: [input.external?.import?.type2 ?? false],
+            type3: [input.external?.import?.type3 ?? false],
+            type4: [input.external?.import?.type4 ?? false],
+          }),
+          upload: this.fb.group({}),
         }),
       });
     }

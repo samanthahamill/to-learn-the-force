@@ -1,4 +1,4 @@
-<div class="panel">
+<div [ngClass]="['card', innerCard ? 'inner-card' : 'default-card']">
   <span class="card-title">
     <h3>
       {{ header }}

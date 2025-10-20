@@ -4,29 +4,48 @@
       <h1>External Input</h1>
 
       <div class="right-buttons">
-        <button class="btn" disabled>
-          <fa-icon [icon]="importIcon"></fa-icon>
-          Import
-        </button>
+        <p-buttongroup>
+          <button
+            pButton
+            pRipple
+            type="button"
+            severity="primary"
+            label="Upload Data"
+            (click)="toggleImportData()"
+            variant="outlined"
+            [ngClass]="{ selected: !importData }"
+          ></button>
+          <button
+            pButton
+            pRipple
+            type="button"
+            severity="primary"
+            label="Input Data"
+            (click)="toggleImportData()"
+            variant="outlined"
+            [ngClass]="{ selected: importData }"
+          ></button>
+        </p-buttongroup>
       </div>
     </div>
 
     <form class="formGroup" [formGroup]="formGroup">
       <div class="container">
-        <div class="row">
-          <app-card header="Original Input">
+        <div *ngIf="importData; else uploadData" class="row">
+          <app-card header="Import Original Input">
             <div class="container">
               <div class="row">
                 <div class="col">
-                  <label name="ogStartTime" for="ogStartTime"
-                    >Original Start Time</label
-                  >
+                  <label name="ogStartTime" for="ogStartTime">
+                    Original Start Time
+                  </label>
                   <div class="input-group">
                     <input
                       class="form-control button-background"
                       placeholder="yyyy-mm-dd"
                       name="ogStartTime"
                       [(ngModel)]="ogStartTime"
+                      [ngModelOptions]="{ standalone: true }"
                       ngbDatepicker
                       #s="ngbDatepicker"
                     />
@@ -37,15 +56,16 @@
                     ></button>
                   </div>
 
-                  <label name="ogEndTime" for="ogEndTime"
-                    >Original End Time</label
-                  >
+                  <label name="ogEndTime" for="ogEndTime">
+                    Original End Time
+                  </label>
                   <div class="input-group">
                     <input
                       class="form-control button-background"
                       placeholder="yyyy-mm-dd"
                       name="ogEndTime"
                       [(ngModel)]="ogEndTime"
+                      [ngModelOptions]="{ standalone: true }"
                       ngbDatepicker
                       #e="ngbDatepicker"
                     />
@@ -108,11 +128,17 @@
           </app-card>
         </div>
 
+        <ng-template #uploadData>
+          <div class="row">
+            <app-card header="Upload Original Input">
+              <label for="uploadFromFile">Upload From CSV</label>
+              <input class="form-control" type="file" id="uploadFromFile" />
+            </app-card>
+          </div>
+        </ng-template>
+
         <div class="row">
           <app-card header="Modified Input">
-            <!-- <tooltip
-              title="All times will be modified based on the difference between 'Original Start Time' and 'New Start Time'"
-            > -->
             <div class="labelAndTooltip">
               <label name="ogStartTime" for="ogStartTime">New Start Time</label>
               <i
@@ -120,13 +146,13 @@
                 title="All times will be modified based on the difference between 'Original Start Time' and 'New Start Time'"
               ></i>
             </div>
-            <!-- </tooltip> -->
             <div class="input-group">
               <input
                 class="form-control button-background"
                 placeholder="yyyy-mm-dd"
                 name="ogStartTime"
                 [(ngModel)]="ogStartTime"
+                [ngModelOptions]="{ standalone: true }"
                 ngbDatepicker
                 #s="ngbDatepicker"
               />

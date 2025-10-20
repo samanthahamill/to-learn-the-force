@@ -31,6 +31,8 @@ $primary-dark: $dark;
 $secondary-dark: $secondary;
 $background-dark: #161616;
 
+$disabled: #303030;
+
 @import "../../node_modules/bootstrap/scss/bootstrap";
 
 :root {
@@ -59,7 +61,7 @@ h5,
 h6 {
   font-family: customVars.$font-family-monospace;
   font-variant: small-caps;
-  font-size: customVars.$font-size-base;
+  font-size: customVars.$font-size-headers;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -105,4 +107,4 @@ input {
 }
 
 /* Importing Bootstrap SCSS file. */
-@import 'bootstrap/scss/bootstrap';
+@import "bootstrap/scss/bootstrap";
