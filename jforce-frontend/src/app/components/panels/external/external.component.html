@@ -42,42 +42,12 @@
                 <label name="ogStartTime" for="ogStartTime">
                   Original Start Time
                 </label>
-                <div class="input-group">
-                  <input
-                    class="form-control button-background"
-                    placeholder="yyyy-mm-dd"
-                    name="ogStartTime"
-                    [(ngModel)]="ogStartTime"
-                    [ngModelOptions]="{ standalone: true }"
-                    ngbDatepicker
-                    #s="ngbDatepicker"
-                  />
-                  <button
-                    class="btn btn-outline-tertiary bi bi-calendar3 button-background icon"
-                    (click)="s.toggle()"
-                    type="button"
-                  ></button>
-                </div>
+                <input type="datetime-local" formControlName="ogStartTime" />
 
                 <label name="ogEndTime" for="ogEndTime">
                   Original End Time
                 </label>
-                <div class="input-group">
-                  <input
-                    class="form-control button-background"
-                    placeholder="yyyy-mm-dd"
-                    name="ogEndTime"
-                    [(ngModel)]="ogEndTime"
-                    [ngModelOptions]="{ standalone: true }"
-                    ngbDatepicker
-                    #e="ngbDatepicker"
-                  />
-                  <button
-                    class="btn btn-outline-tertiary bi bi-calendar3 button-background icon"
-                    (click)="e.toggle()"
-                    type="button"
-                  ></button>
-                </div>
+                <input type="datetime-local" formControlName="ogEndTime" />
               </div>
 
               <div class="col">
@@ -147,22 +117,8 @@
               title="All times will be modified based on the difference between 'Original Start Time' and 'New Start Time'"
             ></i>
           </div>
-          <div class="input-group">
-            <input
-              class="form-control button-background"
-              placeholder="yyyy-mm-dd"
-              name="ogStartTime"
-              [(ngModel)]="ogStartTime"
-              [ngModelOptions]="{ standalone: true }"
-              ngbDatepicker
-              #s="ngbDatepicker"
-            />
-            <button
-              class="btn btn-outline-tertiary bi bi-calendar3 button-background icon"
-              (click)="s.toggle()"
-              type="button"
-            ></button>
-          </div>
+
+          <input type="datetime-local" formControlName="newStartTime" />
         </app-card>
       </div>
     </form>

@@ -69,24 +69,24 @@ export class MainContentComponent {
                 `${new Date().toLocaleString()} MST`, // TODO eventually don't hardcode this
             ],
             details: [input.scenarioInfo?.details ?? ''],
-            platforms: [
-              input.scenarioInfo?.platforms
-                ? this.fb.array([
-                    ...input.scenarioInfo.platforms.map((platform: Platform) =>
-                      this.fb.control(platform, Validators.required),
-                    ),
-                  ])
-                : this.fb.array([]),
-            ],
+            platforms: input.scenarioInfo?.platforms
+              ? this.fb.array([
+                  ...input.scenarioInfo.platforms.map((platform: Platform) =>
+                    this.fb.control(platform, Validators.required),
+                  ),
+                ])
+              : this.fb.array([]),
           }),
           tools: this.fb.group({
             isTool: [input.tool ?? ''],
           }),
         }),
         external: this.fb.group({
+          dataType: [input.external?.dataType ?? 'IMPORT'],
+          newStartTime: [input.external?.newStartTime ?? new Date()],
           import: this.fb.group({
-            startTime: [input.external?.import?.startTime ?? new Date()],
-            endTime: [input.external?.import?.endTime ?? new Date()],
+            ogStartTime: [input.external?.import?.ogStartTime ?? new Date()],
+            ogEndTime: [input.external?.import?.ogEndTime ?? new Date()],
             type1: [input.external?.import?.type1 ?? false],
             type2: [input.external?.import?.type2 ?? false],
             type3: [input.external?.import?.type3 ?? false],

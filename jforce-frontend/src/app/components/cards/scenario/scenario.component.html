@@ -51,22 +51,20 @@
       </div>
     </app-card>
     <app-card header="Platforms ({{ platformCount }})" [innerCard]="true">
-      <div class="container">
-        <div class="row">
-          <div formArrayName="platforms">
-            <div *ngFor="let platform of platforms.controls; let i = index">
-              <label for="platform-{{ i }}">Platform {{ i + 1 }}:</label>
-              <input
-                id="platform-{{ i }}"
-                type="platform"
-                [formControlName]="i"
-              />
-              <button type="button" (click)="removePlatform(i)">Remove</button>
-              <!--  add collapse button -->
-              <!-- add gear button -->
-              <!-- make draggable list -->
-            </div>
-          </div>
+      <div formArrayName="platforms">
+        <div *ngFor="let platform of platforms.value; let i = index">
+          <app-card
+            [lighterCard]="true"
+            header="{{ platform.name }}"
+            [icon]="removeIcon"
+          >
+            <label for="speed-{{ i }}">Speed:</label>
+            <input id="speed-{{ i }}" type="text" [formControlName]="i" />
+            <button type="button" (click)="removePlatform(i)">Remove</button>
+            <!--  add collapse button -->
+            <!-- add gear button -->
+            <!-- make draggable list -->
+          </app-card>
         </div>
       </div>
       <button class="btn button" (click)="addPlatform()">

@@ -29,8 +29,8 @@ export interface UserInputFormData {
     dataType: EXTERNAL_DATA_TYPE;
     newStartTime: Date; // the time to modify the original start time to
     import: {
-      startTime: Date;
-      endTime: Date;
+      ogStartTime: Date;
+      ogEndTime: Date;
       type1: boolean;
       type2: boolean;
       type3: boolean;

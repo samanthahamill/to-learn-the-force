@@ -33,6 +33,7 @@ export class ExternalComponent {
 
   ogStartTime!: NgbDateStruct;
   ogEndTime!: NgbDateStruct;
+  newStartTime!: NgbDateStruct;
 
   // TODO set up actual connections
 

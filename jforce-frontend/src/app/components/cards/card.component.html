@@ -1,4 +1,11 @@
-<div [ngClass]="['card', innerCard ? 'inner-card' : 'default-card']">
+<div
+  [ngClass]="{
+    card: true,
+    'inner-card': innerCard,
+    'lighter-card': lighterCard,
+    'default-card': !innerCard && !lighterCard,
+  }"
+>
   <span class="card-title">
     <h3>
       {{ header }}

@@ -21,6 +21,7 @@ export class CardComponent {
   @Input() onIconClick: (() => void) | undefined = undefined;
 
   @Input() innerCard: boolean = false;
+  @Input() lighterCard: boolean = false;
 
   refreshIcon = faRotate;
   filterIcon = faFilter;

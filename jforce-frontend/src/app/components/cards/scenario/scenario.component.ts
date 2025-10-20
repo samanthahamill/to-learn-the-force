@@ -7,7 +7,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { faAdd } from '@fortawesome/free-solid-svg-icons';
+import { faAdd, faRemove } from '@fortawesome/free-solid-svg-icons';
 import { ButtonModule } from 'primeng/button';
 import { Platform } from '../../../shared/types';
 import { CardComponent } from '../card.component';
@@ -28,6 +28,7 @@ import { CardComponent } from '../card.component';
 export class ScenarioComponent {
   @Input() scenarioInfo!: FormGroup;
   addIcon = faAdd;
+  removeIcon = faRemove;
 
   constructor(private fb: FormBuilder) {}
 
@@ -44,9 +45,14 @@ export class ScenarioComponent {
     let foundName = false;
     let newName = `Platform ${newIndex}`;
 
+    if ((this.platforms?.value as Array<Platform>) === undefined) {
+      return newName;
+    }
+
     while (!foundName) {
+      newName = `Platform ${newIndex}`;
       if (
-        !(this.platforms.value.value as Array<Platform>)
+        !(this.platforms?.value as Array<Platform>)
           .map((platform) => platform.name)
           .includes(newName)
       ) {
@@ -72,6 +78,7 @@ export class ScenarioComponent {
   }
 
   removePlatform(index: number) {
+    this.platforms.removeAt(index);
     // TODO implement
   }
 }
