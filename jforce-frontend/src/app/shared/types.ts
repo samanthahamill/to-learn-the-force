@@ -11,6 +11,11 @@ export interface UserInputFormData {
     isTool: boolean;
   };
   external: {
-    name: string;
+    startTime: Date;
+    endTime: Date;
+    type1: boolean;
+    type2: boolean;
+    type3: boolean;
+    type4: boolean;
   };
 }

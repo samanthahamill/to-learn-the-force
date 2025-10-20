@@ -27,8 +27,9 @@ const projection = 'EPSG:4326';
 })
 export class MapComponent implements OnInit {
   map: Map | undefined;
-
   olMapView: View;
+
+  private aoiLayer: VectorLayer<any>;
   private drawingSource = new VectorSource();
   private drawingLayer!: VectorLayer<VectorSource>;
   private selectionBar!: Bar;
@@ -41,6 +42,8 @@ export class MapComponent implements OnInit {
         stroke: new Styled.Stroke({ color: 'rgb(255, 0, 235' }),
       }),
     });
+
+    this.aoiLayer = new VectorLayer({ source: new VectorSource() });
 
     this.olMapView = new View({
       projection: projection,
@@ -65,6 +68,7 @@ export class MapComponent implements OnInit {
       ]),
       layers: [
         this.drawingLayer,
+        this.aoiLayer,
         new TileLayer({
           source: new OSM(),
         }),
@@ -77,7 +81,7 @@ export class MapComponent implements OnInit {
 
   initButtonBar() {
     const btnBar = new Bar();
-    btnBar.setPosition('top');
+    btnBar.setPosition('left');
 
     this.selectionBar = new Bar({
       className: 'ol-feature-select-bar',
@@ -94,6 +98,11 @@ export class MapComponent implements OnInit {
     //     source: this.trackHeadOnlyLayer.getSource() ?? undefined,
     //   }),
     // );
+    // btnBar.addControl(
+    //   new DrawAoiControl({
+    //     source: this.trackHeadOnlyLayer.getSource() ?? undefined,
+    //   }),
+    // );
 
     const featureToggleSelection = new Toggle({
       className: 'ol-selection-bar-toggle',
@@ -104,7 +113,7 @@ export class MapComponent implements OnInit {
     btnBar.addControl(featureToggleSelection);
 
     // TODO add back in
-    // this.map?.addControl(btnBar);
+    this.map?.addControl(btnBar);
   }
 
   createStringYX(fractionDigits: number) {

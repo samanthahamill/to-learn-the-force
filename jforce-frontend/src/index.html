@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-bs-theme="dark">
   <head>
     <meta charset="utf-8" />
@@ -15,6 +15,10 @@
       rel="stylesheet"
       integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr"
       crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
     />
     <link href="https://unpkg.com/primeicons/primeicons.css" rel="stylesheet" />
     <link
@@ -40,5 +44,16 @@
       integrity="sha384-7qAoOXltbVP82dhxHAUje59V5r2YsVfBafyUDxEdApLPmcdhBPg1DKg1ERo0BZlK"
       crossorigin="anonymous"
     ></script>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script>
+      const button = document.querySelector("#button");
+      const tooltip = document.querySelector("#tooltip");
+
+      // Pass the button, the tooltip, and some options, and Popper will do the
+      // magic positioning for you:
+      Popper.createPopper(button, tooltip, {
+        placement: "right",
+      });
+    </script>
   </body>
 </html>

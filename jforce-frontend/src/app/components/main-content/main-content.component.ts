@@ -64,7 +64,12 @@ export class MainContentComponent {
           }),
         }),
         external: this.fb.group({
-          name: [input.external?.name ?? ''],
+          startTime: [input.external?.startTime ?? new Date()],
+          endTime: [input.external?.endTime ?? new Date()],
+          type1: [input.external?.type1 ?? false],
+          type2: [input.external?.type2 ?? false],
+          type3: [input.external?.type3 ?? false],
+          type4: [input.external?.type4 ?? false],
         }),
       });
     }

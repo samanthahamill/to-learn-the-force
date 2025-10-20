@@ -1,8 +1,52 @@
 @use "styles" as style;
 @use "../panel.scss";
+@use "../../cards/card.component.scss" as card;
+
+h1 {
+  border-bottom-width: 1px;
+  border-color: style.$light;
+  width: 100%;
+}
+
+.button-background {
+  background-color: style.$secondary-dark;
+  border-color: style.$light;
+  padding: 2px;
+  margin-bottom: 0px;
+  padding-left: 4px;
+}
+
+.icon {
+  padding-right: 4px;
+  padding-left: 4px;
+}
+
+.info {
+  padding-left: 4px;
+}
+
+.checkbox {
+  margin-right: 4px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.downwards {
+  flex-direction: column;
+  display: flex;
+}
 
 .external-panel {
   height: calc(50vh - (4px * 2));
   margin-left: style.$panel-margin;
   width: calc(100% - 4px);
+}
+
+.row-1 {
+  display: flex;
+  padding-left: 4px;
+  align-content: center;
 }
