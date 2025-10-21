@@ -1,7 +1,7 @@
 {
   "name": "jforce-frontend",
   "version": "0.0.1",
-  "homepage": "/dtcwc",
+  "homepage": "/jforce",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -11,7 +11,6 @@
     "test:pipeline": "jest --collectCoverage --coverageDirectory=**/TESTS",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "serve:ssr:UnclassDTCWCUI": "node dist/unclass-dtcwc-ui/server/server.mjs",
     "lint": "ng lint"
   },
   "private": true,
@@ -33,7 +32,7 @@
     "@fortawesome/fontawesome-svg-core": "7.1.0",
     "@fortawesome/free-solid-svg-icons": "6.7.2",
     "@microsoft/fetch-event-source": "2.0.1",
-    "@ng-bootstrap/ng-bootstrap": "^18.0.0",
+    "@ng-bootstrap/ng-bootstrap": "18.0.0",
     "@ng-select/ng-select": "14.7.0",
     "@ngneat/elf": "2.5.1",
     "@ngneat/until-destroy": "10.0.0",
@@ -43,7 +42,7 @@
     "ag-grid-angular": "33.2.1",
     "ag-grid-community": "33.2.1",
     "bootstrap": "5.3.7",
-    "bootstrap-icons": "^1.13.1",
+    "bootstrap-icons": "1.13.1",
     "bootswatch": "5.3.7",
     "express": "4.21.2",
     "ngx-bootstrap": "19.0.2",

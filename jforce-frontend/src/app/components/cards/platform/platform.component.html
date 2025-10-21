@@ -1,0 +1,12 @@
+<app-card header="{{ name }}" [lighterCard]="true" [icons]="icons">
+  <form class="formGroup" [formGroup]="platformForm">
+    <div class="container">
+      <div class="row row-col-3">
+        <div class="col">
+          <label for="speed">Speed:</label>
+          <input id="speed" type="text" formControlName="speed" />
+        </div>
+      </div>
+    </div>
+  </form>
+</app-card>

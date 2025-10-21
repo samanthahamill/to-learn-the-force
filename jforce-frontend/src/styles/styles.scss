@@ -7,14 +7,16 @@
 // colors extracted from bootswatch.com/darkly
 $primary: #375a7f;
 $secondary: #363636;
-$success: #00bc6e;
+$success: #00ac4d;
 $info: #3498db;
 $warning: #f39c12;
-$danger: #e74c3c;
+$danger: #f34e3b;
 $light: #adb5bd;
 $dark: #242424;
 
 $medium-grey: #575757;
+$success-hover: #00c95a;
+$danger-hover: #ff6958;
 
 $theme-colors: (
   "primary": $primary,
@@ -62,6 +64,7 @@ h6 {
   font-family: customVars.$font-family-monospace;
   font-variant: small-caps;
   font-size: customVars.$font-size-headers;
+  line-height: customVars.$line-height-headers;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -104,6 +107,16 @@ input {
   background-color: $background-dark !important;
   max-width: 300px !important;
   padding: 8px 12px;
+}
+
+input {
+  margin-left: 4px;
+  width: 100%;
+  border-radius: 5px;
+}
+
+label {
+  white-space: nowrap;
 }
 
 /* Importing Bootstrap SCSS file. */

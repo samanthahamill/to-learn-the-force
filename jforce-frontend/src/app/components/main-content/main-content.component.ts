@@ -72,10 +72,16 @@ export class MainContentComponent {
             platforms: input.scenarioInfo?.platforms
               ? this.fb.array([
                   ...input.scenarioInfo.platforms.map((platform: Platform) =>
-                    this.fb.control(platform, Validators.required),
+                    this.fb.group(platform),
                   ),
                 ])
-              : this.fb.array([]),
+              : this.fb.array([
+                  this.fb.group({
+                    name: ['test'],
+                    id: ['test'],
+                    speed: [undefined],
+                  }),
+                ]),
           }),
           tools: this.fb.group({
             isTool: [input.tool ?? ''],

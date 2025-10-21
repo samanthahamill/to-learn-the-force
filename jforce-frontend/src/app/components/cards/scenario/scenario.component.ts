@@ -1,16 +1,19 @@
 import { Component, Input, NO_ERRORS_SCHEMA } from '@angular/core';
 import {
+  AbstractControl,
   FormArray,
   FormBuilder,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { faAdd, faRemove } from '@fortawesome/free-solid-svg-icons';
+import { CommonModule, NgFor, NgIf } from '@angular/common';
+import { faAdd, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { ButtonModule } from 'primeng/button';
 import { Platform } from '../../../shared/types';
-import { CardComponent } from '../card.component';
+import { CardComponent, ICON_FUNCTION } from '../card.component';
+import { PlatformComponent } from '../platform/platform.component';
 
 @Component({
   selector: 'app-scenario-card',
@@ -20,6 +23,9 @@ import { CardComponent } from '../card.component';
     ReactiveFormsModule,
     ButtonModule,
     CardComponent,
+    PlatformComponent,
+    NgIf,
+    NgFor,
   ],
   templateUrl: './scenario.component.html',
   styleUrl: './scenario.component.scss',
@@ -28,16 +34,32 @@ import { CardComponent } from '../card.component';
 export class ScenarioComponent {
   @Input() scenarioInfo!: FormGroup;
   addIcon = faAdd;
-  removeIcon = faRemove;
+  trashIcon = faTrash;
 
-  constructor(private fb: FormBuilder) {}
+  icons: Array<ICON_FUNCTION>;
+
+  constructor(private fb: FormBuilder) {
+    this.icons = [
+      {
+        icon: this.trashIcon,
+        type: 'DELETE',
+        tooltip: 'Delete All Platforms',
+        onClick: () => this.removeAllPlatforms,
+      },
+    ];
+  }
 
   get platforms(): FormArray {
     return this.scenarioInfo.get('platforms') as FormArray;
   }
 
   get platformCount(): number {
-    return (this.scenarioInfo.get('platforms') as FormArray)?.value?.size ?? 0;
+    return (this.platforms?.value as Array<Platform>).length ?? 0;
+  }
+
+  // In your component class
+  get formGroups(): FormGroup[] {
+    return (this.platforms?.controls as FormGroup[]) ?? [];
   }
 
   private getNewPlatformName() {
@@ -70,15 +92,19 @@ export class ScenarioComponent {
 
     // TODO implement
     this.platforms.push(
-      this.fb.control({
-        name: name,
-        id: name, // TODO make better id
-      } as Platform),
+      this.fb.group({
+        name: [name, [Validators.required]],
+        id: [name, [Validators.required]], // TODO make better id,
+        speed: ['', [Validators.required]],
+      }),
     );
+  }
+
+  removeAllPlatforms() {
+    this.platforms.clear();
   }
 
   removePlatform(index: number) {
     this.platforms.removeAt(index);
-    // TODO implement
   }
 }

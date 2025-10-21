@@ -10,13 +10,13 @@ label {
 .button {
   border-width: 0px;
   border-radius: 5px;
-  margin-left: 4px;
-  margin-bottom: 4px;
+  margin: 4px;
+  margin: 4px;
   background-color: style.$success;
+}
 
-  :hover {
-    background-color: green !important;
-  }
+.button:hover {
+  background-color: style.$success-hover;
 }
 
 .container {
@@ -44,14 +44,7 @@ label {
   flex-direction: column;
 }
 
-.input {
-  margin-left: 4px;
-  width: 100%;
-}
-
-.inner-card {
-  width: 100%;
-  background-color: style.$secondary-dark;
+.platforms {
   margin-top: 4px;
 }
 

@@ -11,11 +11,17 @@
       {{ header }}
     </h3>
 
-    <span *ngIf="icon !== undefined">
+    <span *ngFor="let icon of icons; let i = index">
       <fa-icon
-        [icon]="getIconDefinition()"
-        class="icon-button"
-        (click)="handleIconClicked()"
+        id="i"
+        index="i"
+        [icon]="icon.icon"
+        [ngClass]="{
+          'icon-button': true,
+          'red-icon': icon.type === 'DELETE',
+          'green-icon': icon.type === 'CONFIRM',
+        }"
+        (click)="icon.onClick()"
       ></fa-icon>
     </span>
   </span>

@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "UnclassDTCWCUI": {
+    "JForce": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser-esbuild",
           "options": {
-            "outputPath": "dist/unclass-dtcwc-ui",
+            "outputPath": "dist/jforce",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -79,10 +79,10 @@
           },
           "configurations": {
             "production": {
-              "buildTarget": "UnclassDTCWCUI:build:production"
+              "buildTarget": "JForce:build:production"
             },
             "development": {
-              "buildTarget": "UnclassDTCWCUI:build:development"
+              "buildTarget": "JForce:build:development"
             }
           },
           "defaultConfiguration": "development"

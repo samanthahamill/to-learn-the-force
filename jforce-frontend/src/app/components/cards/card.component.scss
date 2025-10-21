@@ -1,7 +1,7 @@
 @use "styles" as style;
 @use "variables" as customVars;
 
-$card-header-height: 15px;
+$card-header-height: 20px;
 $card-header-margin: 4px;
 
 h3 {
@@ -13,17 +13,6 @@ h3 {
   align-items: center;
 }
 
-.icon-button {
-  display: inline-block;
-  font-weight: bold;
-  align-items: center;
-  padding: 0px;
-  margin: 2px;
-  border: none;
-  background: none;
-  cursor: pointer;
-}
-
 .card {
   padding: customVars.$card-padding;
   border-width: 1px;
@@ -31,18 +20,6 @@ h3 {
   margin-bottom: 4px;
   border-style: solid;
   border-color: style.$light;
-}
-
-.inner-card {
-  background: style.$secondary-dark;
-}
-
-.lighter-card {
-  background: style.$medium-grey;
-}
-
-.default-card {
-  background: style.$primary-dark;
 }
 
 .card-title {
@@ -61,4 +38,58 @@ h3 {
 
 .checkbox {
   margin-right: 4px;
+}
+
+.default-card {
+  background: style.$primary-dark;
+}
+
+.delete {
+  background-color: style.$danger;
+  border-radius: 8px;
+  border-color: style.$danger;
+  padding: 2px;
+  font-size: 1rem;
+}
+
+.delete:hover {
+  background-color: style.$danger-hover;
+}
+
+.icon-button {
+  display: inline-block;
+  font-weight: bold;
+  align-items: center;
+  padding: 0px;
+  margin: 2px;
+  border: none;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  border-radius: 30px;
+}
+
+.inner-card {
+  background: style.$secondary-dark;
+  border-color: grey;
+}
+
+.lighter-card {
+  background: style.$medium-grey;
+}
+
+.green-icon {
+  color: style.$success;
+}
+
+.green-icon:hover {
+  color: style.$success-hover;
+}
+
+.red-icon {
+  color: style.$danger; // TODO fix me
+}
+
+.red-icon:hover {
+  color: style.$danger-hover;
 }

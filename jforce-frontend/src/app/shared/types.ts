@@ -12,6 +12,9 @@ export interface Emitters {
 export interface Platform {
   name: string;
   id: string;
+  readonly: boolean;
+  speed: number;
+  depth: number;
 }
 
 export interface UserInputFormData {
