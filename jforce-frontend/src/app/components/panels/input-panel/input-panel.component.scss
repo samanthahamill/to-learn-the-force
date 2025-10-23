@@ -1,0 +1,27 @@
+@use "styles" as style;
+@use "variables" as customVars;
+@use "../panel.scss";
+
+form {
+  height: 100%;
+}
+
+.bottom-button {
+  bottom: 0px;
+}
+
+.inputs {
+  height: calc(100% - 40px);
+  overflow: auto;
+}
+
+.panel-dimensions {
+  height: calc(100% - 4px);
+}
+
+.submit {
+  width: 150px;
+  border-radius: 5px;
+  bottom: 4px;
+  height: 30px;
+}

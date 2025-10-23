@@ -1,0 +1,29 @@
+<div
+  [ngClass]="{
+    card: true,
+    'inner-card': innerCard,
+    'lighter-card': lighterCard,
+    'default-card': !innerCard && !lighterCard,
+  }"
+>
+  <span class="card-title">
+    <h3>
+      {{ header }}
+    </h3>
+
+    <span *ngFor="let icon of icons; let i = index">
+      <fa-icon
+        id="i"
+        index="i"
+        [icon]="icon.icon"
+        [ngClass]="{
+          'icon-button': true,
+          'red-icon': icon.type === 'DELETE',
+          'green-icon': icon.type === 'CONFIRM',
+        }"
+        (click)="icon.onClick()"
+      ></fa-icon>
+    </span>
+  </span>
+  <ng-content></ng-content>
+</div>

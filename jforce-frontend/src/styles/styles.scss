@@ -7,14 +7,16 @@
 // colors extracted from bootswatch.com/darkly
 $primary: #375a7f;
 $secondary: #363636;
-$success: #00bc6e;
+$success: #00ac4d;
 $info: #3498db;
 $warning: #f39c12;
-$danger: #e74c3c;
+$danger: #f34e3b;
 $light: #adb5bd;
 $dark: #242424;
 
 $medium-grey: #575757;
+$success-hover: #00c95a;
+$danger-hover: #ff6958;
 
 $theme-colors: (
   "primary": $primary,
@@ -31,10 +33,14 @@ $primary-dark: $dark;
 $secondary-dark: $secondary;
 $background-dark: #161616;
 
+$disabled: #303030;
+
 @import "../../node_modules/bootstrap/scss/bootstrap";
 
 :root {
   font-size: customVars.$font-size-base;
+  --bs-gutter-x: 0rem;
+  --bs-gutter-y: 0rem;
 }
 
 html,
@@ -57,7 +63,8 @@ h5,
 h6 {
   font-family: customVars.$font-family-monospace;
   font-variant: small-caps;
-  font-size: customVars.$font-size-base;
+  font-size: customVars.$font-size-headers;
+  line-height: customVars.$line-height-headers;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -67,20 +74,28 @@ h1 {
   font-size: customVars.$font-size-big;
 }
 
-$left-right-panel-margin: 4px;
-$left-right-panel-padding: 2px;
-$left-content-panel-height: 850px;
-
-$left-panel-width: 300px;
-$right-panel-width: calc((100vw - $left-panel-width) - ($left-right-panel-padding * 6));
 $classification-banner-height: 20px;
 $app-bar-height: 40px;
-$content-panel-height: calc(100vh - $app-bar-height - $classification-banner-height - $classification-banner-height);
+$content-panel-height: calc(
+  100vh - $app-bar-height - $classification-banner-height -
+    $classification-banner-height
+);
+$panel-margin: 4px;
+$panel-padding: 2px;
+
+$panel-width: calc(50vw - ($panel-margin * 4));
+$panel-height: calc(
+  100vh - ($panel-margin * 2) - ($classification-banner-height * 2)
+);
 
 body {
   scrollbar-width: thin;
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+input {
+  margin-left: 4px;
 }
 
 .ag-center-cols-viewport {
@@ -94,26 +109,19 @@ body {
   padding: 8px 12px;
 }
 
-.left-panel-dimensions {
-  height: $left-content-panel-height;
-  min-height: $left-content-panel-height;
-  width: $left-panel-width !important;
-  min-width: $left-panel-width !important;
-  max-width: $left-panel-width !important;
-  margin-right: $left-right-panel-margin;
-
-  display: flex;
-  flex-direction: column;
+input {
+  margin-left: 4px;
+  width: 100%;
+  border-radius: 5px;
 }
 
-// styling to apply to an entire page, such as SystemControl or Reports
-.page-content-dimensions {
-  display: flex;
-  width: 100vw;
-  flex-direction: row;
-  min-width: 0px;
-  padding: 4px;
-  overflow-x: hidden;
-  overflow-y: auto;
-  height: 100%;
+label {
+  white-space: nowrap;
 }
+
+.checkbox {
+  width: 13px;
+}
+
+/* Importing Bootstrap SCSS file. */
+@import "bootstrap/scss/bootstrap";

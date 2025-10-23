@@ -1,0 +1,75 @@
+<app-card header="Scenario Info">
+  <form class="formGroup" [formGroup]="scenarioInfo">
+    <app-card header="Info" [innerCard]="true">
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            <label for="scenarioName">Scenario Name:</label>
+            <input
+              id="scenarioName"
+              type="text"
+              class="input"
+              formControlName="scenarioName"
+            />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <label for="scenarioAuthor">Author:</label>
+            <input
+              id="scenarioAuthor"
+              type="text"
+              class="input"
+              formControlName="scenarioAuthor"
+            />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <label for="dateOfCreation">Date of Creation:</label>
+            <input
+              id="dateOfCreation"
+              type="text"
+              formControlName="dateOfCreation"
+              class="readonly input"
+              readonly
+            />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col detailRow">
+            <label for="details">Details:</label>
+            <textarea
+              id="details"
+              type="text"
+              formControlName="details"
+              class="details input"
+              placeholder="Add any details about this scenario that might be worth while to record"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </app-card>
+    <app-card
+      header="Platforms ({{ platformCount }})"
+      [innerCard]="true"
+      [icons]="icons"
+    >
+      <div *ngFor="let platformForm of formGroups; let i = index">
+        <div *ngIf="platformForm != undefined">
+          <app-platform
+            id="i"
+            [index]="i"
+            [platformForm]="platformForm"
+            (onDeleteClicked)="removePlatform(i)"
+            [redIcon]="true"
+          />
+        </div>
+      </div>
+      <button class="btn button" (click)="addPlatform()">
+        <fa-icon [icon]="addIcon"></fa-icon>
+        Add Platform
+      </button>
+    </app-card>
+  </form>
+</app-card>

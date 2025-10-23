@@ -1,0 +1,6 @@
+@use "styles" as style;
+
+p-toast {
+  position: fixed;
+  z-index: 100;
+}

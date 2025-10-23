@@ -1,0 +1,113 @@
+@use "styles" as style;
+@use "../panel.scss";
+@use "../../cards/card.component.scss" as card;
+
+h1 {
+  border-bottom-width: 1px;
+  border-color: style.$light;
+  width: 100%;
+}
+
+.col {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.form-control {
+  background-color: style.$secondary-dark;
+}
+
+::ng-deep .p-buttongroup .p-button:first-of-type:not(:only-of-type) {
+  border-right: 2px solid;
+  border-color: style.$secondary-dark;
+}
+
+.button-background {
+  background-color: style.$secondary-dark;
+  border-color: style.$light;
+  padding: 2px;
+  margin-bottom: 0px;
+  padding-left: 4px;
+}
+
+.icon {
+  padding-right: 4px;
+  padding-left: 4px;
+}
+
+.info {
+  padding-left: 4px;
+}
+
+.checkbox {
+  margin-right: 4px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.downwards {
+  flex-direction: column;
+  display: flex;
+}
+
+.external-panel {
+  height: calc(50vh - (4px * 2));
+  margin-left: style.$panel-margin;
+  width: calc(100% - 4px);
+}
+
+.p-button {
+  padding: 2px;
+  background-color: style.$primary-dark;
+  border-color: style.$secondary-dark;
+  border-width: 2px;
+  border-radius: 5px;
+  color: white;
+  width: 78px;
+}
+
+.p-button:not(:disabled):hover {
+  background-color: style.$secondary-dark;
+  color: white;
+  border-width: 2px;
+  border-color: style.$light;
+}
+
+.primary {
+  background-color: transparent;
+  color: white;
+}
+
+.right-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.right-info-portion {
+  min-height: 30px;
+  height: 30px;
+  max-height: 30px;
+  width: 100%;
+  white-space: nowrap;
+  padding-left: 4px;
+  z-index: 10;
+  font-size: 12px;
+  top: 0px;
+
+  display: flex;
+  justify-content: space-between;
+}
+
+.row-1 {
+  display: flex;
+  padding-left: 4px;
+  align-content: center;
+}
+.selected {
+  background-color: style.$medium-grey;
+  border-color: style.$light !important;
+}

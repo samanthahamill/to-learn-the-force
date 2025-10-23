@@ -1,0 +1,20 @@
+<div class="main-content">
+  <form *ngIf="formGroup" [formGroup]="formGroup">
+    <div class="container">
+      <div class="col">
+        <app-input-panel
+          class="input-panel"
+          [formGroup]="getFormGroup('input')"
+          (onSubmit)="onSubmit()"
+        />
+      </div>
+
+      <div class="col">
+        <!-- TODO add form group -->
+        <app-external-card [formGroup]="getFormGroup('external')" />
+        <!-- Not part of the form. If possible, would be ideal to move -->
+        <app-map />
+      </div>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,87 @@
+@use "styles" as style;
+@use "variables" as customVars;
+
+button {
+  border-width: 0px;
+  border-radius: 5px;
+  margin-left: 4px;
+  margin-bottom: 4px;
+}
+
+h1 {
+  font-size: 18px;
+}
+
+input {
+  border-color: style.$background-dark;
+  background-color: style.$background-dark;
+  border-radius: 5px;
+}
+
+// shared styling for child components to access
+.container {
+  margin: 2px;
+  display: flex;
+  flex-direction: row;
+  padding: 0px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.formGroup {
+  display: flex;
+  max-width: 100%;
+  overflow: hidden;
+  min-height: 100%;
+  min-width: 0;
+}
+
+// styling to apply to an entire page, such as SystemControl or Reports
+.panel-style {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  min-width: 0px;
+  border-radius: 5px;
+  padding: customVars.$card-padding;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: style.$secondary-dark;
+}
+
+.parent {
+  display: flex;
+  flex-direction: row;
+  width: calc(100vw - 8px);
+  overflow: auto;
+}
+
+.right-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.stop-button {
+  background-color: style.$warning;
+}
+
+.title {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
