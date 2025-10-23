@@ -16,7 +16,7 @@ form {
 }
 
 .panel-dimensions {
-  height: 100%;
+  height: calc(100% - 4px);
 }
 
 .submit {

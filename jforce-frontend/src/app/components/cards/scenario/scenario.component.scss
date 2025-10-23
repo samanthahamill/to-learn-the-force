@@ -3,8 +3,8 @@
 @use "styles" as style;
 @use "variables" as customVars;
 
-label {
-  white-space: nowrap;
+textarea {
+  width: 100%;
 }
 
 .button {
@@ -21,6 +21,13 @@ label {
 
 .container {
   flex-direction: column;
+}
+
+.dialog {
+  position: absolute;
+  z-index: 11;
+  height: 100vh;
+  width: 100vw;
 }
 
 .detailRow {

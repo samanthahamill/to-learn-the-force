@@ -36,6 +36,7 @@ export class PlatformComponent implements OnInit {
       {
         icon: faRemove,
         type: 'DELETE',
+        tooltip: 'Delete Platform',
         onClick: () => this.onDeleteClicked.emit(),
       },
     ];
@@ -43,6 +44,5 @@ export class PlatformComponent implements OnInit {
 
   ngOnInit(): void {
     this.name = this.platformForm.get('name')?.value ?? 'Platform';
-    console.log(this.platformForm);
   }
 }

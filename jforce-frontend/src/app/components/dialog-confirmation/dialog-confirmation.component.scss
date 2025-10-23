@@ -1,0 +1,37 @@
+@use "styles" as style;
+
+.toast-buttons {
+  display: flex;
+  flex-direction: row;
+}
+
+.button {
+  border-radius: 5px;
+  width: 100px;
+  height: 30px;
+}
+
+.confirm {
+  background-color: style.$success;
+}
+.confirm:hover {
+  background-color: style.$success-hover;
+}
+
+.custom-dialog {
+  background-color: style.$primary;
+  border-radius: 5px;
+  border-width: 1px;
+  border-color: style.$light;
+  width: 300px;
+  height: 300px;
+  z-index: 11;
+  position: absolute;
+}
+
+.deny {
+  background-color: style.$danger;
+}
+.deny:hover {
+  background-color: style.$danger-hover;
+}

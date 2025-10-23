@@ -1,11 +1,5 @@
-import { CommonModule, NgClass, NgIf } from '@angular/common';
-import {
-  Component,
-  EventEmitter,
-  Input,
-  NO_ERRORS_SCHEMA,
-  Output,
-} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, Input, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faFilter,
@@ -26,7 +20,7 @@ export type ICON_FUNCTION = {
 
 @Component({
   selector: 'app-card',
-  imports: [CommonModule, NgIf, NgClass, ButtonModule, FontAwesomeModule],
+  imports: [CommonModule, ButtonModule, FontAwesomeModule],
   templateUrl: './card.component.html',
   styleUrl: './card.component.scss',
   schemas: [NO_ERRORS_SCHEMA],

@@ -119,5 +119,9 @@ label {
   white-space: nowrap;
 }
 
+.checkbox {
+  width: 13px;
+}
+
 /* Importing Bootstrap SCSS file. */
 @import "bootstrap/scss/bootstrap";

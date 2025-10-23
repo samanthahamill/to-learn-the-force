@@ -1,10 +1,4 @@
-import {
-  Component,
-  inject,
-  Input,
-  NO_ERRORS_SCHEMA,
-  OnInit,
-} from '@angular/core';
+import { Component, Input, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ScenarioComponent } from '../../cards/scenario/scenario.component';
 import { ToolsComponent } from '../../cards/tools/tools.component';

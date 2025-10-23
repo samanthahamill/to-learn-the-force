@@ -1,6 +1,11 @@
-import { Component, Input, NO_ERRORS_SCHEMA } from '@angular/core';
 import {
-  AbstractControl,
+  Component,
+  inject,
+  Input,
+  NO_ERRORS_SCHEMA,
+  ViewChild,
+} from '@angular/core';
+import {
   FormArray,
   FormBuilder,
   FormGroup,
@@ -14,6 +19,7 @@ import { ButtonModule } from 'primeng/button';
 import { Platform } from '../../../shared/types';
 import { CardComponent, ICON_FUNCTION } from '../card.component';
 import { PlatformComponent } from '../platform/platform.component';
+import { DialogConfirmationService } from '../../../services/dialog-confirmation.service';
 
 @Component({
   selector: 'app-scenario-card',
@@ -38,13 +44,23 @@ export class ScenarioComponent {
 
   icons: Array<ICON_FUNCTION>;
 
+  private confirmationService = inject(DialogConfirmationService);
+
   constructor(private fb: FormBuilder) {
     this.icons = [
       {
         icon: this.trashIcon,
         type: 'DELETE',
         tooltip: 'Delete All Platforms',
-        onClick: () => this.removeAllPlatforms,
+        onClick: () =>
+          this.confirmationService.confirmAction(
+            this.removeAllPlatforms,
+            () => {},
+            'Are you sure you want to delete all platforms from this scenario?',
+            'Delete All Platforms Confirmation',
+            'Delete All Platforms',
+            'All platforms successfully removed from scenario',
+          ),
       },
     ];
   }
