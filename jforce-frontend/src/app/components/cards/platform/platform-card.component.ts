@@ -13,14 +13,21 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { CommonModule, NgFor } from '@angular/common';
-import { faRemove } from '@fortawesome/free-solid-svg-icons';
+import { CommonModule, NgClass, NgFor } from '@angular/common';
+import {
+  faCopy,
+  faGear,
+  faLock,
+  faLockOpen,
+  faRemove,
+} from '@fortawesome/free-solid-svg-icons';
 import { PLATFORM_TYPE, Waypoints } from '../../../shared/types';
 import {
   CdkDragDrop,
   moveItemInArray,
   DragDropModule,
 } from '@angular/cdk/drag-drop';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-platform-card',
@@ -32,21 +39,30 @@ import {
     NgFor,
     CommonModule,
     DragDropModule,
+    FontAwesomeModule,
+    NgClass,
   ],
   templateUrl: './platform-card.component.html',
   styleUrl: './platform-card.component.scss',
   schemas: [NO_ERRORS_SCHEMA],
 })
 export class PlatformCardComponent implements OnInit {
+  removeIcon = faRemove;
+  copyIcon = faCopy;
+  gearIcon = faGear;
+  lockIcon = faLock;
+  lockOpenIcon = faLockOpen;
+
   @Input() platformForm!: FormGroup;
   @Input() index!: number;
   @Output() onDeleteClicked = new EventEmitter<void>();
   name: string = '';
-  removeIcon = faRemove;
-  icons: Array<ICON_FUNCTION>;
   readonly: boolean = false;
+  waypointsLocked: boolean = false;
 
   platformTypeOptions: Array<PLATFORM_TYPE> = ['AIR', 'GROUND', 'MARITIME'];
+
+  icons: Array<ICON_FUNCTION>;
 
   constructor() {
     this.icons = [
@@ -77,10 +93,33 @@ export class PlatformCardComponent implements OnInit {
   drop(event: CdkDragDrop<string[]>) {
     const waypoints = this.waypoints;
     moveItemInArray(waypoints, event.previousIndex, event.currentIndex);
-    waypoints.forEach((waypoint, i) => (waypoint.index = i));
-
     // TODO add other logic that fixes drag/drop with times
 
+    this.updateWaypoints(this.shiftWaypoints(waypoints));
+  }
+
+  gearClicked() {
+    // create popup
+  }
+
+  lockClicked() {
+    this.waypointsLocked = !this.waypointsLocked;
+  }
+
+  duplicateWaypoint(index: number) {
+    const duplicateWaypoint = { ...this.waypoints[index] };
+    this.waypoints.splice(index, 0, duplicateWaypoint);
+    this.updateWaypoints(this.shiftWaypoints(this.waypoints));
+  }
+
+  shiftWaypoints(waypoints: Array<Waypoints>): Array<Waypoints> {
+    waypoints.forEach((waypoint, i) => (waypoint.index = i));
+    return waypoints;
+  }
+
+  updateWaypoints(waypoints: Array<Waypoints>) {
     this.platformForm.get('waypoints')?.setValue(waypoints);
   }
+
+  deleteWaypoint(index: number) {}
 }

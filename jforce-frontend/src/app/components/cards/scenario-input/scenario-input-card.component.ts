@@ -118,6 +118,10 @@ export class ScenarioInputCardComponent {
         name: [name, [Validators.required]],
         id: [name, [Validators.required]], // TODO make better id,
         speed: ['', [Validators.required]],
+        type: ['AIR', [Validators.required]],
+        waypoints: [this.fb.array([]), [Validators.required]],
+        reportingFrequency: [0, [Validators.required]],
+        readonly: false, // TODO change to be dynamic once they can add platforms from a predesigned list
       }),
     );
   }

@@ -44,37 +44,96 @@
         </div>
       </div>
       <div class="row-1 table-row">
-        <label>Waypoints</label>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th scope="col">Index</th>
-              <th scope="col">Lat</th>
-              <th scope="col">Lon</th>
-              <th scope="col">Altitude</th>
-              <th scope="col">Date/Time</th>
-            </tr>
-          </thead>
-          <tbody cdkDropList (cdkDropListDropped)="drop($event)">
-            <tr
-              *ngFor="let waypoint of waypoints; let i = index"
-              cdkDrag
-              cdkDragLockAxis="y"
+        <div class="waypoint-header row-1">
+          <div class="col-4"></div>
+          <div class="col-4 waypoint-title"><h1>Waypoints</h1></div>
+          <div class="col-4 icons">
+            <fa-icon
+              [icon]="gearIcon"
+              (click)="gearClicked()"
+              title="Edit Waypoints"
+              class="icon-button"
+            ></fa-icon>
+            <fa-icon
+              *ngIf="!waypointsLocked"
+              [icon]="lockOpenIcon"
+              (click)="lockClicked()"
+              title="Lock Waypoints"
+              class="icon-button"
+            ></fa-icon>
+            <fa-icon
+              *ngIf="waypointsLocked"
+              [icon]="lockIcon"
+              (click)="lockClicked()"
+              title="Unlock Waypoints"
+              class="icon-button"
+            ></fa-icon>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table
+            class="table table-striped table-dark table-hover table-condensed"
+          >
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Lat</th>
+                <th scope="col">Lon</th>
+                <th scope="col">Altitude</th>
+                <th scope="col">Date/Time</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody
+              cdkDropList
+              (cdkDropListDropped)="drop($event)"
+              [ngClass]="{
+                'table-disabled': waypointsLocked,
+              }"
             >
-              <th class="col-xs">
-                <div class="drag-handle">
-                  <ng-container [ngTemplateOutlet]="dragHandleTmpl">
-                  </ng-container>
-                  {{ waypoint.index }}
-                </div>
-              </th>
-              <td>{{ waypoint.lat }}</td>
-              <td>{{ waypoint.lon }}</td>
-              <td>{{ waypoint.alt }}</td>
-              <td>{{ waypoint.datetime }}</td>
-            </tr>
-          </tbody>
-        </table>
+              <tr
+                *ngFor="let waypoint of waypoints; let i = index"
+                cdkDrag
+                [cdkDragDisabled]="waypointsLocked"
+                cdkDragLockAxis="y"
+              >
+                <th class="col-xs">
+                  <div class="drag-handle">
+                    <ng-container [ngTemplateOutlet]="dragHandleTmpl">
+                    </ng-container>
+                    {{ waypoint.index }}
+                  </div>
+                </th>
+                <td>{{ waypoint.lat }}</td>
+                <td>{{ waypoint.lon }}</td>
+                <td>{{ waypoint.alt }}</td>
+                <td>{{ waypoint.datetime }}</td>
+                <td>
+                  <div class="table-buttons">
+                    <fa-icon
+                      [icon]="copyIcon"
+                      (click)="duplicateWaypoint(i)"
+                      title="Duplicate Waypoint"
+                      [ngClass]="{
+                        'icon-button': true,
+                        'icon-disabled': waypointsLocked,
+                      }"
+                    ></fa-icon>
+                    <fa-icon
+                      [icon]="removeIcon"
+                      (click)="deleteWaypoint(i)"
+                      title="Delete Waypoint"
+                      [ngClass]="{
+                        'red-icon': true,
+                        'icon-disabled': waypointsLocked,
+                      }"
+                    ></fa-icon>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </form>

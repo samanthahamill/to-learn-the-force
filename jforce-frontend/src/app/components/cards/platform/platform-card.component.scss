@@ -2,6 +2,8 @@
 @use "styles" as style;
 @use "variables" as customVars;
 
+$table-width: calc(100% - 10px);
+
 input {
   margin-left: style.$default-margin;
 }
@@ -12,9 +14,57 @@ select {
   height: 23.68px;
 }
 
+table {
+  max-width: 100%;
+  min-width: $table-width;
+  overflow: auto;
+  border: 1px solid style.$light;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin-bottom: 0px !important;
+}
+
+tr {
+  border: 1px solid style.$light;
+}
+
+tr,
+th,
+td {
+  max-width: 100%;
+  padding: 0px !important;
+  padding-left: style.$default-margin !important;
+  padding-right: style.$default-margin !important;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+td:not(:first-child),
+th:not(:first-child) {
+  border-left: 1px solid rgb(87, 87, 87);
+}
+
+// Custom Classes
+
 .container {
   margin-top: style.$panel-margin;
   padding: 0px;
+}
+
+.icon-disabled {
+  pointer-events: none;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.formGroup {
+  overflow: hidden;
+}
+
+.icons {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: style.$default-margin;
 }
 
 .input-small {
@@ -30,26 +80,47 @@ select {
   justify-content: space-between;
 }
 
-table {
-  width: calc(100% - 20px) !important;
-  max-width: calc(100% - 20px) !important;
+.waypoint-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-content: center;
+  align-items: center;
+  background-color: #3e4347;
+  width: 100%;
   border: 1px solid style.$light;
+  border-bottom-width: 0px;
+  height: 25px;
+  color: white;
 }
 
-tr,
-th,
-td {
-  padding: style.$default-margin !important;
+.waypoint-title {
+  display: flex;
+  justify-content: center;
+}
+
+.table-disabled {
+  color: style.$disabled !important;
 }
 
 .table-row {
+  margin-top: style.$default-margin;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
+  width: $table-width !important;
+  max-width: $table-width !important;
+  min-width: $table-width !important;
+  justify-self: center;
 }
 
-//
+.table-responsive {
+  width: 100%;
+}
+
+// DnD BELOW
 
 .drag-handle {
   display: flex;
