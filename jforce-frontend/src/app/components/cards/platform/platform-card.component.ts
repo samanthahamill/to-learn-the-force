@@ -16,7 +16,6 @@ import {
 import { CommonModule, NgFor } from '@angular/common';
 import { faRemove } from '@fortawesome/free-solid-svg-icons';
 import { PLATFORM_TYPE, Waypoints } from '../../../shared/types';
-import { WaypointRowComponent } from './waypoint-row/waypoint-row.component';
 
 @Component({
   selector: 'app-platform-card',
