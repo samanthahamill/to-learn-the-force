@@ -90,12 +90,23 @@ export class PlatformCardComponent implements OnInit {
     }
   }
 
+  deleteWaypoint(index: number) {
+    this.waypoints.splice(index, 1);
+    this.shiftWaypoints();
+  }
+
   drop(event: CdkDragDrop<string[]>) {
     const waypoints = this.waypoints;
     moveItemInArray(waypoints, event.previousIndex, event.currentIndex);
     // TODO add other logic that fixes drag/drop with times
 
-    this.updateWaypoints(this.shiftWaypoints(waypoints));
+    this.shiftWaypoints();
+  }
+
+  duplicateWaypoint(index: number) {
+    const duplicateWaypoint = { ...this.waypoints[index] };
+    this.waypoints.splice(index, 0, duplicateWaypoint);
+    this.shiftWaypoints();
   }
 
   gearClicked() {
@@ -106,20 +117,11 @@ export class PlatformCardComponent implements OnInit {
     this.waypointsLocked = !this.waypointsLocked;
   }
 
-  duplicateWaypoint(index: number) {
-    const duplicateWaypoint = { ...this.waypoints[index] };
-    this.waypoints.splice(index, 0, duplicateWaypoint);
-    this.updateWaypoints(this.shiftWaypoints(this.waypoints));
+  nameUpdated() {
+    this.name = this.platformForm.get('name')?.value ?? 'Platform';
   }
 
-  shiftWaypoints(waypoints: Array<Waypoints>): Array<Waypoints> {
-    waypoints.forEach((waypoint, i) => (waypoint.index = i));
-    return waypoints;
+  shiftWaypoints() {
+    this.waypoints.forEach((waypoint, i) => (waypoint.index = i));
   }
-
-  updateWaypoints(waypoints: Array<Waypoints>) {
-    this.platformForm.get('waypoints')?.setValue(waypoints);
-  }
-
-  deleteWaypoint(index: number) {}
 }

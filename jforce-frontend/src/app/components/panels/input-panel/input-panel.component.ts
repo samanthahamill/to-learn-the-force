@@ -5,11 +5,13 @@ import { ToolsComponent } from '../../cards/tools/tools.component';
 import { CommonModule, NgIf } from '@angular/common';
 import { faDownload, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { InfoCardComponent } from '../../cards/info/info-card.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-input-panel',
   imports: [
     ScenarioInputCardComponent,
+    FontAwesomeModule,
     ToolsComponent,
     InfoCardComponent,
     CommonModule,

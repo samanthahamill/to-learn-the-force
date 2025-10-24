@@ -34,19 +34,15 @@
         <app-card
           *ngIf="importData; else uploadData"
           formGroupName="import"
-          header="Import Original Input"
+          header="Import External Input"
         >
           <div class="container">
             <div class="row">
               <div class="col">
-                <label name="ogStartTime" for="ogStartTime">
-                  Original Start Time
-                </label>
+                <label name="ogStartTime" for="ogStartTime"> Start Time </label>
                 <input type="datetime-local" formControlName="ogStartTime" />
 
-                <label name="ogEndTime" for="ogEndTime">
-                  Original End Time
-                </label>
+                <label name="ogEndTime" for="ogEndTime"> End Time </label>
                 <input type="datetime-local" formControlName="ogEndTime" />
               </div>
 
@@ -102,14 +98,14 @@
 
         <ng-template #uploadData formGroupName="upload">
           <div class="row">
-            <app-card header="Upload Original Input">
+            <app-card header="Upload External Input">
               <label for="uploadFromFile">Upload From CSV</label>
               <input class="form-control" type="file" id="uploadFromFile" />
             </app-card>
           </div>
         </ng-template>
 
-        <app-card header="Modified Input">
+        <app-card header="External Input Modifications">
           <div class="labelAndTooltip">
             <label name="ogStartTime" for="ogStartTime">New Start Time</label>
             <i

@@ -8,8 +8,9 @@
             id="name"
             type="text"
             formControlName="name"
-            readonly="readonly"
+            [readonly]="readonly"
             class="name"
+            (onBlur)="nameUpdated()"
           />
         </div>
       </div>
@@ -29,7 +30,7 @@
             id="speed"
             type="number"
             formControlName="speed"
-            readonly="readonly"
+            [readonly]="readonly"
           />
         </div>
         <div class="col">
@@ -39,7 +40,7 @@
             id="reportingFrequency"
             type="number"
             formControlName="reportingFrequency"
-            readonly="readonly"
+            [readonly]="readonly"
           />
         </div>
       </div>
@@ -124,6 +125,7 @@
                       (click)="deleteWaypoint(i)"
                       title="Delete Waypoint"
                       [ngClass]="{
+                        'icon-button': true,
                         'red-icon': true,
                         'icon-disabled': waypointsLocked,
                       }"
