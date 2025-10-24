@@ -1,0 +1,52 @@
+<form class="formGroup" [formGroup]="aoi">
+  <app-card header="AOI" [innerCard]="true">
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <label for="lat">Latitude:</label>
+          <input
+            id="lat"
+            type="number"
+            class="input"
+            formControlName="lat"
+            placeholder="Latitude"
+          />
+        </div>
+        <div class="col">
+          <label for="alt">Altitude:</label>
+          <input
+            id="alt"
+            type="number"
+            formControlName="alt"
+            class="readonly input"
+            placeholder="Altitude"
+            readonly
+          />
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <label for="lon">Longitude:</label>
+          <input
+            id="lon"
+            type="number"
+            class="input"
+            formControlName="lon"
+            placeholder="Longitude"
+          />
+        </div>
+
+        <div class="col detailRow">
+          <label for="radius">Radius:</label>
+          <input
+            id="radius"
+            type="text"
+            formControlName="radius"
+            class="input"
+            placeholder="Radius"
+          />
+        </div>
+      </div>
+    </div>
+  </app-card>
+</form>

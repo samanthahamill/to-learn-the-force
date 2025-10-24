@@ -1,0 +1,25 @@
+@use "../card.component.scss" as card;
+@use "styles" as style;
+@use "variables" as customVars;
+
+input {
+  width: 150px;
+  background-color: style.$dark;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.container {
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  padding-top: 4px;
+}

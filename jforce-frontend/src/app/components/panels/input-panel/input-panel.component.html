@@ -16,11 +16,11 @@
     </div>
 
     <form *ngIf="formGroup" [formGroup]="formGroup" (ngSubmit)="onSubmit()">
-      <app-info-card [info]="getScenarioFormGroup('baseInfo')" />
-      <!-- TODO add form group -->
       <div class="inputs">
-        <app-scenario-card
-          [scenarioInfo]="getScenarioFormGroup('scenarioInfo')"
+        <app-info-card [info]="getScenarioFormGroup('baseInfo')" />
+        <!-- TODO add form group -->
+        <app-scenario-input-card
+          [scenarioInput]="getScenarioFormGroup('scenarioInput')"
         />
         <app-tools-card [tools]="getFormGroup('tools')" />
       </div>

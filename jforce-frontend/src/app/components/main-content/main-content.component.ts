@@ -14,7 +14,7 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ToastService } from '../../services/toast.service';
 import { UserStateService } from '../../services/user-state.service';
 import { ExternalComponent } from '../panels/external/external.component';
-import { Platform, UserInputFormData, UserInputType } from '../../shared/types';
+import { Platform, UserInputFormData } from '../../shared/types';
 
 @UntilDestroy()
 @Component({
@@ -73,10 +73,10 @@ export class MainContentComponent {
               ],
               details: [input.scenario?.baseInfo?.details ?? ''],
             }),
-            scenarioInfo: this.fb.group({
-              platforms: input.scenario?.scenarioInfo?.platforms
+            scenarioInput: this.fb.group({
+              platforms: input.scenario?.scenarioInput?.platforms
                 ? this.fb.array([
-                    ...input.scenario?.scenarioInfo.platforms.map(
+                    ...input.scenario?.scenarioInput.platforms.map(
                       (platform: Platform) => this.fb.group(platform),
                     ),
                   ])

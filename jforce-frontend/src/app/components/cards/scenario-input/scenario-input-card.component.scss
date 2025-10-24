@@ -26,6 +26,11 @@
   width: 100vw;
 }
 
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
 .platforms {
   margin-top: 4px;
 }

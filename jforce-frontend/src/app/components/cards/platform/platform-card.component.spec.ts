@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ScenarioComponent } from './scenario.component';
+import { PlatformCardComponent } from './platform-card.component';
 
-describe('ScenarioComponent', () => {
-  let component: ScenarioComponent;
-  let fixture: ComponentFixture<ScenarioComponent>;
+describe('PlatformCardComponent', () => {
+  let component: PlatformCardComponent;
+  let fixture: ComponentFixture<PlatformCardComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ScenarioComponent],
+      imports: [PlatformCardComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ScenarioComponent);
+    fixture = TestBed.createComponent(PlatformCardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

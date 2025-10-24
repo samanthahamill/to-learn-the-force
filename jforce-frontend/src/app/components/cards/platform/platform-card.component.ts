@@ -17,13 +17,13 @@ import { CommonModule } from '@angular/common';
 import { faRemove } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
-  selector: 'app-platform',
+  selector: 'app-platform-card',
   imports: [CommonModule, CardComponent, FormsModule, ReactiveFormsModule],
-  templateUrl: './platform.component.html',
-  styleUrl: './platform.component.scss',
+  templateUrl: './platform-card.component.html',
+  styleUrl: './platform-card.component.scss',
   schemas: [NO_ERRORS_SCHEMA],
 })
-export class PlatformComponent implements OnInit {
+export class PlatformCardComponent implements OnInit {
   @Input() platformForm!: FormGroup;
   @Input() index!: number;
   @Output() onDeleteClicked = new EventEmitter<void>();

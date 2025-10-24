@@ -1,6 +1,6 @@
 <app-card header="Scenario Info">
-  <form class="formGroup" [formGroup]="scenarioInfo">
-    <app-aoi-card [aoiInfo] />
+  <form class="formGroup" [formGroup]="scenarioInput">
+    <app-aoi-card [aoiInfo]="getFormGroup('aoi')" />
     <app-card
       header="Platforms ({{ platformCount }})"
       [innerCard]="true"
@@ -8,7 +8,7 @@
     >
       <div *ngFor="let platformForm of formGroups; let i = index">
         <div *ngIf="platformForm != undefined">
-          <app-platform
+          <app-platform-card
             id="i"
             [index]="i"
             [platformForm]="platformForm"

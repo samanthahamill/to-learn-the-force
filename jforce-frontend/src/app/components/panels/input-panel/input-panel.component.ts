@@ -1,6 +1,6 @@
 import { Component, Input, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ScenarioComponent } from '../../cards/scenario/scenario.component';
+import { ScenarioInputCardComponent } from '../../cards/scenario-input/scenario-input-card.component';
 import { ToolsComponent } from '../../cards/tools/tools.component';
 import { CommonModule, NgIf } from '@angular/common';
 import { faDownload, faUpload } from '@fortawesome/free-solid-svg-icons';
@@ -9,10 +9,10 @@ import { InfoCardComponent } from '../../cards/info/info-card.component';
 @Component({
   selector: 'app-input-panel',
   imports: [
-    ScenarioComponent,
+    ScenarioInputCardComponent,
     ToolsComponent,
-    CommonModule,
     InfoCardComponent,
+    CommonModule,
     NgIf,
     FormsModule,
     ReactiveFormsModule,
@@ -34,6 +34,8 @@ export class InputPanelComponent {
   }
 
   getScenarioFormGroup(formGroup: string): FormGroup {
-    return this.formGroup?.get('scenario')?.get(formGroup) as FormGroup;
+    return (this.formGroup?.get('scenario') as FormGroup)?.get(
+      formGroup,
+    ) as FormGroup;
   }
 }

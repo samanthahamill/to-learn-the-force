@@ -18,29 +18,29 @@ import { faAdd, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { ButtonModule } from 'primeng/button';
 import { Platform } from '../../../shared/types';
 import { CardComponent, ICON_FUNCTION } from '../card.component';
-import { PlatformComponent } from '../platform/platform.component';
+import { PlatformCardComponent } from '../platform/platform-card.component';
 import { DialogConfirmationService } from '../../../services/dialog-confirmation.service';
-import { InfoCardComponent } from '../info/info-card.component';
+import { AoiCardComponent } from '../aoi/aoi-card.component';
 
 @Component({
-  selector: 'app-scenario-card',
+  selector: 'app-scenario-input-card',
   imports: [
+    ButtonModule,
+    CardComponent,
+    PlatformCardComponent,
+    AoiCardComponent,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    ButtonModule,
-    CardComponent,
-    PlatformComponent,
-    InfoCardComponent,
     NgIf,
     NgFor,
   ],
-  templateUrl: './scenario.component.html',
-  styleUrl: './scenario.component.scss',
+  templateUrl: './scenario-input-card.component.html',
+  styleUrl: './scenario-input-card.component.scss',
   schemas: [NO_ERRORS_SCHEMA],
 })
-export class ScenarioComponent {
-  @Input() scenarioInfo!: FormGroup;
+export class ScenarioInputCardComponent {
+  @Input() scenarioInput!: FormGroup;
   addIcon = faAdd;
   trashIcon = faTrash;
 
@@ -68,7 +68,7 @@ export class ScenarioComponent {
   }
 
   get platforms(): FormArray {
-    return this.scenarioInfo.get('platforms') as FormArray;
+    return this.scenarioInput.get('platforms') as FormArray;
   }
 
   get platformCount(): number {
@@ -78,6 +78,10 @@ export class ScenarioComponent {
   // In your component class
   get formGroups(): FormGroup[] {
     return (this.platforms?.controls as FormGroup[]) ?? [];
+  }
+
+  getFormGroup(formGroup: string): FormGroup {
+    return this.scenarioInput?.get(formGroup) as FormGroup;
   }
 
   private getNewPlatformName() {

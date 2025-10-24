@@ -32,7 +32,7 @@ export interface UserInputFormData {
       dateOfCreation: Date;
       details: string;
     };
-    scenarioInfo: {
+    scenarioInput: {
       aoi: AOIType;
       platforms: Array<Platform>;
     };
