@@ -4,6 +4,7 @@ import { ScenarioComponent } from '../../cards/scenario/scenario.component';
 import { ToolsComponent } from '../../cards/tools/tools.component';
 import { CommonModule, NgIf } from '@angular/common';
 import { faDownload, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { InfoCardComponent } from '../../cards/info/info-card.component';
 
 @Component({
   selector: 'app-input-panel',
@@ -11,6 +12,7 @@ import { faDownload, faUpload } from '@fortawesome/free-solid-svg-icons';
     ScenarioComponent,
     ToolsComponent,
     CommonModule,
+    InfoCardComponent,
     NgIf,
     FormsModule,
     ReactiveFormsModule,
@@ -29,5 +31,9 @@ export class InputPanelComponent {
 
   getFormGroup(formGroup: string): FormGroup {
     return this.formGroup?.get(formGroup) as FormGroup;
+  }
+
+  getScenarioFormGroup(formGroup: string): FormGroup {
+    return this.formGroup?.get('scenario')?.get(formGroup) as FormGroup;
   }
 }

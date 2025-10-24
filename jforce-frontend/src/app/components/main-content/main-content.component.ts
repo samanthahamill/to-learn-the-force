@@ -59,29 +59,35 @@ export class MainContentComponent {
       console.log('blank form initiated');
       this.formGroup = this.fb.group({
         input: this.fb.group({
-          scenarioInfo: this.fb.group({
-            scenarioName: [
-              input.scenarioInfo?.scenarioName ?? 'Default Scenario',
-            ],
-            scenarioAuthor: [input.scenarioInfo?.scenarioAuthor ?? 'TBD'], // TODO eventually pull this from user profile and don't allow to be edited
-            dateOfCreation: [
-              input.scenarioInfo?.dateOfCreation ??
-                `${new Date().toLocaleString()} MST`, // TODO eventually don't hardcode this
-            ],
-            details: [input.scenarioInfo?.details ?? ''],
-            platforms: input.scenarioInfo?.platforms
-              ? this.fb.array([
-                  ...input.scenarioInfo.platforms.map((platform: Platform) =>
-                    this.fb.group(platform),
-                  ),
-                ])
-              : this.fb.array([
-                  this.fb.group({
-                    name: ['test'],
-                    id: ['test'],
-                    speed: [undefined],
-                  }),
-                ]),
+          scenario: this.fb.group({
+            baseInfo: this.fb.group({
+              scenarioName: [
+                input.scenario?.baseInfo?.scenarioName ?? 'Default Scenario',
+              ],
+              scenarioAuthor: [
+                input.scenario?.baseInfo?.scenarioAuthor ?? 'TBD',
+              ], // TODO eventually pull this from user profile and don't allow to be edited
+              dateOfCreation: [
+                input.scenario?.baseInfo?.dateOfCreation ??
+                  `${new Date().toLocaleString()} MST`, // TODO eventually don't hardcode this
+              ],
+              details: [input.scenario?.baseInfo?.details ?? ''],
+            }),
+            scenarioInfo: this.fb.group({
+              platforms: input.scenario?.scenarioInfo?.platforms
+                ? this.fb.array([
+                    ...input.scenario?.scenarioInfo.platforms.map(
+                      (platform: Platform) => this.fb.group(platform),
+                    ),
+                  ])
+                : this.fb.array([
+                    this.fb.group({
+                      name: ['test'],
+                      id: ['test'],
+                      speed: [undefined],
+                    }),
+                  ]),
+            }),
           }),
           tools: this.fb.group({
             isTool: [input.tool ?? ''],

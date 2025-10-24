@@ -20,6 +20,7 @@ import { Platform } from '../../../shared/types';
 import { CardComponent, ICON_FUNCTION } from '../card.component';
 import { PlatformComponent } from '../platform/platform.component';
 import { DialogConfirmationService } from '../../../services/dialog-confirmation.service';
+import { InfoCardComponent } from '../info/info-card.component';
 
 @Component({
   selector: 'app-scenario-card',
@@ -30,6 +31,7 @@ import { DialogConfirmationService } from '../../../services/dialog-confirmation
     ButtonModule,
     CardComponent,
     PlatformComponent,
+    InfoCardComponent,
     NgIf,
     NgFor,
   ],

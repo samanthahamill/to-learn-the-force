@@ -1,0 +1,49 @@
+@use "../card.component.scss" as card;
+@use "../../panels/panel.scss";
+@use "styles" as style;
+@use "variables" as customVars;
+
+input {
+  margin-left: 4px;
+}
+
+textarea {
+  width: 100%;
+}
+
+.container {
+  flex-direction: column;
+}
+
+.detailRow {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.details {
+  height: 50px;
+  text-align: start;
+  vertical-align: top;
+  overflow: auto;
+  max-height: 150px;
+  min-height: 40px;
+  border-radius: 5px;
+  background-color: #161616;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.readonly {
+  background-color: style.$disabled;
+  color: rgb(168, 168, 168);
+}
+
+.row {
+  display: flex;
+  width: 100%;
+  padding-top: 4px;
+}

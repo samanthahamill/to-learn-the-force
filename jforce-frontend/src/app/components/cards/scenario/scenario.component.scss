@@ -3,10 +3,6 @@
 @use "styles" as style;
 @use "variables" as customVars;
 
-textarea {
-  width: 100%;
-}
-
 .button {
   border-width: 0px;
   border-radius: 5px;
@@ -30,40 +26,8 @@ textarea {
   width: 100vw;
 }
 
-.detailRow {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.details {
-  height: 250px;
-  text-align: start;
-  vertical-align: top;
-  overflow: auto;
-  max-height: 250px;
-  border-radius: 5px;
-  background-color: #161616;
-}
-
-.formGroup {
-  display: flex;
-  flex-direction: column;
-}
-
 .platforms {
   margin-top: 4px;
-}
-
-.readonly {
-  background-color: style.$disabled;
-  color: rgb(168, 168, 168);
-}
-
-.row {
-  display: flex;
-  width: 100%;
-  padding-top: 4px;
 }
 
 .title {

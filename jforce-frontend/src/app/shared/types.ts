@@ -1,3 +1,10 @@
+export interface AOIType {
+  lat: number;
+  lon: number;
+  alt: number;
+  radius: number;
+}
+
 export interface IntInfo {
   name: string;
 }
@@ -18,12 +25,17 @@ export interface Platform {
 }
 
 export interface UserInputFormData {
-  scenarioInfo: {
-    scenarioName: string;
-    scenarioAuthor: string;
-    dateOfCreation: Date;
-    details: string;
-    platforms: Array<Platform>;
+  scenario: {
+    baseInfo: {
+      scenarioName: string;
+      scenarioAuthor: string;
+      dateOfCreation: Date;
+      details: string;
+    };
+    scenarioInfo: {
+      aoi: AOIType;
+      platforms: Array<Platform>;
+    };
   };
   tool: {
     isTool: boolean;
