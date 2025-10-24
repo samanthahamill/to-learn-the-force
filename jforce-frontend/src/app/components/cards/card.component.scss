@@ -93,3 +93,9 @@ h3 {
 .red-icon:hover {
   color: style.$danger-hover;
 }
+
+.row-1 {
+  display: flex;
+  align-content: center;
+  padding-top: 4px;
+}

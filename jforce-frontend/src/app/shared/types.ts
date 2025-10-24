@@ -17,12 +17,17 @@ export interface Emitters {
 }
 
 export interface Platform {
-  name: string;
   id: string;
-  readonly: boolean;
+  name: string;
+  type: PLATFORM_TYPE;
   speed: number;
-  depth: number;
+
+  waypoints: Array<Waypoints>;
+  reportingFrequency: number; // likely not a number
+  readonly: boolean; // backend value
 }
+
+export type PLATFORM_TYPE = 'GROUND' | 'MARITIME' | 'AIR';
 
 export interface UserInputFormData {
   scenario: {
@@ -68,4 +73,12 @@ export interface VesselInfo {
   id: string;
   emitter: Array<Emitters>;
   // TODO add other
+}
+
+export interface Waypoints {
+  lat: number;
+  lon: number;
+  alt: number;
+  datetime: Date; // should there be a start/end time? Possibly a different type
+  index: number; // backend variable only to ensure proper ordering
 }

@@ -1,11 +1,70 @@
 <app-card header="{{ name }}" [lighterCard]="true" [icons]="icons">
   <form class="formGroup" [formGroup]="platformForm">
     <div class="container">
-      <div class="row row-col-3">
+      <div class="row-1">
         <div class="col">
-          <label for="speed">Speed:</label>
-          <input id="speed" type="text" formControlName="speed" />
+          <label for="name">Name</label>
+          <input
+            id="name"
+            type="text"
+            formControlName="name"
+            readonly="readonly"
+            class="name"
+          />
         </div>
+      </div>
+      <div class="row-1 three-col">
+        <div class="col">
+          <label tooltip="Type" for="type">Type</label>
+          <select formControlName="type" id="type" size="small">
+            <option *ngFor="let option of platformTypeOptions" [value]="option">
+              {{ option }}
+            </option>
+          </select>
+        </div>
+        <div class="col">
+          <label for="speed">Speed</label>
+          <input
+            class="input-small"
+            id="speed"
+            type="number"
+            formControlName="speed"
+            readonly="readonly"
+          />
+        </div>
+        <div class="col">
+          <label for="reportingFrequency">Reporting Freq</label>
+          <input
+            class="input-small"
+            id="reportingFrequency"
+            type="number"
+            formControlName="reportingFrequency"
+            readonly="readonly"
+          />
+        </div>
+      </div>
+      <div class="row-1 table-row">
+        <label>Waypoints</label>
+        <table class="table table-striped">
+          <!-- <tbody cdkDropList (cdkDropListDropped)="drop($event)"> -->
+          <!-- <tr *ngFor="let waypoint of waypoints" cdkDrag> -->
+          <tbody>
+            <tr>
+              <th>Index</th>
+              <th>Lat</th>
+              <th>Lon</th>
+              <th>Altitude</th>
+              <th>Date/Time</th>
+            </tr>
+            <tr *ngFor="let waypoint of waypoints; let i = index">
+              <td>{{ waypoint.index }}</td>
+              <td>{{ waypoint.lat }}</td>
+              <td>{{ waypoint.lon }}</td>
+              <td>{{ waypoint.alt }}</td>
+              <td>{{ waypoint.datetime }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </form>

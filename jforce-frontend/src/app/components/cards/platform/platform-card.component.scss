@@ -1,0 +1,50 @@
+@use "../card.component.scss" as card;
+@use "styles" as style;
+@use "variables" as customVars;
+
+input {
+  margin-left: style.$default-margin;
+}
+
+select {
+  border-radius: 5px;
+  margin-left: style.$default-margin;
+  height: 23.68px;
+}
+
+.container {
+  margin-top: style.$panel-margin;
+  padding: 0px;
+}
+
+.input-small {
+  width: 50px;
+}
+
+.name {
+  width: 250px;
+}
+
+.three-col {
+  display: flex;
+  justify-content: space-between;
+}
+
+table {
+  width: calc(100% - 20px) !important;
+  max-width: calc(100% - 20px) !important;
+  border: 1px solid style.$light;
+}
+
+tr,
+th,
+td {
+  padding: style.$default-margin !important;
+}
+
+.table-row {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

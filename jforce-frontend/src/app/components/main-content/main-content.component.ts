@@ -74,17 +74,49 @@ export class MainContentComponent {
               details: [input.scenario?.baseInfo?.details ?? ''],
             }),
             scenarioInput: this.fb.group({
+              aoi: this.fb.group({
+                lat: input.scenario?.scenarioInput?.aoi.lat ?? 0,
+                lon: input.scenario?.scenarioInput?.aoi.lon ?? 0,
+                alt: input.scenario?.scenarioInput?.aoi.alt ?? 0,
+                radius: input.scenario?.scenarioInput?.aoi.radius ?? 0,
+              }),
               platforms: input.scenario?.scenarioInput?.platforms
                 ? this.fb.array([
                     ...input.scenario?.scenarioInput.platforms.map(
-                      (platform: Platform) => this.fb.group(platform),
+                      (platform: Platform, i: number) =>
+                        this.fb.group({
+                          id: platform.id ?? `Unknown ${i}`,
+                          name: platform.name ?? 'Name',
+                          type: platform.type ?? 'AIR',
+                          speed: platform.speed ?? 0,
+
+                          waypoints: this.fb.array(
+                            platform.waypoints?.map((waypoint) =>
+                              this.fb.group(waypoint),
+                            ) ?? [],
+                          ),
+                          reportingFrequency: platform.reportingFrequency ?? 0, // likely not a number
+                          readonly: platform.readonly ?? false,
+                        }),
                     ),
                   ])
                 : this.fb.array([
                     this.fb.group({
                       name: ['test'],
                       id: ['test'],
-                      speed: [undefined],
+                      readonly: [false],
+                      speed: [0],
+                      type: ['AIR'],
+                      waypoints: this.fb.array([
+                        this.fb.group({
+                          lat: 0,
+                          lon: 0,
+                          alt: 0,
+                          datetime: new Date().toISOString(),
+                          index: 0,
+                        }),
+                      ]),
+                      reportingFrequency: 0, // likely not a number
                     }),
                   ]),
             }),

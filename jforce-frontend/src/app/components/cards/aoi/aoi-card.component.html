@@ -1,4 +1,4 @@
-<form class="formGroup" [formGroup]="aoi">
+<form class="formGroup" [formGroup]="aoiFormGroup">
   <app-card header="AOI" [innerCard]="true">
     <div class="container">
       <div class="row">
@@ -20,7 +20,6 @@
             formControlName="alt"
             class="readonly input"
             placeholder="Altitude"
-            readonly
           />
         </div>
       </div>

@@ -1,6 +1,6 @@
 <app-card header="Scenario Info">
   <form class="formGroup" [formGroup]="scenarioInput">
-    <app-aoi-card [aoiInfo]="getFormGroup('aoi')" />
+    <app-aoi-card [aoiFormGroup]="getFormGroup('aoi')" />
     <app-card
       header="Platforms ({{ platformCount }})"
       [innerCard]="true"
