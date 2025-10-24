@@ -115,6 +115,20 @@ export class MainContentComponent {
                           datetime: new Date().toISOString(),
                           index: 0,
                         }),
+                        this.fb.group({
+                          lat: 1,
+                          lon: 1,
+                          alt: 1,
+                          datetime: new Date().toISOString(),
+                          index: 1,
+                        }),
+                        this.fb.group({
+                          lat: 2,
+                          lon: 2,
+                          alt: 1,
+                          datetime: new Date().toISOString(),
+                          index: 2,
+                        }),
                       ]),
                       reportingFrequency: 0, // likely not a number
                     }),

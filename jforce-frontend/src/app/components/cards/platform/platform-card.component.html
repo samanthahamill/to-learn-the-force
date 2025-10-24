@@ -46,18 +46,28 @@
       <div class="row-1 table-row">
         <label>Waypoints</label>
         <table class="table table-striped">
-          <!-- <tbody cdkDropList (cdkDropListDropped)="drop($event)"> -->
-          <!-- <tr *ngFor="let waypoint of waypoints" cdkDrag> -->
-          <tbody>
+          <thead>
             <tr>
-              <th>Index</th>
-              <th>Lat</th>
-              <th>Lon</th>
-              <th>Altitude</th>
-              <th>Date/Time</th>
+              <th scope="col">Index</th>
+              <th scope="col">Lat</th>
+              <th scope="col">Lon</th>
+              <th scope="col">Altitude</th>
+              <th scope="col">Date/Time</th>
             </tr>
-            <tr *ngFor="let waypoint of waypoints; let i = index">
-              <td>{{ waypoint.index }}</td>
+          </thead>
+          <tbody cdkDropList (cdkDropListDropped)="drop($event)">
+            <tr
+              *ngFor="let waypoint of waypoints; let i = index"
+              cdkDrag
+              cdkDragLockAxis="y"
+            >
+              <th class="col-xs">
+                <div class="drag-handle">
+                  <ng-container [ngTemplateOutlet]="dragHandleTmpl">
+                  </ng-container>
+                  {{ waypoint.index }}
+                </div>
+              </th>
               <td>{{ waypoint.lat }}</td>
               <td>{{ waypoint.lon }}</td>
               <td>{{ waypoint.alt }}</td>
@@ -69,3 +79,20 @@
     </div>
   </form>
 </app-card>
+
+<ng-template #dragHandleTmpl>
+  <svg
+    class="bi bi-list handle"
+    width="1em"
+    height="1em"
+    viewBox="0 0 16 16"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fill-rule="evenodd"
+      d="M2.5 11.5A.5.5 0 013 11h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4A.5.5 0 013 7h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4A.5.5 0 013 3h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"
+      clip-rule="evenodd"
+    />
+  </svg>
+</ng-template>

@@ -16,6 +16,11 @@ import {
 import { CommonModule, NgFor } from '@angular/common';
 import { faRemove } from '@fortawesome/free-solid-svg-icons';
 import { PLATFORM_TYPE, Waypoints } from '../../../shared/types';
+import {
+  CdkDragDrop,
+  moveItemInArray,
+  DragDropModule,
+} from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-platform-card',
@@ -26,6 +31,7 @@ import { PLATFORM_TYPE, Waypoints } from '../../../shared/types';
     ReactiveFormsModule,
     NgFor,
     CommonModule,
+    DragDropModule,
   ],
   templateUrl: './platform-card.component.html',
   styleUrl: './platform-card.component.scss',
@@ -66,5 +72,15 @@ export class PlatformCardComponent implements OnInit {
     if (readonly !== undefined) {
       this.readonly = readonly;
     }
+  }
+
+  drop(event: CdkDragDrop<string[]>) {
+    const waypoints = this.waypoints;
+    moveItemInArray(waypoints, event.previousIndex, event.currentIndex);
+    waypoints.forEach((waypoint, i) => (waypoint.index = i));
+
+    // TODO add other logic that fixes drag/drop with times
+
+    this.platformForm.get('waypoints')?.setValue(waypoints);
   }
 }
