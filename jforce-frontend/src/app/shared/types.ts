@@ -22,7 +22,7 @@ export interface Platform {
   type: PLATFORM_TYPE;
   speed: number;
 
-  waypoints: Array<Waypoints>;
+  waypoints: Array<Waypoint>;
   reportingFrequency: number; // likely not a number
   readonly: boolean; // backend value
 }
@@ -75,7 +75,7 @@ export interface VesselInfo {
   // TODO add other
 }
 
-export interface Waypoints {
+export interface Waypoint {
   lat: number;
   lon: number;
   alt: number;

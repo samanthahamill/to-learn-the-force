@@ -8,15 +8,16 @@ import {
 import {
   FormArray,
   FormBuilder,
+  FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
-import { faAdd, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faAdd, faTable, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { ButtonModule } from 'primeng/button';
-import { Platform } from '../../../shared/types';
+import { Platform, Waypoint } from '../../../shared/types';
 import { CardComponent, ICON_FUNCTION } from '../card.component';
 import { PlatformCardComponent } from '../platform/platform-card.component';
 import { DialogConfirmationService } from '../../../services/dialog-confirmation.service';
@@ -43,13 +44,23 @@ export class ScenarioInputCardComponent {
   @Input() scenarioInput!: FormGroup;
   addIcon = faAdd;
   trashIcon = faTrash;
+  tableIcon = faTable;
 
   icons: Array<ICON_FUNCTION>;
 
   private confirmationService = inject(DialogConfirmationService);
+  shouldShowWaypointTableRows: boolean = true;
 
   constructor(private fb: FormBuilder) {
     this.icons = [
+      {
+        icon: this.tableIcon,
+        type: 'NONE',
+        tooltip: 'Toggle Waypoint Table Visibility',
+        onClick: () => {
+          this.shouldShowWaypointTableRows = !this.shouldShowWaypointTableRows;
+        },
+      },
       {
         icon: this.trashIcon,
         type: 'DELETE',
@@ -109,21 +120,56 @@ export class ScenarioInputCardComponent {
     return newName;
   }
 
-  addPlatform() {
+  addPlatform(platform?: Platform) {
+    console.log(platform);
     const name = this.getNewPlatformName();
 
     // TODO implement
     this.platforms.push(
       this.fb.group({
-        name: [name, [Validators.required]],
-        id: [name, [Validators.required]], // TODO make better id,
-        speed: ['', [Validators.required]],
-        type: ['AIR', [Validators.required]],
-        waypoints: [this.fb.array([]), [Validators.required]],
-        reportingFrequency: [0, [Validators.required]],
-        readonly: false, // TODO change to be dynamic once they can add platforms from a predesigned list
+        name: new FormControl(platform?.name ?? name, {
+          validators: Validators.required,
+        }),
+        id: new FormControl(name, { validators: Validators.required }), // TODO make better id,
+        speed: new FormControl(platform?.speed ?? '', {
+          validators: Validators.required,
+        }),
+        type: new FormControl(platform?.type ?? 'AIR', {
+          validators: Validators.required,
+        }),
+        waypoints: this.fb.array(
+          platform?.waypoints.map((waypoint: Waypoint) =>
+            this.fb.group({
+              lat: new FormControl(waypoint.lat, {
+                validators: Validators.required,
+              }),
+              lon: new FormControl(waypoint.lon, {
+                validators: Validators.required,
+              }),
+              alt: new FormControl(waypoint.alt, {
+                validators: Validators.required,
+              }),
+              datetime: new FormControl(waypoint.datetime, {
+                validators: Validators.required,
+              }),
+              index: new FormControl(waypoint.index, {
+                validators: Validators.required,
+              }),
+            }),
+          ) ?? [],
+        ),
+        reportingFrequency: new FormControl(platform?.reportingFrequency ?? 0, {
+          validators: Validators.required,
+        }),
+        readonly: new FormControl(platform?.readonly ?? false, {
+          validators: Validators.required,
+        }), // TODO change to be dynamic once they can add platforms from a predesigned list
       }),
     );
+  }
+
+  duplicatePlatform(index: number) {
+    this.addPlatform({ ...this.platforms.value[index] });
   }
 
   removeAllPlatforms() {

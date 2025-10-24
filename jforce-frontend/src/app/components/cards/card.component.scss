@@ -56,6 +56,12 @@ h3 {
   background-color: style.$danger-hover;
 }
 
+.icon-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
 .icon-button {
   display: inline-block;
   font-weight: bold;

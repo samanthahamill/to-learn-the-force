@@ -6,9 +6,11 @@
 .button {
   border-width: 0px;
   border-radius: 5px;
-  margin: 4px;
-  margin: 4px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  margin-left: 0px;
   background-color: style.$success;
+  width: 100%;
 }
 
 .button:hover {
@@ -33,6 +35,11 @@
 
 .platforms {
   margin-top: 4px;
+}
+
+.platform-inner {
+  overflow-y: auto;
+  max-height: 515px;
 }
 
 .title {

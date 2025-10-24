@@ -11,19 +11,22 @@
       {{ header }}
     </h3>
 
-    <span *ngFor="let icon of icons; let i = index">
-      <fa-icon
-        id="i"
-        index="i"
-        [icon]="icon.icon"
-        [ngClass]="{
-          'icon-button': true,
-          'red-icon': icon.type === 'DELETE',
-          'green-icon': icon.type === 'CONFIRM',
-        }"
-        (click)="icon.onClick()"
-      ></fa-icon>
-    </span>
+    <div class="icon-group">
+      <span *ngFor="let icon of icons; let i = index">
+        <fa-icon
+          id="i"
+          index="i"
+          [icon]="icon.icon"
+          [ngClass]="{
+            'icon-button': true,
+            'red-icon': icon.type === 'DELETE',
+            'green-icon': icon.type === 'CONFIRM',
+          }"
+          (click)="icon.onClick()"
+          [title]="icon.tooltip"
+        ></fa-icon>
+      </span>
+    </div>
   </span>
   <ng-content></ng-content>
 </div>

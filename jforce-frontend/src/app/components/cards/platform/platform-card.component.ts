@@ -13,15 +13,15 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { CommonModule, NgClass, NgFor } from '@angular/common';
+import { CommonModule, NgClass, NgFor, NgIf } from '@angular/common';
 import {
   faCopy,
-  faGear,
   faLock,
   faLockOpen,
+  faPencil,
   faRemove,
 } from '@fortawesome/free-solid-svg-icons';
-import { PLATFORM_TYPE, Waypoints } from '../../../shared/types';
+import { PLATFORM_TYPE, Waypoint } from '../../../shared/types';
 import {
   CdkDragDrop,
   moveItemInArray,
@@ -36,11 +36,12 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     CardComponent,
     FormsModule,
     ReactiveFormsModule,
-    NgFor,
     CommonModule,
     DragDropModule,
     FontAwesomeModule,
     NgClass,
+    NgFor,
+    NgIf,
   ],
   templateUrl: './platform-card.component.html',
   styleUrl: './platform-card.component.scss',
@@ -49,13 +50,17 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 export class PlatformCardComponent implements OnInit {
   removeIcon = faRemove;
   copyIcon = faCopy;
-  gearIcon = faGear;
+  editIcon = faPencil;
   lockIcon = faLock;
   lockOpenIcon = faLockOpen;
 
   @Input() platformForm!: FormGroup;
   @Input() index!: number;
+  @Input() shouldShowWaypointTableRows!: boolean;
+
   @Output() onDeleteClicked = new EventEmitter<void>();
+  @Output() onCopyClicked = new EventEmitter<void>();
+
   name: string = '';
   readonly: boolean = false;
   waypointsLocked: boolean = false;
@@ -67,6 +72,12 @@ export class PlatformCardComponent implements OnInit {
   constructor() {
     this.icons = [
       {
+        icon: faCopy,
+        type: 'NONE',
+        tooltip: 'Copy Platform',
+        onClick: () => this.onCopyClicked.emit(),
+      },
+      {
         icon: faRemove,
         type: 'DELETE',
         tooltip: 'Delete Platform',
@@ -75,10 +86,10 @@ export class PlatformCardComponent implements OnInit {
     ];
   }
 
-  get waypoints(): Waypoints[] {
+  get waypoints(): Waypoint[] {
     return (
       ((this.platformForm.get('waypoints') as FormArray)
-        ?.value as Waypoints[]) ?? []
+        ?.value as Waypoint[]) ?? []
     );
   }
 

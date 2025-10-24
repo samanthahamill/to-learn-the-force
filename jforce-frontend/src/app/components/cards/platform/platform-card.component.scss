@@ -2,8 +2,6 @@
 @use "styles" as style;
 @use "variables" as customVars;
 
-$table-width: calc(100% - 10px);
-
 input {
   margin-left: style.$default-margin;
 }
@@ -16,7 +14,7 @@ select {
 
 table {
   max-width: 100%;
-  min-width: $table-width;
+  min-width: 100%;
   overflow: auto;
   border: 1px solid style.$light;
   white-space: nowrap;
@@ -37,6 +35,7 @@ td {
   padding-right: style.$default-margin !important;
   white-space: nowrap;
   text-overflow: ellipsis;
+  align-content: center;
 }
 
 td:not(:first-child),
@@ -46,9 +45,14 @@ th:not(:first-child) {
 
 // Custom Classes
 
+.actions {
+  display: flex;
+  justify-content: center;
+  border-bottom-width: 0 !important;
+}
+
 .container {
   margin-top: style.$panel-margin;
-  padding: 0px;
 }
 
 .icon-disabled {
@@ -110,9 +114,9 @@ th:not(:first-child) {
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  width: $table-width !important;
-  max-width: $table-width !important;
-  min-width: $table-width !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 100% !important;
   justify-self: center;
 }
 
@@ -125,6 +129,7 @@ th:not(:first-child) {
 .drag-handle {
   display: flex;
   align-items: center;
+  justify-content: center;
   cursor: move;
 
   .handle {

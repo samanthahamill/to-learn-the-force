@@ -5,6 +5,7 @@ import { CommonModule, NgIf } from '@angular/common';
 import {
   FormArray,
   FormBuilder,
+  FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
@@ -61,94 +62,203 @@ export class MainContentComponent {
         input: this.fb.group({
           scenario: this.fb.group({
             baseInfo: this.fb.group({
-              scenarioName: [
+              scenarioName: new FormControl(
                 input.scenario?.baseInfo?.scenarioName ?? 'Default Scenario',
-              ],
-              scenarioAuthor: [
+                { validators: Validators.required },
+              ),
+              scenarioAuthor: new FormControl(
                 input.scenario?.baseInfo?.scenarioAuthor ?? 'TBD',
-              ], // TODO eventually pull this from user profile and don't allow to be edited
-              dateOfCreation: [
+                { validators: Validators.required },
+              ), // TODO eventually pull this from user profile and don't allow to be edited
+              dateOfCreation: new FormControl(
                 input.scenario?.baseInfo?.dateOfCreation ??
-                  `${new Date().toLocaleString()} MST`, // TODO eventually don't hardcode this
-              ],
-              details: [input.scenario?.baseInfo?.details ?? ''],
+                  new Date().toISOString(),
+                { validators: Validators.required }, // TODO eventually don't hardcode this
+              ),
+              details: new FormControl(
+                input.scenario?.baseInfo?.details ?? '',
+                { validators: Validators.required },
+              ),
             }),
             scenarioInput: this.fb.group({
               aoi: this.fb.group({
-                lat: input.scenario?.scenarioInput?.aoi.lat ?? 0,
-                lon: input.scenario?.scenarioInput?.aoi.lon ?? 0,
-                alt: input.scenario?.scenarioInput?.aoi.alt ?? 0,
-                radius: input.scenario?.scenarioInput?.aoi.radius ?? 0,
+                lat: new FormControl(
+                  input.scenario?.scenarioInput?.aoi.lat ?? 0,
+                  { validators: Validators.required },
+                ),
+                lon: new FormControl(
+                  input.scenario?.scenarioInput?.aoi.lon ?? 0,
+                  { validators: Validators.required },
+                ),
+                alt: new FormControl(
+                  input.scenario?.scenarioInput?.aoi.alt ?? 0,
+                  { validators: Validators.required },
+                ),
+                radius: new FormControl(
+                  input.scenario?.scenarioInput?.aoi.radius ?? 0,
+                  { validators: Validators.required },
+                ),
               }),
               platforms: input.scenario?.scenarioInput?.platforms
                 ? this.fb.array([
                     ...input.scenario?.scenarioInput.platforms.map(
                       (platform: Platform, i: number) =>
                         this.fb.group({
-                          id: platform.id ?? `Unknown ${i}`,
-                          name: platform.name ?? 'Name',
-                          type: platform.type ?? 'AIR',
-                          speed: platform.speed ?? 0,
+                          id: new FormControl(platform.id ?? `Unknown ${i}`, {
+                            validators: Validators.required,
+                          }),
+                          name: new FormControl(platform.name ?? 'Name', {
+                            validators: Validators.required,
+                          }),
+                          type: new FormControl(platform.type ?? 'AIR', {
+                            validators: Validators.required,
+                          }),
+                          speed: new FormControl(platform.speed ?? 0, {
+                            validators: Validators.required,
+                          }),
 
                           waypoints: this.fb.array(
                             platform.waypoints?.map((waypoint) =>
-                              this.fb.group(waypoint),
+                              this.fb.group({
+                                lat: new FormControl(waypoint.lat, {
+                                  validators: Validators.required,
+                                }),
+                                lon: new FormControl(waypoint.lon, {
+                                  validators: Validators.required,
+                                }),
+                                alt: new FormControl(waypoint.alt, {
+                                  validators: Validators.required,
+                                }),
+                                datetime: new FormControl(waypoint.datetime, {
+                                  validators: Validators.required,
+                                }),
+                                index: new FormControl(waypoint.index, {
+                                  validators: Validators.required,
+                                }),
+                              }),
                             ) ?? [],
                           ),
-                          reportingFrequency: platform.reportingFrequency ?? 0, // likely not a number
-                          readonly: platform.readonly ?? false,
+                          reportingFrequency: new FormControl(
+                            platform.reportingFrequency ?? 0,
+                            { validators: Validators.required },
+                          ), // likely not a number
+                          readonly: new FormControl(
+                            platform.readonly ?? false,
+                            { validators: Validators.required },
+                          ),
                         }),
                     ),
                   ])
                 : this.fb.array([
                     this.fb.group({
-                      name: ['test'],
-                      id: ['test'],
-                      readonly: [false],
-                      speed: [0],
-                      type: ['AIR'],
+                      name: new FormControl('test', {
+                        validators: Validators.required,
+                      }),
+                      id: new FormControl('test', {
+                        validators: Validators.required,
+                      }),
+                      readonly: new FormControl(false, {
+                        validators: Validators.required,
+                      }),
+                      speed: new FormControl(0, {
+                        validators: Validators.required,
+                      }),
+                      type: new FormControl('AIR', {
+                        validators: Validators.required,
+                      }),
                       waypoints: this.fb.array([
                         this.fb.group({
-                          lat: 0,
-                          lon: 0,
-                          alt: 0,
-                          datetime: new Date().toISOString(),
-                          index: 0,
+                          lat: new FormControl(0, {
+                            validators: Validators.required,
+                          }),
+                          lon: new FormControl(0, {
+                            validators: Validators.required,
+                          }),
+                          alt: new FormControl(0, {
+                            validators: Validators.required,
+                          }),
+                          datetime: new FormControl(new Date().toISOString(), {
+                            validators: Validators.required,
+                          }),
+                          index: new FormControl(0, {
+                            validators: Validators.required,
+                          }),
                         }),
                         this.fb.group({
-                          lat: 1,
-                          lon: 1,
-                          alt: 1,
-                          datetime: new Date().toISOString(),
-                          index: 1,
+                          lat: new FormControl(1, {
+                            validators: Validators.required,
+                          }),
+                          lon: new FormControl(1, {
+                            validators: Validators.required,
+                          }),
+                          alt: new FormControl(1, {
+                            validators: Validators.required,
+                          }),
+                          datetime: new FormControl(new Date().toISOString(), {
+                            validators: Validators.required,
+                          }),
+                          index: new FormControl(1, {
+                            validators: Validators.required,
+                          }),
                         }),
                         this.fb.group({
-                          lat: 2,
-                          lon: 2,
-                          alt: 1,
-                          datetime: new Date().toISOString(),
-                          index: 2,
+                          lat: new FormControl(2, {
+                            validators: Validators.required,
+                          }),
+                          lon: new FormControl(2, {
+                            validators: Validators.required,
+                          }),
+                          alt: new FormControl(1, {
+                            validators: Validators.required,
+                          }),
+                          datetime: new FormControl(new Date().toISOString(), {
+                            validators: Validators.required,
+                          }),
+                          index: new FormControl(2, {
+                            validators: Validators.required,
+                          }),
                         }),
                       ]),
-                      reportingFrequency: 0, // likely not a number
+                      reportingFrequency: new FormControl(0, [
+                        Validators.required,
+                      ]), // likely not a number
                     }),
                   ]),
             }),
           }),
           tools: this.fb.group({
-            isTool: [input.tool ?? ''],
+            isTool: new FormControl(input.tool ?? 'true', {
+              validators: Validators.required,
+            }),
           }),
         }),
         external: this.fb.group({
-          dataType: [input.external?.dataType ?? 'IMPORT'],
-          newStartTime: [input.external?.newStartTime ?? new Date()],
+          dataType: new FormControl(input.external?.dataType ?? 'IMPORT'),
+          newStartTime: new FormControl(
+            input.external?.newStartTime ?? new Date(),
+            { validators: Validators.required },
+          ),
           import: this.fb.group({
-            ogStartTime: [input.external?.import?.ogStartTime ?? new Date()],
-            ogEndTime: [input.external?.import?.ogEndTime ?? new Date()],
-            type1: [input.external?.import?.type1 ?? false],
-            type2: [input.external?.import?.type2 ?? false],
-            type3: [input.external?.import?.type3 ?? false],
-            type4: [input.external?.import?.type4 ?? false],
+            ogStartTime: new FormControl(
+              input.external?.import?.ogStartTime ?? new Date(),
+              { validators: Validators.required },
+            ),
+            ogEndTime: new FormControl(
+              input.external?.import?.ogEndTime ?? new Date(),
+              { validators: Validators.required },
+            ),
+            type1: new FormControl(input.external?.import?.type1 ?? false, {
+              validators: Validators.required,
+            }),
+            type2: new FormControl(input.external?.import?.type2 ?? false, {
+              validators: Validators.required,
+            }),
+            type3: new FormControl(input.external?.import?.type3 ?? false, {
+              validators: Validators.required,
+            }),
+            type4: new FormControl(input.external?.import?.type4 ?? false, {
+              validators: Validators.required,
+            }),
           }),
           upload: this.fb.group({}),
         }),

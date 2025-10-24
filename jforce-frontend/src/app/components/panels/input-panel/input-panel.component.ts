@@ -1,7 +1,6 @@
 import { Component, Input, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ScenarioInputCardComponent } from '../../cards/scenario-input/scenario-input-card.component';
-import { ToolsComponent } from '../../cards/tools/tools.component';
 import { CommonModule, NgIf } from '@angular/common';
 import { faDownload, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { InfoCardComponent } from '../../cards/info/info-card.component';
@@ -12,7 +11,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
   imports: [
     ScenarioInputCardComponent,
     FontAwesomeModule,
-    ToolsComponent,
     InfoCardComponent,
     CommonModule,
     NgIf,

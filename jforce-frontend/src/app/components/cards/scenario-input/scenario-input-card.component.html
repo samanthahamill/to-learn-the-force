@@ -6,21 +6,26 @@
       [innerCard]="true"
       [icons]="icons"
     >
-      <div *ngFor="let platformForm of formGroups; let i = index">
-        <div *ngIf="platformForm != undefined">
-          <app-platform-card
-            id="i"
-            [index]="i"
-            [platformForm]="platformForm"
-            (onDeleteClicked)="removePlatform(i)"
-            [redIcon]="true"
-          />
+      <div class="platform-inner">
+        <div *ngFor="let platformForm of formGroups; let i = index">
+          <div *ngIf="platformForm != undefined">
+            <app-platform-card
+              id="i"
+              [index]="i"
+              [platformForm]="platformForm"
+              (onDeleteClicked)="removePlatform(i)"
+              (onCopyClicked)="duplicatePlatform(i)"
+              [shouldShowWaypointTableRows]="shouldShowWaypointTableRows"
+              [redIcon]="true"
+            />
+          </div>
         </div>
+
+        <button class="btn button" (click)="addPlatform()">
+          <fa-icon [icon]="addIcon"></fa-icon>
+          Add Platform
+        </button>
       </div>
-      <button class="btn button" (click)="addPlatform()">
-        <fa-icon [icon]="addIcon"></fa-icon>
-        Add Platform
-      </button>
     </app-card>
   </form>
 </app-card>
