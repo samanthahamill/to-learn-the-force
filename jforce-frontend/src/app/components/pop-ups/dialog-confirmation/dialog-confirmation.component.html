@@ -1,0 +1,26 @@
+<div
+  class="modal modal-custom"
+  tabindex="-1"
+  role="dialog"
+  #confirmationDialog
+  id="confirmationDialog"
+  aria-labelledby="confirmationDialogLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="model-content">
+      <div class="modal-header">
+        <h1 class="modal-title">{{ title }}</h1>
+      </div>
+      <div class="modal-body">
+        <p>{{ message }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn confirm" (click)="onConfirm()">
+          Accept
+        </button>
+        <button type="button" class="btn deny" (click)="onDeny()">Deny</button>
+      </div>
+    </div>
+  </div>
+</div>

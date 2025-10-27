@@ -20,7 +20,9 @@ export interface Platform {
   id: string;
   name: string;
   type: PLATFORM_TYPE;
-  speed: number;
+  maxSpeed: number;
+  maxDepth: number;
+  maxAlt: number;
 
   waypoints: Array<Waypoint>;
   reportingFrequency: number; // likely not a number
@@ -42,10 +44,10 @@ export interface UserInputFormData {
       platforms: Array<Platform>;
     };
   };
-  tool: {
+  tool?: {
     isTool: boolean;
   };
-  external: {
+  external?: {
     dataType: EXTERNAL_DATA_TYPE;
     newStartTime: Date; // the time to modify the original start time to
     import: {
@@ -79,6 +81,7 @@ export interface Waypoint {
   lat: number;
   lon: number;
   alt: number;
+  speedKts: number;
   datetime: Date; // should there be a start/end time? Possibly a different type
   index: number; // backend variable only to ensure proper ordering
 }

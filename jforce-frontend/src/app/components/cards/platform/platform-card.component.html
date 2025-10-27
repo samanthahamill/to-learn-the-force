@@ -1,7 +1,7 @@
 <app-card header="{{ name }}" [lighterCard]="true" [icons]="icons">
   <form class="formGroup" [formGroup]="platformForm">
     <div class="container">
-      <div class="row-1">
+      <div class="row-1 mutli-col">
         <div class="col">
           <label for="name">Name</label>
           <input
@@ -10,11 +10,8 @@
             formControlName="name"
             [readonly]="readonly"
             class="name"
-            (onBlur)="nameUpdated()"
           />
         </div>
-      </div>
-      <div class="row-1 three-col">
         <div class="col">
           <label tooltip="Type" for="type">Type</label>
           <select formControlName="type" id="type" size="small">
@@ -23,13 +20,35 @@
             </option>
           </select>
         </div>
-        <div class="col">
-          <label for="speed">Speed</label>
+      </div>
+      <div class="row-1 mutli-col">
+        <div *ngIf="platformType == 'AIR'" class="col">
+          <label for="maxAlt">Max Alt</label>
           <input
             class="input-small"
-            id="speed"
+            id="maxAlt"
             type="number"
-            formControlName="speed"
+            formControlName="maxAlt"
+            [readonly]="readonly"
+          />
+        </div>
+        <div *ngIf="platformType == 'MARITIME'" class="col">
+          <label for="maxDepth">Max Depth</label>
+          <input
+            class="input-small"
+            id="maxDepth"
+            type="number"
+            formControlName="maxDepth"
+            [readonly]="readonly"
+          />
+        </div>
+        <div class="col">
+          <label for="maxSpeed">Max Speed</label>
+          <input
+            class="input-small"
+            id="maxSpeed"
+            type="number"
+            formControlName="maxSpeed"
             [readonly]="readonly"
           />
         </div>
@@ -51,10 +70,13 @@
           <div class="col-4 icons">
             <fa-icon
               [icon]="editIcon"
-              (click)="gearClicked()"
+              (click)="openModal()"
               title="Edit Waypoints"
               class="icon-button"
             ></fa-icon>
+
+            <!-- data-toggle="modal"
+              data-target="#exampleModal" -->
             <fa-icon
               *ngIf="!waypointsLocked"
               [icon]="lockOpenIcon"
@@ -81,6 +103,7 @@
                 <th scope="col">Lat</th>
                 <th scope="col">Lon</th>
                 <th scope="col">Altitude</th>
+                <th scope="col">Speed</th>
                 <th scope="col">Date/Time</th>
                 <th scope="col" class="actions">Actions</th>
               </tr>
@@ -107,6 +130,7 @@
                 <td>{{ waypoint.lat }}</td>
                 <td>{{ waypoint.lon }}</td>
                 <td>{{ waypoint.alt }}</td>
+                <td>{{ waypoint.speedKts }}</td>
                 <td>{{ waypoint.datetime }}</td>
                 <td class="actions">
                   <div class="table-buttons">

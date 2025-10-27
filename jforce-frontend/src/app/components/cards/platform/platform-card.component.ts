@@ -1,6 +1,7 @@
 import {
   Component,
   EventEmitter,
+  inject,
   Input,
   NO_ERRORS_SCHEMA,
   OnInit,
@@ -12,6 +13,7 @@ import {
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
 import { CommonModule, NgClass, NgFor, NgIf } from '@angular/common';
 import {
@@ -28,7 +30,10 @@ import {
   DragDropModule,
 } from '@angular/cdk/drag-drop';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { WaypointEditorService } from '../../../services/waypoint-editor.service';
 
+@UntilDestroy()
 @Component({
   selector: 'app-platform-card',
   imports: [
@@ -61,13 +66,13 @@ export class PlatformCardComponent implements OnInit {
   @Output() onDeleteClicked = new EventEmitter<void>();
   @Output() onCopyClicked = new EventEmitter<void>();
 
-  name: string = '';
-  readonly: boolean = false;
   waypointsLocked: boolean = false;
 
   platformTypeOptions: Array<PLATFORM_TYPE> = ['AIR', 'GROUND', 'MARITIME'];
 
   icons: Array<ICON_FUNCTION>;
+
+  private waypointEditorService = inject(WaypointEditorService);
 
   constructor() {
     this.icons = [
@@ -93,12 +98,38 @@ export class PlatformCardComponent implements OnInit {
     );
   }
 
+  get name(): string {
+    return this.platformForm.get('name')?.value;
+  }
+
+  get platformType(): PLATFORM_TYPE {
+    return this.platformForm.get('type')?.value;
+  }
+
+  get readonly(): boolean {
+    return this.platformForm.get('readonly')?.value;
+  }
+
   ngOnInit(): void {
-    this.name = this.platformForm.get('name')?.value ?? 'Platform';
-    const readonly = this.platformForm.get('readonly')?.value;
-    if (readonly !== undefined) {
-      this.readonly = readonly;
-    }
+    this.platformForm.valueChanges
+      .pipe(untilDestroyed(this))
+      .subscribe((value) => {
+        const type = this.platformForm?.controls['type'].value as PLATFORM_TYPE;
+
+        // if (this.platformType != type) {
+        //   this.platformType = type;
+        // }
+        this.platformForm.controls['depth'].clearValidators();
+        this.platformForm.controls['alt'].clearValidators();
+
+        if (type == 'MARITIME') {
+          this.platformForm.controls['depth'].setValidators(
+            Validators.required,
+          );
+        } else if (type == 'AIR') {
+          this.platformForm.controls['alt'].setValidators(Validators.required);
+        }
+      });
   }
 
   deleteWaypoint(index: number) {
@@ -128,9 +159,17 @@ export class PlatformCardComponent implements OnInit {
     this.waypointsLocked = !this.waypointsLocked;
   }
 
-  nameUpdated() {
-    this.name = this.platformForm.get('name')?.value ?? 'Platform';
+  openModal() {
+    this.waypointEditorService.updateWaypointAndOpenDialog(
+      this.waypoints,
+      this.name,
+      this.index,
+    );
   }
+
+  // nameUpdated() {
+  //   this.name = this.platformForm.get('name')?.value ?? 'Platform';
+  // }
 
   shiftWaypoints() {
     this.waypoints.forEach((waypoint, i) => (waypoint.index = i));

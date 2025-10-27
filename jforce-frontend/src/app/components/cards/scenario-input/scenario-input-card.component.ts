@@ -1,10 +1,4 @@
-import {
-  Component,
-  inject,
-  Input,
-  NO_ERRORS_SCHEMA,
-  ViewChild,
-} from '@angular/core';
+import { Component, inject, Input, NO_ERRORS_SCHEMA } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -121,7 +115,6 @@ export class ScenarioInputCardComponent {
   }
 
   addPlatform(platform?: Platform) {
-    console.log(platform);
     const name = this.getNewPlatformName();
 
     // TODO implement
@@ -131,7 +124,13 @@ export class ScenarioInputCardComponent {
           validators: Validators.required,
         }),
         id: new FormControl(name, { validators: Validators.required }), // TODO make better id,
-        speed: new FormControl(platform?.speed ?? '', {
+        maxSpeed: new FormControl(platform?.maxSpeed ?? '', {
+          validators: Validators.required,
+        }),
+        maxAlt: new FormControl(platform?.maxAlt ?? '', {
+          validators: Validators.required,
+        }),
+        maxDepth: new FormControl(platform?.maxDepth ?? '', {
           validators: Validators.required,
         }),
         type: new FormControl(platform?.type ?? 'AIR', {
@@ -153,6 +152,9 @@ export class ScenarioInputCardComponent {
                 validators: Validators.required,
               }),
               index: new FormControl(waypoint.index, {
+                validators: Validators.required,
+              }),
+              speedKts: new FormControl(waypoint.speedKts, {
                 validators: Validators.required,
               }),
             }),

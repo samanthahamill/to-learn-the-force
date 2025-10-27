@@ -1,16 +1,17 @@
-import { CommonModule, NgIf } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import {
   ConfirmationServiceOptions,
   DialogConfirmationService,
-} from '../../services/dialog-confirmation.service';
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+} from '../../../services/dialog-confirmation.service';
+declare var $: any;
 
 @UntilDestroy()
 @Component({
   selector: 'app-dialog-confirmation',
-  imports: [CommonModule, NgIf, ConfirmDialogModule],
+  imports: [CommonModule, ConfirmDialogModule],
   templateUrl: './dialog-confirmation.component.html',
   styleUrl: './dialog-confirmation.component.scss',
 })
@@ -20,7 +21,8 @@ export class DialogConfirmationComponent {
 
   title: string = 'Confirmation Dialog';
   message!: string;
-  showModal = true;
+
+  @ViewChild('confirmationDialog') modal!: ElementRef;
 
   constructor() {
     this.dialogConfirmationService.dialogState
@@ -30,18 +32,25 @@ export class DialogConfirmationComponent {
           this.dialog = message;
           this.title = message.header;
           this.message = message.message;
-          this.showModal = true;
         }
       });
   }
 
+  openModal() {
+    $(this.modal.nativeElement).modal('show');
+  }
+
+  closeModal() {
+    $(this.modal.nativeElement).modal('hide');
+  }
+
   onConfirm() {
-    this.showModal = false;
+    this.closeModal();
     this.dialog?.accept();
   }
 
   onDeny() {
-    this.showModal = false;
+    this.closeModal();
     this.dialog?.deny();
   }
 }

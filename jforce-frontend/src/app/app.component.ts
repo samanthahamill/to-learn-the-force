@@ -2,8 +2,9 @@ import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
 import { MainContentComponent } from './components/main-content/main-content.component';
 import { ClassificationBannerComponent } from './components/classification-banner/classification-banner.component';
 import { CommonModule } from '@angular/common';
-import { DialogConfirmationComponent } from './components/dialog-confirmation/dialog-confirmation.component';
-import { ToastComponent } from './components/toast/toast.component';
+import { DialogConfirmationComponent } from './components/pop-ups/dialog-confirmation/dialog-confirmation.component';
+import { ToastComponent } from './components/pop-ups/toast/toast.component';
+import { WaypointDialogComponent } from './components/pop-ups/waypoint-dialog/waypoint-dialog.component';
 
 @Component({
   selector: 'app-root',
@@ -13,6 +14,7 @@ import { ToastComponent } from './components/toast/toast.component';
     MainContentComponent,
     ToastComponent,
     ClassificationBannerComponent,
+    WaypointDialogComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createStore, select, withProps } from '@ngneat/elf';
-import { AOIType, UserInputFormData } from '../shared/types';
+import { AOIType, UserInputFormData, Waypoint } from '../shared/types';
 
 interface UserStoreState {
   input: UserInputFormData | undefined;
@@ -49,6 +49,35 @@ export class UserStateService {
         ...state,
         aoi: newAoi as AOIType,
       }));
+    }
+  }
+
+  updateWaypoint(platformIndex: number, waypointInfo: Waypoint[]) {
+    if (platformIndex !== undefined && waypointInfo !== undefined) {
+      const inputValue = store.value.input;
+
+      const platforms = inputValue?.scenario.scenarioInput.platforms;
+      if (platforms !== undefined) {
+        platforms[platformIndex].waypoints = waypointInfo;
+
+        store.update((state) => ({
+          ...state,
+          input:
+            state.input == undefined
+              ? undefined
+              : {
+                  // TODO fix me... trying to update waypoints
+                  ...state.input,
+                  scenario: {
+                    ...state.input.scenario,
+                    scenarioInput: {
+                      ...state.input.scenario.scenarioInput,
+                      platforms: platforms,
+                    },
+                  },
+                },
+        }));
+      }
     }
   }
 }

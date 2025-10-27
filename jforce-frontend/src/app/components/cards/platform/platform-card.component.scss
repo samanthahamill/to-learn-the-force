@@ -79,7 +79,28 @@ th:not(:first-child) {
   width: 250px;
 }
 
-.three-col {
+.table-disabled {
+  color: style.$disabled !important;
+}
+
+.table-row {
+  margin-top: style.$default-margin;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 100% !important;
+  justify-self: center;
+}
+
+.table-responsive {
+  width: 100%;
+}
+
+.mutli-col {
   display: flex;
   justify-content: space-between;
 }
@@ -101,27 +122,6 @@ th:not(:first-child) {
 .waypoint-title {
   display: flex;
   justify-content: center;
-}
-
-.table-disabled {
-  color: style.$disabled !important;
-}
-
-.table-row {
-  margin-top: style.$default-margin;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 100% !important;
-  justify-self: center;
-}
-
-.table-responsive {
-  width: 100%;
 }
 
 // DnD BELOW
