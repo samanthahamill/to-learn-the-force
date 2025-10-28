@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PlatformComponent } from './platform.component';
+import { AoiCardComponent } from './aoi-card.component';
 
-describe('PlatformComponent', () => {
-  let component: PlatformComponent;
-  let fixture: ComponentFixture<PlatformComponent>;
+describe('AoiCardComponent', () => {
+  let component: AoiCardComponent;
+  let fixture: ComponentFixture<AoiCardComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PlatformComponent]
+      imports: [AoiCardComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(PlatformComponent);
+    fixture = TestBed.createComponent(AoiCardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

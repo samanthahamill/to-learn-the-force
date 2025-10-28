@@ -1,3 +1,10 @@
+export interface AOIType {
+  lat: number;
+  lon: number;
+  alt: number;
+  radius: number;
+}
+
 export interface IntInfo {
   name: string;
 }
@@ -10,25 +17,37 @@ export interface Emitters {
 }
 
 export interface Platform {
-  name: string;
   id: string;
-  readonly: boolean;
-  speed: number;
-  depth: number;
+  name: string;
+  type: PLATFORM_TYPE;
+  maxSpeed: number;
+  maxDepth: number;
+  maxAlt: number;
+
+  waypoints: Array<Waypoint>;
+  reportingFrequency: number; // likely not a number
+  readonly: boolean; // backend value
 }
 
+export type PLATFORM_TYPE = 'GROUND' | 'MARITIME' | 'AIR';
+
 export interface UserInputFormData {
-  scenarioInfo: {
-    scenarioName: string;
-    scenarioAuthor: string;
-    dateOfCreation: Date;
-    details: string;
-    platforms: Array<Platform>;
+  scenario: {
+    baseInfo: {
+      scenarioName: string;
+      scenarioAuthor: string;
+      dateOfCreation: Date;
+      details: string;
+    };
+    scenarioInput: {
+      aoi: AOIType;
+      platforms: Array<Platform>;
+    };
   };
-  tool: {
+  tool?: {
     isTool: boolean;
   };
-  external: {
+  external?: {
     dataType: EXTERNAL_DATA_TYPE;
     newStartTime: Date; // the time to modify the original start time to
     import: {
@@ -56,4 +75,13 @@ export interface VesselInfo {
   id: string;
   emitter: Array<Emitters>;
   // TODO add other
+}
+
+export interface Waypoint {
+  lat: number;
+  lon: number;
+  alt: number;
+  speedKts: number;
+  datetime: Date; // should there be a start/end time? Possibly a different type
+  index: number; // backend variable only to ensure proper ordering
 }

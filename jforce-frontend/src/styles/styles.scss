@@ -74,12 +74,13 @@ h1 {
   font-size: customVars.$font-size-big;
 }
 
-$classification-banner-height: 20px;
 $app-bar-height: 40px;
+$classification-banner-height: 20px;
 $content-panel-height: calc(
   100vh - $app-bar-height - $classification-banner-height -
     $classification-banner-height
 );
+$default-margin: 4px;
 $panel-margin: 4px;
 $panel-padding: 2px;
 
@@ -110,7 +111,6 @@ input {
 }
 
 input {
-  margin-left: 4px;
   width: 100%;
   border-radius: 5px;
 }
@@ -122,6 +122,8 @@ label {
 .checkbox {
   width: 13px;
 }
+
+$grid-gutter-width: 1rem;
 
 /* Importing Bootstrap SCSS file. */
 @import "bootstrap/scss/bootstrap";

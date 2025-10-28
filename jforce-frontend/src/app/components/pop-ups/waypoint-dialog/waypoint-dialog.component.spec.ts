@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ToolsComponent } from './tools.component';
+import { WaypointDialogComponent } from './waypoint-dialog.component';
 
-describe('ToolsComponent', () => {
-  let component: ToolsComponent;
-  let fixture: ComponentFixture<ToolsComponent>;
+describe('WaypointDialogComponent', () => {
+  let component: WaypointDialogComponent;
+  let fixture: ComponentFixture<WaypointDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ToolsComponent]
+      imports: [WaypointDialogComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ToolsComponent);
+    fixture = TestBed.createComponent(WaypointDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,0 +1,49 @@
+@use "../card.component.scss" as card;
+@use "../../panels/panel.scss";
+@use "styles" as style;
+@use "variables" as customVars;
+
+.button {
+  border-width: 0px;
+  border-radius: 5px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  margin-left: 0px;
+  background-color: style.$success;
+  width: 100%;
+}
+
+.button:hover {
+  background-color: style.$success-hover;
+}
+
+.container {
+  flex-direction: column;
+}
+
+.dialog {
+  position: absolute;
+  z-index: 11;
+  height: 100vh;
+  width: 100vw;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.platforms {
+  margin-top: 4px;
+}
+
+.platform-inner {
+  overflow-y: auto;
+  max-height: 515px;
+}
+
+.title {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}

@@ -1,0 +1,31 @@
+<app-card header="Scenario Input">
+  <form class="formGroup" [formGroup]="scenarioInput">
+    <app-aoi-card [aoiFormGroup]="getFormGroup('aoi')" />
+    <app-card
+      header="Platforms ({{ platformCount }})"
+      [innerCard]="true"
+      [icons]="icons"
+    >
+      <div class="platform-inner">
+        <div *ngFor="let platformForm of formGroups; let i = index">
+          <div *ngIf="platformForm != undefined">
+            <app-platform-card
+              id="i"
+              [index]="i"
+              [platformForm]="platformForm"
+              (onDeleteClicked)="removePlatform(i)"
+              (onCopyClicked)="duplicatePlatform(i)"
+              [shouldShowWaypointTableRows]="shouldShowWaypointTableRows"
+              [redIcon]="true"
+            />
+          </div>
+        </div>
+
+        <button class="btn button" (click)="addPlatform()">
+          <fa-icon [icon]="addIcon"></fa-icon>
+          Add Platform
+        </button>
+      </div>
+    </app-card>
+  </form>
+</app-card>

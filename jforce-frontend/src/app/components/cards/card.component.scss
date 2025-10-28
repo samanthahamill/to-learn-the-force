@@ -56,17 +56,26 @@ h3 {
   background-color: style.$danger-hover;
 }
 
+.icon-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
 .icon-button {
   display: inline-block;
   font-weight: bold;
   align-items: center;
   padding: 0px;
-  margin: 2px;
   border: none;
   cursor: pointer;
   width: 20px;
   height: 20px;
   border-radius: 30px;
+}
+
+.icon-button:hover {
+  color: style.$light;
 }
 
 .inner-card {
@@ -92,4 +101,10 @@ h3 {
 
 .red-icon:hover {
   color: style.$danger-hover;
+}
+
+.row-1 {
+  display: flex;
+  align-content: center;
+  padding-top: 4px;
 }

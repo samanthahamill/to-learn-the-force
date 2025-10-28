@@ -7,11 +7,14 @@ form {
 }
 
 .bottom-button {
+  position: absolute;
   bottom: 0px;
+  display: flex;
+  justify-content: center;
 }
 
 .inputs {
-  height: calc(100% - 40px);
+  height: calc(100% - 30px);
   overflow: auto;
 }
 
@@ -20,8 +23,7 @@ form {
 }
 
 .submit {
-  width: 150px;
   border-radius: 5px;
-  bottom: 4px;
-  height: 30px;
+  padding: style.$default-margin;
+  margin-bottom: calc(style.$default-margin * 2);
 }
