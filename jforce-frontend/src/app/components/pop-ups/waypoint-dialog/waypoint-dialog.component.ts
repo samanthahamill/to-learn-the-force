@@ -48,8 +48,9 @@ import { Draw, Modify, Snap } from 'ol/interaction';
 import { point } from '@turf/turf';
 import CircleStyle from 'ol/style/Circle';
 import Feature from 'ol/Feature';
-import { Geometry } from 'ol/geom';
+import { Geometry, Point } from 'ol/geom';
 import GeoJSON from 'ol/format/GeoJSON';
+import { fromLonLat } from 'ol/proj';
 
 declare var $: any;
 const projection = 'EPSG:4326';
@@ -145,6 +146,7 @@ export class WaypointDialogComponent implements OnInit {
       .subscribe((info) => {
         if (info !== undefined) {
           this.waypointFormData = { ...info };
+          this.renderWaypoints();
           this.openModal();
         }
       });
@@ -220,7 +222,6 @@ export class WaypointDialogComponent implements OnInit {
   }
 
   activeDrawPointInteraction() {
-    // this.drawToggleSelection?.activate();
     this.map?.addInteraction(this.draw);
     this.map?.addInteraction(this.snap);
   }
@@ -249,7 +250,9 @@ export class WaypointDialogComponent implements OnInit {
       { id: waypoint.index },
     );
 
-    const feature = this.geoJSON.readFeature(pt) as Feature<Geometry>;
+    const feature = new Feature(
+      new Point(fromLonLat([waypoint.lon, waypoint.lat])),
+    );
     const ptStyle = this.getStyle();
     feature.setStyle(ptStyle);
 
@@ -272,6 +275,8 @@ export class WaypointDialogComponent implements OnInit {
       stroke: new Styled.Stroke({ width: 1, color: 'red' }),
     });
   }
+
+  // non-map functions
 
   addWaypoint() {
     if (

@@ -15,64 +15,7 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ToastService } from '../../services/toast.service';
 import { UserStateService } from '../../services/user-state.service';
 import { ExternalComponent } from '../panels/external/external.component';
-import { Platform, UserInputFormData } from '../../shared/types';
-
-const BASIC_FORM_DATA: UserInputFormData = {
-  scenario: {
-    baseInfo: {
-      scenarioName: 'Test',
-      scenarioAuthor: 'TBD',
-      dateOfCreation: new Date(),
-      details: '',
-    },
-    scenarioInput: {
-      aoi: {
-        lat: 0,
-        lon: 0,
-        alt: 0,
-        radius: 10,
-      },
-      platforms: [
-        {
-          name: 'test',
-          id: 'test',
-          readonly: false,
-          maxSpeed: 0,
-          maxAlt: 0,
-          maxDepth: 0,
-          type: 'AIR',
-          reportingFrequency: 0,
-          waypoints: [
-            {
-              lat: 2,
-              lon: 2,
-              alt: 1,
-              datetime: new Date().toISOString(),
-              index: 0,
-              speedKts: 13,
-            },
-            {
-              lat: 1,
-              lon: 1,
-              alt: 1,
-              datetime: new Date().toISOString(),
-              index: 1,
-              speedKts: 13,
-            },
-            {
-              lat: 1,
-              lon: 0,
-              alt: 1,
-              datetime: new Date().toISOString(),
-              index: 2,
-              speedKts: 13,
-            },
-          ],
-        },
-      ],
-    },
-  },
-};
+import { AOIType, Platform, UserInputFormData } from '../../shared/types';
 
 @UntilDestroy()
 @Component({
@@ -100,7 +43,7 @@ export class MainContentComponent {
     this.userStateService.input$
       .pipe(untilDestroyed(this))
       .subscribe((data: UserInputFormData | undefined) => {
-        if (data !== undefined) {
+        if (data !== undefined && data != this.formGroup?.value) {
           this.updateInput(data);
         }
       });
@@ -108,7 +51,13 @@ export class MainContentComponent {
 
   ngOnInit(): void {
     if (this.formGroup == null) {
-      this.updateInput(BASIC_FORM_DATA);
+      this.updateInput({} as UserInputFormData);
+    }
+  }
+
+  onUpdated() {
+    if (this.formGroup) {
+      this.userStateService.updateInput(this.formGroup.value);
     }
   }
 

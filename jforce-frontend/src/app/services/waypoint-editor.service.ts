@@ -2,10 +2,6 @@ import { inject, Injectable } from '@angular/core';
 import { Waypoint } from '../shared/types';
 import { createStore, select, withProps } from '@ngneat/elf';
 import { UserStateService } from './user-state.service';
-<<<<<<< HEAD
-import { FormArray, FormGroup } from '@angular/forms';
-=======
->>>>>>> a88f983806ddf8210550edf946cfcb5bcdaa926b
 
 export interface WaypointEditorInformation {
   waypoints: Waypoint[];

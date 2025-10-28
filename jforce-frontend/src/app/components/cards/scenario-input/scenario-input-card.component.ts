@@ -1,4 +1,13 @@
-import { Component, inject, Input, NO_ERRORS_SCHEMA } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  NO_ERRORS_SCHEMA,
+  OnInit,
+  Output,
+} from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -16,7 +25,9 @@ import { CardComponent, ICON_FUNCTION } from '../card.component';
 import { PlatformCardComponent } from '../platform/platform-card.component';
 import { DialogConfirmationService } from '../../../services/dialog-confirmation.service';
 import { AoiCardComponent } from '../aoi/aoi-card.component';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
+@UntilDestroy()
 @Component({
   selector: 'app-scenario-input-card',
   imports: [
@@ -36,6 +47,7 @@ import { AoiCardComponent } from '../aoi/aoi-card.component';
 })
 export class ScenarioInputCardComponent {
   @Input() scenarioInput!: FormGroup;
+  @Input() formUpdated!: () => void;
   addIcon = faAdd;
   trashIcon = faTrash;
   tableIcon = faTable;
@@ -70,6 +82,10 @@ export class ScenarioInputCardComponent {
           ),
       },
     ];
+  }
+
+  onUpdated(): void {
+    this.formUpdated();
   }
 
   get platforms(): FormArray {

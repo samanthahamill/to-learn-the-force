@@ -8,6 +8,7 @@
             id="name"
             type="text"
             formControlName="name"
+            (blur)="onUpdate()"
             [readonly]="readonly"
             class="name"
           />
@@ -29,6 +30,7 @@
             id="maxAlt"
             type="number"
             formControlName="maxAlt"
+            (blur)="onUpdate()"
             [readonly]="readonly"
           />
         </div>
@@ -39,6 +41,7 @@
             id="maxDepth"
             type="number"
             formControlName="maxDepth"
+            (blur)="onUpdate()"
             [readonly]="readonly"
           />
         </div>
@@ -49,6 +52,7 @@
             id="maxSpeed"
             type="number"
             formControlName="maxSpeed"
+            (blur)="onUpdate()"
             [readonly]="readonly"
           />
         </div>
@@ -59,6 +63,7 @@
             id="reportingFrequency"
             type="number"
             formControlName="reportingFrequency"
+            (blur)="onUpdate()"
             [readonly]="readonly"
           />
         </div>

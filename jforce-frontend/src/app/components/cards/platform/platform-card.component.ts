@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   EventEmitter,
   inject,
@@ -51,7 +52,7 @@ import { WaypointEditorService } from '../../../services/waypoint-editor.service
   styleUrl: './platform-card.component.scss',
   schemas: [NO_ERRORS_SCHEMA],
 })
-export class PlatformCardComponent implements OnInit {
+export class PlatformCardComponent implements AfterViewInit {
   removeIcon = faRemove;
   copyIcon = faCopy;
   editIcon = faPencil;
@@ -61,7 +62,7 @@ export class PlatformCardComponent implements OnInit {
   @Input() platformForm!: FormGroup;
   @Input() index!: number;
   @Input() shouldShowWaypointTableRows!: boolean;
-
+  @Input() formUpdated!: () => void;
   @Output() onDeleteClicked = new EventEmitter<void>();
   @Output() onCopyClicked = new EventEmitter<void>();
 
@@ -109,26 +110,27 @@ export class PlatformCardComponent implements OnInit {
     return this.platformForm.get('readonly')?.value;
   }
 
-  ngOnInit(): void {
-    this.platformForm.valueChanges
-      .pipe(untilDestroyed(this))
-      .subscribe((value) => {
-        const type = this.platformForm?.controls['type'].value as PLATFORM_TYPE;
+  ngAfterViewInit(): void {
+    this.platformForm.valueChanges.pipe(untilDestroyed(this)).subscribe(() => {
+      const type = this.platformForm?.controls['type'].value as PLATFORM_TYPE;
 
-        // if (this.platformType != type) {
-        //   this.platformType = type;
-        // }
-        this.platformForm.controls['depth'].clearValidators();
-        this.platformForm.controls['alt'].clearValidators();
+      this.platformForm.controls['depth'].clearValidators();
+      this.platformForm.controls['alt'].clearValidators();
 
-        if (type == 'MARITIME') {
-          this.platformForm.controls['depth'].setValidators(
-            Validators.required,
-          );
-        } else if (type == 'AIR') {
-          this.platformForm.controls['alt'].setValidators(Validators.required);
-        }
-      });
+      if (type == 'MARITIME') {
+        this.platformForm.controls['depth'].setValidators(Validators.required);
+      } else if (type == 'AIR') {
+        this.platformForm.controls['alt'].setValidators(Validators.required);
+      }
+
+      console.log('here');
+
+      this.formUpdated();
+    });
+  }
+
+  onUpdate(): void {
+    this.formUpdated();
   }
 
   deleteWaypoint(index: number) {
@@ -172,5 +174,6 @@ export class PlatformCardComponent implements OnInit {
 
   shiftWaypoints() {
     this.waypoints.forEach((waypoint, i) => (waypoint.index = i));
+    this.formUpdated();
   }
 }

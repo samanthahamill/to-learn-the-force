@@ -1,21 +1,36 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, inject, Input } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  inject,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CardComponent } from '../card.component';
 import { UserStateService } from '../../../services/user-state.service';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
+@UntilDestroy()
 @Component({
   selector: 'app-aoi-card',
   imports: [CardComponent, FormsModule, ReactiveFormsModule, CommonModule],
   templateUrl: './aoi-card.component.html',
   styleUrl: './aoi-card.component.scss',
 })
-export class AoiCardComponent implements AfterViewInit {
+export class AoiCardComponent implements OnInit, AfterViewInit {
   @Input() aoiFormGroup!: FormGroup;
   @Input() onInputUpdated!: (details: string) => void;
+  @Input() formUpdated!: () => void;
   private userState = inject(UserStateService);
 
   constructor() {}
+  ngOnInit(): void {
+    this.aoiFormGroup?.valueChanges.pipe(untilDestroyed(this)).subscribe(() => {
+      this.formUpdated();
+    });
+  }
 
   ngAfterViewInit(): void {
     if (this.aoiFormGroup === undefined) {

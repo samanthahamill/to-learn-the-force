@@ -1,6 +1,9 @@
 <app-card header="Scenario Input">
   <form class="formGroup" [formGroup]="scenarioInput">
-    <app-aoi-card [aoiFormGroup]="getFormGroup('aoi')" />
+    <app-aoi-card
+      [aoiFormGroup]="getFormGroup('aoi')"
+      [formUpdated]="onUpdated.bind(this)"
+    />
     <app-card
       header="Platforms ({{ platformCount }})"
       [innerCard]="true"
@@ -13,10 +16,11 @@
               id="i"
               [index]="i"
               [platformForm]="platformForm"
-              (onDeleteClicked)="removePlatform(i)"
-              (onCopyClicked)="duplicatePlatform(i)"
               [shouldShowWaypointTableRows]="shouldShowWaypointTableRows"
               [redIcon]="true"
+              (onDeleteClicked)="removePlatform(i)"
+              (onCopyClicked)="duplicatePlatform(i)"
+              [formUpdated]="onUpdated.bind(this)"
             />
           </div>
         </div>

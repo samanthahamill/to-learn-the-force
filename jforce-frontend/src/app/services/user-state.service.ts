@@ -2,6 +2,63 @@ import { Injectable } from '@angular/core';
 import { createStore, select, withProps } from '@ngneat/elf';
 import { AOIType, UserInputFormData, Waypoint } from '../shared/types';
 
+const BASIC_FORM_DATA: UserInputFormData = {
+  scenario: {
+    baseInfo: {
+      scenarioName: 'Test',
+      scenarioAuthor: 'TBD',
+      dateOfCreation: new Date(),
+      details: '',
+    },
+    scenarioInput: {
+      aoi: {
+        lat: 0,
+        lon: 0,
+        alt: 0,
+        radius: 10,
+      },
+      platforms: [
+        {
+          name: 'test',
+          id: 'test',
+          readonly: false,
+          maxSpeed: 0,
+          maxAlt: 0,
+          maxDepth: 0,
+          type: 'AIR',
+          reportingFrequency: 0,
+          waypoints: [
+            {
+              lat: 2,
+              lon: 2,
+              alt: 1,
+              datetime: new Date().toISOString(),
+              index: 0,
+              speedKts: 13,
+            },
+            {
+              lat: 1,
+              lon: 1,
+              alt: 1,
+              datetime: new Date().toISOString(),
+              index: 1,
+              speedKts: 13,
+            },
+            {
+              lat: 1,
+              lon: 0,
+              alt: 1,
+              datetime: new Date().toISOString(),
+              index: 2,
+              speedKts: 13,
+            },
+          ],
+        },
+      ],
+    },
+  },
+};
+
 interface UserStoreState {
   input: UserInputFormData | undefined;
   aoi: AOIType | undefined;
@@ -22,17 +79,24 @@ export class UserStateService {
   input$ = store.pipe(select((state) => state.input));
   aoi$ = store.pipe(select((state) => state.aoi));
 
-  constructor() {}
+  constructor() {
+    store.update((state) => ({ ...state, input: BASIC_FORM_DATA }));
+  }
 
   get getAOI() {
     return store.value.aoi;
   }
 
   updateInput(input: UserInputFormData) {
-    store.update((state) => ({ ...state, input: input }));
+    store.update((state) => ({
+      ...state,
+      input: input,
+      aoi: input.scenario.scenarioInput.aoi,
+    }));
   }
 
   updateAOI(newAoi: AOIType) {
+    console.log(newAoi);
     const aoi = store.value.aoi;
     if (
       newAoi.lat !== undefined &&

@@ -36,8 +36,8 @@ fa-icon {
 }
 
 .map-dimensions {
-  height: 50vw !important;
-  width: 100%;
+  height: 45.5vh !important;
+  width: 49.5vw;
   z-index: 0;
   position: relative;
   margin: style.$panel-margin;
@@ -56,3 +56,5 @@ fa-icon {
   min-width: 100%;
   background-color: none;
 }
+
+// 833x1064
