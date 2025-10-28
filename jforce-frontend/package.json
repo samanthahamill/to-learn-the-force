@@ -39,7 +39,7 @@
     "@popperjs/core": "2.11.8",
     "@primeng/themes": "19.0.10",
     "@turf/turf": "7.2.0",
-    "@types/jquery": "^3.5.33",
+    "@types/jquery": "3.5.33",
     "ag-grid-angular": "33.2.1",
     "ag-grid-community": "33.2.1",
     "bootstrap": "5.3.7",
@@ -57,7 +57,7 @@
     "primeicons": "7.0.0",
     "primeng": "19.0.10",
     "rxjs": "7.8.2",
-    "terra-draw": "^1.18.1",
+    "terra-draw": "1.18.1",
     "tslib": "2.8.1",
     "zone.js": "~0.15.0"
   },
