@@ -41,7 +41,6 @@ import { WaypointEditorService } from '../../../services/waypoint-editor.service
     CardComponent,
     FormsModule,
     ReactiveFormsModule,
-    CommonModule,
     DragDropModule,
     FontAwesomeModule,
     NgClass,

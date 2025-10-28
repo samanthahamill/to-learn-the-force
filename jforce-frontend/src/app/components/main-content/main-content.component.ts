@@ -47,7 +47,23 @@ const BASIC_FORM_DATA: UserInputFormData = {
               lat: 2,
               lon: 2,
               alt: 1,
-              datetime: new Date(),
+              datetime: new Date().toISOString(),
+              index: 0,
+              speedKts: 13,
+            },
+            {
+              lat: 1,
+              lon: 1,
+              alt: 1,
+              datetime: new Date().toISOString(),
+              index: 1,
+              speedKts: 13,
+            },
+            {
+              lat: 1,
+              lon: 0,
+              alt: 1,
+              datetime: new Date().toISOString(),
               index: 2,
               speedKts: 13,
             },
@@ -98,7 +114,7 @@ export class MainContentComponent {
 
   updateInput(input: UserInputFormData) {
     if (input !== null) {
-      console.log('blank form initiated');
+      console.log('Default Form Initiated');
       this.formGroup = this.fb.group({
         input: this.fb.group({
           scenario: this.fb.group({

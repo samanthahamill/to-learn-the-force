@@ -82,6 +82,6 @@ export interface Waypoint {
   lon: number;
   alt: number;
   speedKts: number;
-  datetime: Date; // should there be a start/end time? Possibly a different type
+  datetime: string; // should there be a start/end time? Possibly a different type
   index: number; // backend variable only to ensure proper ordering
 }

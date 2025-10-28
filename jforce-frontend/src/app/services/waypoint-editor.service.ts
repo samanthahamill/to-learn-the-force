@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Waypoint } from '../shared/types';
 import { createStore, select, withProps } from '@ngneat/elf';
 import { UserStateService } from './user-state.service';
+import { FormArray, FormGroup } from '@angular/forms';
 
 export interface WaypointEditorInformation {
   waypoints: Waypoint[];
@@ -37,7 +38,6 @@ export class WaypointEditorService {
     platformName: string,
     platformIndex: number,
   ) {
-    console.log('updateWaypointAndOpenDialog');
     const info = {
       waypoints: waypoints,
       platformName: platformName,

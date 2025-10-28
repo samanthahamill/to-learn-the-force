@@ -1,7 +1,6 @@
 import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
-import { Coordinate, format } from 'ol/coordinate';
 import Map from 'ol/Map';
 import Fill from 'ol/style/Fill';
 import Style from 'ol/style/Style';
@@ -25,6 +24,7 @@ import { DrawEvent } from 'ol/interaction/Draw';
 import { Circle } from 'ol/geom';
 import GeoJSON from 'ol/format/GeoJSON';
 import { point, circle } from '@turf/turf';
+import { createStringYX } from '../../../shared/utils';
 
 const projection = 'EPSG:4326';
 
@@ -91,25 +91,30 @@ export class MapComponent implements OnInit {
       source: this.vectorSource,
     });
 
+    const tile = new TileLayer({
+      source: new OSM(),
+    });
+    tile.on('prerender', (evt) => {
+      // return
+      if (evt.context) {
+        const context = evt.context as CanvasRenderingContext2D;
+        context.filter = 'grayscale(80%) invert(100%) ';
+        context.globalCompositeOperation = 'source-over';
+      }
+    });
+
     this.map = new Map({
       target: 'mapContainer',
       controls: defaultControls().extend([
         new ScaleLine({ units: 'nautical' }),
         new MousePosition({
-          coordinateFormat: this.createStringYX(4),
+          coordinateFormat: createStringYX(4),
           projection: projection,
           className: 'custom-mouse-position',
           target: 'mousePositionDisplay',
         }),
       ]),
-      layers: [
-        this.drawingLayer,
-        this.aoiLayer,
-        this.vectorLayer,
-        new TileLayer({
-          source: new OSM(),
-        }),
-      ],
+      layers: [this.drawingLayer, this.aoiLayer, this.vectorLayer, tile],
       view: this.olMapView,
     });
 
@@ -204,17 +209,5 @@ export class MapComponent implements OnInit {
 
     // TODO add back in
     this.map?.addControl(btnBar);
-  }
-
-  createStringYX(fractionDigits: number) {
-    return (
-      /**
-       * @param {Coordinate} coordinate Coordinate.
-       * @return {string} String YX.
-       */
-      function (coordinate: Coordinate | undefined) {
-        return format(coordinate!, '{x}, {y}', fractionDigits);
-      }
-    );
   }
 }

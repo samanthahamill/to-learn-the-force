@@ -1,35 +1,152 @@
 <div
-  class="modal modal-custom"
+  class="modal fade modal-custom"
   tabindex="-1"
   role="dialog"
   #waypointModal
   id="waypointModal"
   aria-labelledby="waypointModalLabel"
   aria-hidden="true"
+  data-bs-backdrop="static"
 >
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
+  <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+    <div class="modal-content model-dimensions">
       <div class="modal-header">
         <h5 class="modal-title">{{ platformName }} Waypoint Editor</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
-        </button>
       </div>
-      <div class="modal-body">
-        <p>Modal body text goes here.</p>
+      <div class="modal-body flex-modal">
+        <div clas="custom-table">
+          <div class="add-waypoint"></div>
+          <div class="table-responsive">
+            <table
+              class="table table-striped table-dark table-hover table-condensed"
+            >
+              <thead>
+                <tr>
+                  <th scope="col" class="actions">#</th>
+                  <th scope="col">Lat</th>
+                  <th scope="col">Lon</th>
+                  <th scope="col">Altitude</th>
+                  <th scope="col">Speed</th>
+                  <th scope="col">Date/Time</th>
+                  <th scope="col" class="actions">Actions</th>
+                </tr>
+              </thead>
+              <tbody cdkDropList (cdkDropListDropped)="drop($event)">
+                <tr>
+                  <th></th>
+                  <td>
+                    <input
+                      class="input-small"
+                      id="LatInput"
+                      type="number"
+                      [(ngModel)]="latInput"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      class="input-small"
+                      id="LonInput"
+                      type="number"
+                      [(ngModel)]="lonInput"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      class="input-small"
+                      id="AltInput"
+                      type="number"
+                      [(ngModel)]="altInput"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      class="input-small"
+                      id="SpeedInput"
+                      type="number"
+                      [(ngModel)]="speedInput"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      class="input-small"
+                      id="datetimeInput"
+                      type="datetime-local"
+                      [(ngModel)]="datetimeInput"
+                    />
+                  </td>
+                  <td>
+                    <fa-icon
+                      [icon]="addIcon"
+                      (click)="addWaypoint()"
+                      title="Add Waypoint"
+                      [ngClass]="{
+                        'icon-button': true,
+                        'green-icon': true,
+                      }"
+                    ></fa-icon>
+                  </td>
+                </tr>
+                <tr
+                  *ngFor="let waypoint of waypoints; let i = index"
+                  cdkDrag
+                  cdkDragLockAxis="y"
+                >
+                  <th class="col-xs">
+                    <div class="drag-handle">
+                      <ng-container [ngTemplateOutlet]="dragHandleTmpl">
+                      </ng-container>
+                    </div>
+                  </th>
+                  <td>{{ waypoint.lat }}</td>
+                  <td>{{ waypoint.lon }}</td>
+                  <td>{{ waypoint.alt }}</td>
+                  <td>{{ waypoint.speedKts }}</td>
+                  <td>{{ waypoint.datetime }}</td>
+                  <td class="actions">
+                    <div class="table-buttons">
+                      <fa-icon
+                        [icon]="copyIcon"
+                        (click)="duplicateWaypoint(i)"
+                        title="Duplicate Waypoint"
+                        class="icon-button"
+                      ></fa-icon>
+                      <fa-icon
+                        [icon]="removeIcon"
+                        (click)="deleteWaypoint(i)"
+                        title="Delete Waypoint"
+                        [ngClass]="{
+                          'icon-button': true,
+                          'red-icon': true,
+                        }"
+                      ></fa-icon>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div
+          #mapContainerWaypoints
+          id="mapContainerWaypoints"
+          class="map-dimensions"
+        ></div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (onClick)="closeAndSaveModal()"
+          data-bs-dismiss="modal"
+        >
+          Save changes
+        </button>
         <button
           type="button"
           class="btn btn-secondary"
           data-dismiss="modal"
           (onClick)="closeModal()"
+          data-bs-dismiss="modal"
         >
           Close
         </button>
@@ -37,3 +154,20 @@
     </div>
   </div>
 </div>
+
+<ng-template #dragHandleTmpl>
+  <svg
+    class="bi bi-list handle"
+    width="1em"
+    height="1em"
+    viewBox="0 0 16 16"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fill-rule="evenodd"
+      d="M2.5 11.5A.5.5 0 013 11h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4A.5.5 0 013 7h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4A.5.5 0 013 3h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"
+      clip-rule="evenodd"
+    />
+  </svg>
+</ng-template>
