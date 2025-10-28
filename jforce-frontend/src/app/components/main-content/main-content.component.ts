@@ -43,6 +43,7 @@ export class MainContentComponent {
     this.userStateService.input$
       .pipe(untilDestroyed(this))
       .subscribe((data: UserInputFormData | undefined) => {
+        console.log('input updated');
         if (data !== undefined && data != this.formGroup?.value) {
           this.updateInput(data);
         }

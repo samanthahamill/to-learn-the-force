@@ -80,7 +80,11 @@ export class UserStateService {
   aoi$ = store.pipe(select((state) => state.aoi));
 
   constructor() {
-    store.update((state) => ({ ...state, input: BASIC_FORM_DATA }));
+    store.update((state) => ({
+      ...state,
+      input: BASIC_FORM_DATA,
+      aoi: BASIC_FORM_DATA.scenario.scenarioInput.aoi,
+    }));
   }
 
   get getAOI() {
@@ -96,7 +100,6 @@ export class UserStateService {
   }
 
   updateAOI(newAoi: AOIType) {
-    console.log(newAoi);
     const aoi = store.value.aoi;
     if (
       newAoi.lat !== undefined &&
@@ -112,6 +115,18 @@ export class UserStateService {
       store.update((state) => ({
         ...state,
         aoi: newAoi as AOIType,
+        input: state.input
+          ? {
+              ...state.input,
+              scenario: {
+                ...state.input?.scenario,
+                scenarioInput: {
+                  ...state.input?.scenario?.scenarioInput,
+                  aoi: newAoi,
+                },
+              },
+            }
+          : undefined,
       }));
     }
   }

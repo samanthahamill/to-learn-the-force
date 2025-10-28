@@ -5,7 +5,6 @@ import {
   inject,
   Input,
   NO_ERRORS_SCHEMA,
-  OnInit,
   Output,
 } from '@angular/core';
 import { CardComponent, ICON_FUNCTION } from '../card.component';
@@ -122,8 +121,6 @@ export class PlatformCardComponent implements AfterViewInit {
       } else if (type == 'AIR') {
         this.platformForm.controls['alt'].setValidators(Validators.required);
       }
-
-      console.log('here');
 
       this.formUpdated();
     });

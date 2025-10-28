@@ -1,5 +1,13 @@
 import { Coordinate, format } from 'ol/coordinate';
 
+export const toRadians = (degrees: number): number => degrees * (Math.PI / 180);
+export const NMI_TO_KM = 1.852;
+export const NMI_TO_M = 1852;
+export const FOV_RANGE_KM = 2500 * NMI_TO_KM;
+export const MAP_FACTOR = 0.7;
+export const DEFAULT_ZOOM = 9;
+export const MINS_PER_DAY = 86400;
+
 export function createStringYX(fractionDigits: number) {
   return (
     /**
@@ -10,6 +18,22 @@ export function createStringYX(fractionDigits: number) {
       return format(coordinate!, '{x}, {y}', fractionDigits);
     }
   );
+}
+
+export function deepClone<T>(items: T[]): T[] {
+  return items.map((item) => {
+    if (Array.isArray(item)) {
+      return deepClone(item); // Handle nested arrays
+    } else if (typeof item === 'object' && item !== null) {
+      // Correctly cloning each object property
+      const clonedObject: any = {};
+      for (const key in item) {
+        clonedObject[key] = deepClone([item[key]])[0];
+      }
+      return clonedObject;
+    }
+    return item; // Return primitive types unchanged
+  });
 }
 
 export const PLATFORM_TRACK_COLORS = [

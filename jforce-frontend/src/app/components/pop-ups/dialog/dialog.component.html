@@ -2,19 +2,19 @@
   class="modal fade modal-custom"
   tabindex="-1"
   role="dialog"
-  #waypointModal
-  id="waypointModal"
-  aria-labelledby="waypointModalLabel"
+  #modal
+  id="modal"
+  aria-labelledby="modelLabel"
   aria-hidden="true"
   data-bs-backdrop="static"
 >
   <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-    <div class="modal-content modal-dimensions">
+    <div class="modal-content model-dimensions">
       <div class="modal-header">
-        <h5 class="modal-title">{{ platformName }} Waypoint Editor</h5>
+        <h5 class="modal-title">{{ modelTitle }}</h5>
       </div>
       <div class="modal-body">
-        <app-waypoint-editor [waypointFormData]="waypointFormData" />
+        <ng-content></ng-content>
       </div>
       <div class="modal-footer">
         <div *ngIf="theresAnError">

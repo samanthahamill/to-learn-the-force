@@ -19,17 +19,17 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
   templateUrl: './aoi-card.component.html',
   styleUrl: './aoi-card.component.scss',
 })
-export class AoiCardComponent implements OnInit, AfterViewInit {
+export class AoiCardComponent implements AfterViewInit {
   @Input() aoiFormGroup!: FormGroup;
   @Input() onInputUpdated!: (details: string) => void;
   @Input() formUpdated!: () => void;
   private userState = inject(UserStateService);
 
   constructor() {}
-  ngOnInit(): void {
-    this.aoiFormGroup?.valueChanges.pipe(untilDestroyed(this)).subscribe(() => {
-      this.formUpdated();
-    });
+
+  onFormUpdate() {
+    this.formUpdated();
+    this.userState.updateAOI(this.aoiFormGroup.value);
   }
 
   ngAfterViewInit(): void {
@@ -58,11 +58,6 @@ export class AoiCardComponent implements OnInit, AfterViewInit {
     ) {
       this.updateDataSourceService();
     }
-  }
-
-  createToast(message: string): void {
-    this.onInputUpdated(message);
-    this.updateDataSourceService();
   }
 
   updateDataSourceService(): void {

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import Map from 'ol/Map';
@@ -18,13 +18,18 @@ import { OSM } from 'ol/source';
 import { UserStateService } from '../../../services/user-state.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { AOIType, Platform, Waypoint } from '../../../shared/types';
-import { fromLonLat, toLonLat } from 'ol/proj';
+import { fromLonLat } from 'ol/proj';
 import { Draw } from 'ol/interaction';
 import { DrawEvent } from 'ol/interaction/Draw';
 import { Circle, Point } from 'ol/geom';
 import GeoJSON from 'ol/format/GeoJSON';
-import { point, circle } from '@turf/turf';
-import { createStringYX, PLATFORM_TRACK_COLORS } from '../../../shared/utils';
+import {
+  createStringYX,
+  MAP_FACTOR,
+  NMI_TO_M,
+  PLATFORM_TRACK_COLORS,
+  toRadians,
+} from '../../../shared/utils';
 import Feature from 'ol/Feature';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -38,7 +43,7 @@ const projection = 'EPSG:4326';
   templateUrl: './map.component.html',
   styleUrl: './map.component.scss',
 })
-export class MapComponent implements OnInit {
+export class MapComponent implements OnInit, OnDestroy {
   map: Map | undefined;
   olMapView: View;
   aoiValue: AOIType | undefined;
@@ -86,7 +91,7 @@ export class MapComponent implements OnInit {
     });
 
     this.userStateService.aoi$.pipe(untilDestroyed(this)).subscribe((aoi) => {
-      if (aoi != this.aoiValue && this.aoiLayer) {
+      if (aoi !== undefined && aoi != this.aoiValue && this.aoiLayer) {
         this.aoiValue = aoi;
         this.renderAOI();
       }
@@ -151,25 +156,85 @@ export class MapComponent implements OnInit {
         .setCenter(fromLonLat([this.aoiValue.lon, this.aoiValue.lat]));
     }
   }
-
   renderAOI() {
-    if (this.aoiValue) {
-      const aoiSource = this.aoiLayer.getSource();
-      if (aoiSource) {
-        aoiSource.clear(true);
-        const pt = point(
-          [this.aoiValue.lon, this.aoiValue.lat],
-          {},
-          { id: 'aoi' },
-        );
+    // if (this.aoiValue) {
+    //   const aoiSource = this.aoiLayer.getSource();
+    //   if (aoiSource) {
+    //     aoiSource.clear(true);
+    //     const pt = point(
+    //       [this.aoiValue.lon, this.aoiValue.lat],
+    //       {},
+    //       { id: 'aoi' },
+    //     );
 
-        const aoi = circle(pt, this.aoiValue.radius, {
-          steps: 180,
-          units: 'kilometers',
-        });
-        aoiSource.addFeature(this.geoJson.readFeature(aoi));
-        // this.fixExtent = aoiSource.getExtent();
-      }
+    //     const aoi = circle(pt, this.aoiValue.radius, {
+    //       steps: 180,
+    //       units: 'nauticalmiles',
+    //     });
+
+    //     const feature = this.geoJson.readFeature(aoi) as Feature<Geometry>;
+    //     feature.setStyle(
+    //       new Styled.Style({
+    //         image: new Styled.Circle({
+    //           radius: 5,
+    //           fill: new Styled.Fill({ color: 'rgb(0, 0, 200)' }),
+    //           stroke: new Styled.Stroke({ color: 'white', width: 2 }),
+    //         }),
+    //       }),
+    //     );
+    //     feature.set(
+    //       'label',
+    //       `Location: (${this.aoiValue.lat}, ${this.aoiValue.lon})`,
+    //     );
+
+    //     aoiSource.addFeature(feature);
+    //   }
+    // }
+
+    if (this.aoiValue) {
+      this.aoiLayer.getSource().clear();
+      const feature = new Feature(
+        new Point(fromLonLat([this.aoiValue.lon, this.aoiValue.lat])),
+      );
+      feature.setStyle(
+        new Styled.Style({
+          image: new Styled.Circle({
+            radius: 5,
+            fill: new Styled.Fill({ color: 'rgb(0, 0, 200)' }),
+            stroke: new Styled.Stroke({ color: 'white', width: 2 }),
+          }),
+        }),
+      );
+      feature.set(
+        'label',
+        `Location: (${this.aoiValue.lat}, ${this.aoiValue.lon})`,
+      );
+
+      const center = [this.aoiValue]
+        .reduce(
+          (acc, point) => {
+            acc[0] += point.lon;
+            acc[1] += point.lat;
+            return acc;
+          },
+          [0, 0],
+        )
+        .map((coord) => coord / [this.aoiValue].length);
+
+      // convert nmi to meters and scale radius depending on latitude on Earth's surface
+      const adjRadius = NMI_TO_M * Math.cos(toRadians(this.aoiValue!.lat));
+      const circle = new Circle(
+        fromLonLat(center),
+        (this.aoiValue.radius * adjRadius) / MAP_FACTOR,
+      );
+      const circleFeature = new Feature(circle);
+      circleFeature.set('label', 'Area of Interest');
+      circleFeature.setStyle(
+        new Styled.Style({
+          stroke: new Styled.Stroke({ color: 'yellow', width: 3 }),
+        }),
+      );
+      this.aoiLayer.getSource().addFeatures(feature);
     }
   }
 
@@ -177,6 +242,7 @@ export class MapComponent implements OnInit {
     this.isDrawing = true;
     if (!active) {
       if (this.draw) {
+        this.draw.abortDrawing();
         this.map!.removeInteraction(this.draw);
       }
       this.isDrawing = false;
@@ -188,18 +254,19 @@ export class MapComponent implements OnInit {
       type: 'Circle',
     });
 
+    this.aoiLayer.getSource()?.clear(true);
     this.map!.addInteraction(this.draw);
 
     this.draw.on('drawend', (event: DrawEvent) => {
       const geometry = event.feature.getGeometry() as Circle;
-      const center = toLonLat(geometry.getCenter());
-      const radius = geometry.getRadius() * 0.7;
+      const center = geometry.getCenter();
+      const radius = geometry.getRadius();
 
       this.userStateService.updateAOI({
         lat: center[1],
         lon: center[0],
         alt: 0.0,
-        radius: radius / 1852,
+        radius: radius * 120, // TODO these ratios are not correct
       });
 
       this.isDrawing = false;
@@ -236,8 +303,6 @@ export class MapComponent implements OnInit {
         return this.createWaypointFeature(waypoint, platform.name, platform.id);
       });
     });
-
-    console.log(features);
 
     this.platformWaypointSource.addFeatures(features);
   }
@@ -294,5 +359,21 @@ export class MapComponent implements OnInit {
       uid.charCodeAt(2) * 5 +
       uid.charCodeAt(3) * 7;
     return PLATFORM_TRACK_COLORS[hash % PLATFORM_TRACK_COLORS.length];
+  }
+
+  private destroyMap() {
+    if (this.map) {
+      this.aoiLayer.dispose();
+      this.drawingLayer.dispose();
+      this.vectorLayer?.dispose();
+      this.map.dispose();
+      this.map = undefined;
+      this.vectorSource = undefined;
+      this.vectorLayer = undefined;
+    }
+  }
+
+  ngOnDestroy() {
+    this.destroyMap();
   }
 }
