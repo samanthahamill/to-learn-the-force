@@ -24,10 +24,7 @@ import { DrawEvent } from 'ol/interaction/Draw';
 import { Circle } from 'ol/geom';
 import GeoJSON from 'ol/format/GeoJSON';
 import { point, circle } from '@turf/turf';
-<<<<<<< HEAD
 import { createStringYX } from '../../../shared/utils';
-=======
->>>>>>> a88f983806ddf8210550edf946cfcb5bcdaa926b
 
 const projection = 'EPSG:4326';
 
