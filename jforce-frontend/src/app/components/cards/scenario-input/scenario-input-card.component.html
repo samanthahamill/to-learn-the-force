@@ -25,10 +25,16 @@
           </div>
         </div>
 
-        <button class="btn button" (click)="addPlatform()">
-          <fa-icon [icon]="addIcon"></fa-icon>
-          Add Platform
-        </button>
+        <div class="buttons">
+          <button class="btn button" (click)="addPlatform()">
+            <fa-icon [icon]="addIcon"></fa-icon>
+            Add Custom Platform
+          </button>
+          <button class="btn button disabled" (click)="addPlatform()" disabled>
+            <fa-icon [icon]="addIcon"></fa-icon>
+            Import Platform
+          </button>
+        </div>
       </div>
     </app-card>
   </form>
