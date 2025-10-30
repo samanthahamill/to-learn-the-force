@@ -15,7 +15,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
         lat: 0,
         lon: 0,
         alt: 0,
-        radius: 10,
+        radius: 150,
       },
       platforms: [
         {
@@ -64,6 +64,12 @@ interface UserStoreState {
   aoi: AOIType | undefined;
 }
 
+export interface ChangeAOIRequest {
+  centerLat: number;
+  centerLon: number;
+  radius: number;
+}
+
 const store = createStore(
   { name: 'user-state' },
   withProps<UserStoreState>({
@@ -97,6 +103,16 @@ export class UserStateService {
       input: input,
       aoi: input.scenario.scenarioInput.aoi,
     }));
+  }
+
+  updateAOIRequest(aoi: ChangeAOIRequest) {
+    // TODO implement
+    this.updateAOI({
+      lat: aoi.centerLat,
+      lon: aoi.centerLon,
+      radius: aoi.radius,
+      alt: 0.0,
+    });
   }
 
   updateAOI(newAoi: AOIType) {

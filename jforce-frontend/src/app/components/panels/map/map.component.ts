@@ -1,4 +1,10 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  inject,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import Map from 'ol/Map';
@@ -8,6 +14,7 @@ import View from 'ol/View';
 import Bar from 'ol-ext/control/Bar';
 import Toggle from 'ol-ext/control/Toggle';
 import * as Styled from 'ol/style';
+import { Stroke, Circle as CircleStyle } from 'ol/style';
 import {
   defaults as defaultControls,
   MousePosition,
@@ -15,12 +22,16 @@ import {
 } from 'ol/control.js';
 import TileLayer from 'ol/layer/Tile';
 import { OSM } from 'ol/source';
-import { UserStateService } from '../../../services/user-state.service';
+import {
+  ChangeAOIRequest,
+  UserStateService,
+} from '../../../services/user-state.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { AOIType, Platform, Waypoint } from '../../../shared/types';
-import { fromLonLat } from 'ol/proj';
+import { fromLonLat, getUserProjection, Projection, toLonLat } from 'ol/proj';
 import { Draw } from 'ol/interaction';
 import { DrawEvent } from 'ol/interaction/Draw';
+import ContextMenu, { CallbackObject } from 'ol-contextmenu';
 import { Circle, Point } from 'ol/geom';
 import GeoJSON from 'ol/format/GeoJSON';
 import {
@@ -33,8 +44,29 @@ import {
 import Feature from 'ol/Feature';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { TerraDraw, TerraDrawPointMode } from 'terra-draw';
+import { TerraDrawOpenLayersAdapter } from 'terra-draw-openlayers-adapter';
+import {
+  polygonToLine,
+  greatCircle,
+  point,
+  bearing,
+  destination,
+  Units,
+  convertLength,
+  circle,
+  polygon,
+} from '@turf/turf';
+import { Extent } from 'ol/extent';
+import { DrawCircleAoiControl } from './control/draw-circle-aoi-control.component';
+
+// import { FeatureId } from 'terra-draw/dist/store/store';
+export type FeatureId = string | number;
 
 const projection = 'EPSG:4326';
+const aoiStyle = new Style({
+  stroke: new Styled.Stroke({ color: 'yellow', width: 2 }),
+});
 
 @UntilDestroy()
 @Component({
@@ -60,10 +92,14 @@ export class MapComponent implements OnInit, OnDestroy {
   private isDrawing: boolean;
 
   private userStateService = inject(UserStateService);
-  // private drawCircleAoiControl: DrawCircleAoiControl;
+  private drawCircleAoiControl: DrawCircleAoiControl;
 
   platformWaypointSource: VectorSource = new VectorSource();
   platformWaypointLayer: VectorLayer;
+  terraDraw: TerraDraw | undefined;
+  terraDrawOpenLayerAdapter: TerraDrawOpenLayersAdapter | undefined;
+  fitExtent: Extent | undefined;
+  contextMenuElement: HTMLElement | null = null;
 
   constructor() {
     this.drawingLayer = new VectorLayer({
@@ -74,7 +110,10 @@ export class MapComponent implements OnInit, OnDestroy {
       }),
     });
 
-    this.aoiLayer = new VectorLayer({ source: new VectorSource() });
+    this.aoiLayer = new VectorLayer({
+      source: new VectorSource(),
+      style: aoiStyle,
+    });
 
     this.platformWaypointSource = new VectorSource();
     this.platformWaypointLayer = new VectorLayer({
@@ -90,7 +129,12 @@ export class MapComponent implements OnInit, OnDestroy {
       maxZoom: 18,
     });
 
+    this.drawCircleAoiControl = new DrawCircleAoiControl({
+      onDrawEnd: (evt: any) => this.onDrawCircleAoiComplete(evt),
+    });
+
     this.userStateService.aoi$.pipe(untilDestroyed(this)).subscribe((aoi) => {
+      console.log('here');
       if (aoi !== undefined && aoi != this.aoiValue && this.aoiLayer) {
         this.aoiValue = aoi;
         this.renderAOI();
@@ -113,17 +157,17 @@ export class MapComponent implements OnInit, OnDestroy {
       source: this.vectorSource,
     });
 
-    const tile = new TileLayer({
-      source: new OSM(),
-    });
-    tile.on('prerender', (evt) => {
-      // return
-      if (evt.context) {
-        const context = evt.context as CanvasRenderingContext2D;
-        context.filter = 'grayscale(80%) invert(100%) ';
-        context.globalCompositeOperation = 'source-over';
-      }
-    });
+    // const tile = new TileLayer({
+    //   source: new OSM(),
+    // });
+    // tile.on('prerender', (evt) => {
+    //   // return
+    //   if (evt.context) {
+    //     const context = evt.context as CanvasRenderingContext2D;
+    //     context.filter = 'grayscale(80%) invert(100%)';
+    //     context.globalCompositeOperation = 'darken';
+    //   }
+    // });
 
     this.map = new Map({
       target: 'mapContainer',
@@ -137,7 +181,9 @@ export class MapComponent implements OnInit, OnDestroy {
         }),
       ]),
       layers: [
-        tile,
+        new TileLayer({
+          source: new OSM(),
+        }),
         this.drawingLayer,
         this.aoiLayer,
         this.vectorLayer,
@@ -147,6 +193,87 @@ export class MapComponent implements OnInit, OnDestroy {
     });
 
     this.initButtonBar();
+    this.initTerraDraw();
+  }
+
+  initTerraDraw() {
+    this.map?.once('rendercomplete', () => {
+      this.terraDrawOpenLayerAdapter = new TerraDrawOpenLayersAdapter({
+        lib: {
+          Feature,
+          GeoJSON,
+          Style,
+          VectorLayer,
+          VectorSource,
+          Stroke,
+          getUserProjection,
+          fromLonLat,
+          Projection,
+          Circle: CircleStyle,
+          Fill,
+          Icon: Styled.Icon,
+          toLonLat,
+        },
+        map: this.map!,
+        coordinatePrecision: 9,
+      });
+      this.terraDraw = new TerraDraw({
+        adapter: this.terraDrawOpenLayerAdapter,
+        modes: [new TerraDrawPointMode({ styles: { pointOutlineWidth: 2 } })],
+      });
+    });
+
+    this.terraDraw?.on('finish', (id, context) => {
+      if (context.action == 'draw') {
+        const selection = this.terraDraw?.getSnapshotFeature(id);
+        if (selection) {
+          this.handleSelectionComplete(id);
+        }
+      }
+
+      this.terraDraw?.clear();
+      this.terraDraw?.stop();
+      this.resetMapCursor();
+    });
+  }
+
+  // @HostListener('window:keydown', [`$event`])
+  // handleKeydown(event: KeyboardEvent) {
+  //   if (event.key === 'Excape') {
+  //     if (
+  //       this.terraDraw?.getModeState() === 'started' ||
+  //       this.terraDraw?.getModeState() === 'drawing'
+  //     ) {
+  //       event.preventDefault();
+  //       event.stopPropagation();
+  //       this.terraDraw.clear();
+  //       this.terraDraw.stop();
+  //       this.resetMapCursor();
+  //     }
+  //   }
+  // }
+
+  activateTerraDraw() {
+    this.terraDraw?.start();
+    this.terraDraw?.clear();
+    this.terraDraw?.setMode('point');
+  }
+
+  private handleSelectionComplete(selectionId: FeatureId) {
+    const selectionFeature = this.terraDraw
+      ?.getSnapshot()
+      .find((f) => f.id === selectionId);
+
+    if (!selectionFeature || selectionFeature.geometry.type !== 'Polygon')
+      return;
+
+    const selectionPolygon = polygon(selectionFeature?.geometry.coordinates);
+
+    const intersectionIds: Waypoint[] = [];
+  }
+
+  private resetMapCursor() {
+    this.terraDrawOpenLayerAdapter?.setCursor('unset');
   }
 
   updateMapCenter() {
@@ -156,140 +283,36 @@ export class MapComponent implements OnInit, OnDestroy {
         .setCenter(fromLonLat([this.aoiValue.lon, this.aoiValue.lat]));
     }
   }
+
   renderAOI() {
-    // if (this.aoiValue) {
-    //   const aoiSource = this.aoiLayer.getSource();
-    //   if (aoiSource) {
-    //     aoiSource.clear(true);
-    //     const pt = point(
-    //       [this.aoiValue.lon, this.aoiValue.lat],
-    //       {},
-    //       { id: 'aoi' },
-    //     );
-
-    //     const aoi = circle(pt, this.aoiValue.radius, {
-    //       steps: 180,
-    //       units: 'nauticalmiles',
-    //     });
-
-    //     const feature = this.geoJson.readFeature(aoi) as Feature<Geometry>;
-    //     feature.setStyle(
-    //       new Styled.Style({
-    //         image: new Styled.Circle({
-    //           radius: 5,
-    //           fill: new Styled.Fill({ color: 'rgb(0, 0, 200)' }),
-    //           stroke: new Styled.Stroke({ color: 'white', width: 2 }),
-    //         }),
-    //       }),
-    //     );
-    //     feature.set(
-    //       'label',
-    //       `Location: (${this.aoiValue.lat}, ${this.aoiValue.lon})`,
-    //     );
-
-    //     aoiSource.addFeature(feature);
-    //   }
-    // }
-
     if (this.aoiValue) {
-      this.aoiLayer.getSource().clear();
-      const feature = new Feature(
-        new Point(fromLonLat([this.aoiValue.lon, this.aoiValue.lat])),
-      );
-      feature.setStyle(
-        new Styled.Style({
-          image: new Styled.Circle({
-            radius: 5,
-            fill: new Styled.Fill({ color: 'rgb(0, 0, 200)' }),
-            stroke: new Styled.Stroke({ color: 'white', width: 2 }),
-          }),
-        }),
-      );
-      feature.set(
-        'label',
-        `Location: (${this.aoiValue.lat}, ${this.aoiValue.lon})`,
-      );
+      const source = this.aoiLayer.getSource();
+      if (source) {
+        source.clear(true);
 
-      const center = [this.aoiValue]
-        .reduce(
-          (acc, point) => {
-            acc[0] += point.lon;
-            acc[1] += point.lat;
-            return acc;
-          },
-          [0, 0],
-        )
-        .map((coord) => coord / [this.aoiValue].length);
-
-      // convert nmi to meters and scale radius depending on latitude on Earth's surface
-      const adjRadius = NMI_TO_M * Math.cos(toRadians(this.aoiValue!.lat));
-      const circle = new Circle(
-        fromLonLat(center),
-        (this.aoiValue.radius * adjRadius) / MAP_FACTOR,
-      );
-      const circleFeature = new Feature(circle);
-      circleFeature.set('label', 'Area of Interest');
-      circleFeature.setStyle(
-        new Styled.Style({
-          stroke: new Styled.Stroke({ color: 'yellow', width: 3 }),
-        }),
-      );
-      this.aoiLayer.getSource().addFeatures(feature);
+        const pt = point(
+          [this.aoiValue.lat, this.aoiValue.lon],
+          {},
+          { id: 'aoi' },
+        );
+        const aoi = circle(pt, this.aoiValue.radius, {
+          steps: 180,
+          units: 'nauticalmiles',
+        });
+        source.addFeature(this.geoJson.readFeature(aoi));
+        this.fitExtent = source.getExtent();
+      }
     }
   }
 
-  drawNewAOI(active: boolean) {
-    this.isDrawing = true;
-    if (!active) {
-      if (this.draw) {
-        this.draw.abortDrawing();
-        this.map!.removeInteraction(this.draw);
-      }
-      this.isDrawing = false;
-      return;
-    }
-
-    this.draw = new Draw({
-      source: this.vectorSource,
-      type: 'Circle',
-    });
-
-    this.aoiLayer.getSource()?.clear(true);
-    this.map!.addInteraction(this.draw);
-
-    this.draw.on('drawend', (event: DrawEvent) => {
-      const geometry = event.feature.getGeometry() as Circle;
-      const center = geometry.getCenter();
-      const radius = geometry.getRadius();
-
-      this.userStateService.updateAOI({
-        lat: center[1],
-        lon: center[0],
-        alt: 0.0,
-        radius: radius * 120, // TODO these ratios are not correct
-      });
-
-      this.isDrawing = false;
-      requestAnimationFrame(() => {
-        this.map!.removeInteraction(this.draw!);
-      });
-    });
+  private onDrawCircleAoiComplete(evt: ChangeAOIRequest) {
+    this.userStateService.updateAOIRequest(evt);
   }
 
   initButtonBar() {
     const btnBar = new Bar();
     btnBar.setPosition('left');
-
-    const drawNewAoi = new Toggle({
-      className: 'ol-draw-aoi-toggle',
-      html: `<i class="fa-solid fa-object-group"></i>`,
-      title: 'Draw New AOI',
-      active: this.isDrawing,
-      onToggle: (active) => this.drawNewAOI(active),
-    });
-    btnBar.addControl(drawNewAoi);
-
-    // TODO add back in
+    btnBar.addControl(this.drawCircleAoiControl);
     this.map?.addControl(btnBar);
   }
 
@@ -318,6 +341,7 @@ export class MapComponent implements OnInit, OnDestroy {
     const hex = '0000'.substr(String(platformId).length) + platformId;
     const color = this.getColorIndex(hex);
     const label = `Platform: ${platformName} Waypoint ${waypoint.index}\nloc: [${(waypoint.lon, waypoint.lat)}];\nalt: ${waypoint.alt}\nspeed:${waypoint.speedKts}`;
+
     feature.setStyle([
       new Styled.Style({
         image: new Styled.Circle({
