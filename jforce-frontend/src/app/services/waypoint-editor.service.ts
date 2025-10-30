@@ -6,6 +6,7 @@ import { UserStateService } from './user-state.service';
 export interface WaypointEditorInformation {
   waypoints: Waypoint[];
   platformName: string;
+  platformId: string;
   platformIndex: number;
 }
 
@@ -36,11 +37,13 @@ export class WaypointEditorService {
     waypoints: Waypoint[],
     platformName: string,
     platformIndex: number,
+    platformId: string,
   ) {
     const info = {
       waypoints: waypoints,
       platformName: platformName,
       platformIndex: platformIndex,
+      platformId: platformId,
     };
     store.update((state) => ({
       ...state,

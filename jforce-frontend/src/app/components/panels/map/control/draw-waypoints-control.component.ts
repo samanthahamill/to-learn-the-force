@@ -5,21 +5,21 @@ import Draw, { DrawEvent } from 'ol/interaction/Draw';
 import VectorLayer from 'ol/layer/Vector';
 import { transform } from 'ol/proj';
 import VectorSource from 'ol/source/Vector';
-import { Circle } from 'ol/geom';
-import { circular } from 'ol/geom/Polygon';
+import { MultiPoint } from 'ol/geom';
 import { convertLength } from '@turf/helpers';
 import { ChangeAOIRequest } from '../../../../services/user-state.service';
 import { Snap } from 'ol/interaction';
+import { Coordinate } from 'ol/coordinate';
 
 const PROJECTION_TYPE = 'EPSG:4326';
 
-export type DrawAoiCallbacks = { onDrawEnd: (evt: any) => void };
-export type DrawAoiOptions = Options & DrawAoiCallbacks;
+export type DrawWaypointsType = { onDrawEnd: (evt: any) => void };
+export type DrawWaypointsOptions = Options & DrawWaypointsType;
 
-export class DrawCircleAoiControl extends Control {
+export class DrawWaypointsControl extends Control {
   private drawInteraction: Draw;
   private overlayLayer: VectorLayer;
-  private drawEnd: (event: ChangeAOIRequest) => void | undefined;
+  private drawEnd: (event: Coordinate[]) => void | undefined;
   lengthOverlay: Overlay | undefined;
   lengthElement: HTMLElement | undefined;
   centerPoint: Array<number> | undefined;
@@ -28,12 +28,14 @@ export class DrawCircleAoiControl extends Control {
   radiusInNmi: number = 0.0;
   snap: Snap;
 
-  constructor(options: DrawAoiOptions) {
+  drawing: boolean = false;
+
+  constructor(options: DrawWaypointsOptions) {
     const button = document.createElement('button');
-    button.title = 'Draw New AOI';
-    button.innerHTML = "<i class='fa fa-dot-circle'></i>";
+    button.title = 'Add Waypoints';
+    button.innerHTML = "<i class='fa fa-dot-circle'></i>"; // change me
     const element = document.createElement('div');
-    element.className = 'ol-zoom-aoi ol-unselectable ol-control';
+    element.className = 'ol-waypoints ol-unselectable ol-control';
     element.appendChild(button);
 
     super({ element: element, target: options.target });
@@ -43,38 +45,37 @@ export class DrawCircleAoiControl extends Control {
 
     this.drawInteraction = new Draw({
       source: this.overlayLayer.getSource() ?? undefined,
-      type: 'Circle',
+      type: 'MultiPoint',
     });
     this.snap = new Snap({
       source: this.overlayLayer.getSource() ?? undefined,
     });
 
     this.drawInteraction.on('drawend', (event: DrawEvent) => {
-      const geometry = event.feature.getGeometry() as Circle;
+      const geometry = event.feature.getGeometry() as MultiPoint;
       const viewProjection = this.map!.getView().getProjection();
-      const centerProjected = transform(
-        geometry.getCenter(),
-        viewProjection,
-        PROJECTION_TYPE,
-      );
+      const points = geometry.getCoordinates().map((coord) => {
+        return transform(coord, viewProjection, PROJECTION_TYPE);
+      });
 
-      this.drawEnd({
-        centerLat: centerProjected[0],
-        centerLon: centerProjected[1],
-        radius: convertLength(geometry.getRadius(), 'degrees', 'nauticalmiles'),
-      });
-      requestAnimationFrame(() => {
-        this.map!.removeInteraction(this.drawInteraction);
-      });
+      this.drawEnd(points);
     });
 
-    button.addEventListener('click', () => this.activate());
+    button.addEventListener('click', () => {
+      if (this.drawing) {
+        this.map!.removeInteraction(this.drawInteraction);
+        this.drawing = false;
+      } else {
+        this.activate();
+      }
+    });
   }
 
   activate(): void {
     if (this.getMap()) {
       if (this.drawInteraction) {
         this.getMap()?.addInteraction(this.drawInteraction);
+        this.drawing = true;
       }
     }
   }

@@ -162,6 +162,7 @@ export class PlatformCardComponent implements AfterViewInit {
       this.waypoints,
       this.name,
       this.index,
+      (this.platformForm.get('id')?.value as string) ?? 0,
     );
   }
 

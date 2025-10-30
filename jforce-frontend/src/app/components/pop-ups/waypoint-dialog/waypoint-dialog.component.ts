@@ -55,6 +55,7 @@ export class WaypointDialogComponent implements OnInit {
           this.waypointFormData = {
             waypoints: deepClone(info.waypoints),
             platformName: info.platformName,
+            platformId: info.platformId,
             platformIndex: info.platformIndex,
           };
 

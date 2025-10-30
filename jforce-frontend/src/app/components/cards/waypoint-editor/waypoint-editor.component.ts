@@ -1,11 +1,12 @@
 import {
   Component,
+  inject,
   Input,
   NO_ERRORS_SCHEMA,
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import { UntilDestroy } from '@ngneat/until-destroy';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { WaypointEditorInformation } from '../../../services/waypoint-editor.service';
 import {
   DragDropModule,
@@ -40,11 +41,16 @@ import { createStringYX } from '../../../shared/utils';
 import Bar from 'ol-ext/control/Bar';
 import Toggle from 'ol-ext/control/Toggle';
 import { Draw, Modify, Snap } from 'ol/interaction';
-import { point } from '@turf/turf';
+import { circle, point } from '@turf/turf';
 import CircleStyle from 'ol/style/Circle';
 import Feature from 'ol/Feature';
 import { Point } from 'ol/geom';
 import { fromLonLat } from 'ol/proj';
+import { UserStateService } from '../../../services/user-state.service';
+import GeoJSON from 'ol/format/GeoJSON';
+import { DrawWaypointsControl } from '../../panels/map/control/draw-waypoints-control.component';
+import { Coordinate } from 'ol/coordinate';
+import { BaseMapComponent } from '../../panels/map/base-map.component';
 
 const projection = 'EPSG:4326';
 
@@ -62,26 +68,16 @@ const projection = 'EPSG:4326';
   styleUrl: './waypoint-editor.component.scss',
   schemas: [NO_ERRORS_SCHEMA],
 })
-export class WaypointEditorComponent implements OnInit, OnDestroy {
-  @Input() waypointFormData: WaypointEditorInformation | undefined;
+export class WaypointEditorComponent extends BaseMapComponent {
+  @Input() waypointPlatformData: WaypointEditorInformation | undefined;
 
   removeIcon = faRemove;
   copyIcon = faCopy;
   addIcon = faAdd;
 
-  map: Map | undefined;
-  olMapView: View;
-  aoiValue: AOIType | undefined;
-
   reportSource: VectorSource = new VectorSource();
   reportLayer: VectorLayer;
-
-  private aoiLayer: VectorLayer<any>;
-  private drawingSource = new VectorSource();
-  private drawingLayer!: VectorLayer<VectorSource>;
-  private draw!: Draw;
-  private snap!: Snap;
-  private drawToggleSelection: Toggle | undefined;
+  private drawWaypointControl: DrawWaypointsControl;
 
   allowDraw: boolean;
   theresAnError: boolean;
@@ -93,15 +89,7 @@ export class WaypointEditorComponent implements OnInit, OnDestroy {
   speedInput: number | undefined = undefined;
 
   constructor() {
-    this.drawingLayer = new VectorLayer({
-      source: this.drawingSource,
-      style: new Style({
-        fill: new Fill({ color: 'rgba(255, 255, 255, 0.2)' }),
-        stroke: new Styled.Stroke({ color: 'rgb(255, 0, 235' }),
-      }),
-    });
-
-    this.aoiLayer = new VectorLayer({ source: new VectorSource() });
+    super('mapContainerWaypoints');
 
     this.reportSource = new VectorSource();
     this.reportLayer = new VectorLayer({
@@ -118,96 +106,37 @@ export class WaypointEditorComponent implements OnInit, OnDestroy {
 
     this.allowDraw = false;
     this.theresAnError = false;
+
+    this.userStateService.aoi$.pipe(untilDestroyed(this)).subscribe((aoi) => {
+      if (aoi !== undefined && aoi != this.aoiValue && this.aoiLayer) {
+        this.aoiValue = aoi;
+        this.renderAOI();
+      }
+    });
+
+    this.drawWaypointControl = new DrawWaypointsControl({
+      onDrawEnd: (points) => this.onDrawEnd(points),
+    });
+
     this.renderWaypoints();
   }
 
   get platformName() {
-    return this.waypointFormData?.platformName;
+    return this.waypointPlatformData?.platformName;
   }
 
   get waypoints(): Waypoint[] {
-    return this.waypointFormData?.waypoints ?? [];
+    return this.waypointPlatformData?.waypoints ?? [];
   }
 
-  ngOnInit() {
-    const tile = new TileLayer({
-      source: new OSM(),
-    });
-    tile.on('prerender', (evt) => {
-      // return
-      if (evt.context) {
-        const context = evt.context as CanvasRenderingContext2D;
-        context.filter = 'grayscale(80%) invert(100%) ';
-        context.globalCompositeOperation = 'source-over';
-      }
-    });
-
-    this.map = new Map({
-      target: 'mapContainerWaypoints',
-      controls: defaultControls().extend([
-        new ScaleLine({ units: 'nautical' }),
-        new MousePosition({
-          coordinateFormat: createStringYX(4),
-          projection: projection,
-          className: 'custom-mouse-position',
-          target: 'mousePositionDisplay',
-        }),
-      ]),
-      layers: [this.drawingLayer, this.aoiLayer, this.reportLayer, tile],
-      view: this.olMapView,
-    });
-
-    const modify = new Modify({ source: this.drawingSource });
-    this.map.addInteraction(modify);
-
-    // TODO this doesn't work
-    this.draw = new Draw({
-      source: this.drawingSource,
-      type: 'Point',
-    });
-    this.snap = new Snap({ source: this.drawingSource });
-
-    this.initButtonBar();
+  override customLayers() {
+    return [this.reportLayer];
   }
 
   groupObject = faObjectGroup;
 
-  initButtonBar() {
-    const btnBar = new Bar();
-    btnBar.setPosition('left');
-
-    this.drawToggleSelection = new Toggle({
-      className: 'ol-selection-bar-toggle',
-      html: `<fa-icon [icon]="groupObject"/>`, // todo this doesn't show up
-      title: 'Draw Selection',
-      active: this.allowDraw,
-      // bar: this.selectionBar,
-      onToggle: (active) => (this.allowDraw = active),
-    });
-    btnBar.addControl(this.drawToggleSelection);
-
-    // TODO add back in
-    this.map?.addControl(btnBar);
-  }
-
-  handleDrawingActivated(active: boolean) {
-    this.allowDraw = active;
-    // change below
-    if (active) {
-      this.activeDrawPointInteraction();
-    } else {
-      this.stopDrawPointInteraction();
-    }
-  }
-
-  activeDrawPointInteraction() {
-    this.map?.addInteraction(this.draw);
-    this.map?.addInteraction(this.snap);
-  }
-
-  stopDrawPointInteraction() {
-    this.map?.removeInteraction(this.draw);
-    this.map?.removeInteraction(this.snap);
+  override addButtonsToBar() {
+    return [this.drawWaypointControl];
   }
 
   renderWaypoints() {
@@ -215,30 +144,34 @@ export class WaypointEditorComponent implements OnInit, OnDestroy {
 
     const features: any[] = [];
     this.waypoints.forEach((waypoint) => {
-      const feature = this.createWaypointFeature(waypoint);
+      const feature = this.createWaypointFeature(
+        waypoint,
+        this.platformName ?? '',
+        this.waypointPlatformData?.platformIndex.toString() ?? '',
+      );
       features.push(feature);
     });
 
     this.reportSource.addFeatures(features);
   }
 
-  createWaypointFeature(waypoint: Waypoint) {
-    const pt = point(
-      [waypoint.lon, waypoint.lat],
-      { data: waypoint },
-      { id: waypoint.index },
-    );
+  // createWaypointFeature(waypoint: Waypoint) {
+  //   const pt = point(
+  //     [waypoint.lon, waypoint.lat],
+  //     { data: waypoint },
+  //     { id: waypoint.index },
+  //   );
 
-    const feature = new Feature(
-      new Point(fromLonLat([waypoint.lon, waypoint.lat])),
-    );
-    const ptStyle = this.getStyle();
-    feature.setStyle(ptStyle);
+  //   const feature = new Feature(
+  //     new Point(fromLonLat([waypoint.lon, waypoint.lat])),
+  //   );
+  //   const ptStyle = this.getStyle();
+  //   feature.setStyle(ptStyle);
 
-    const label = `Waypoint ${waypoint.index}\nloc: [${(waypoint.lon, waypoint.lat)}];\nalt: ${waypoint.alt}\nspeed:${waypoint.speedKts}`;
-    ptStyle.getText()?.setText(label);
-    return feature;
-  }
+  //   const label = `Waypoint ${waypoint.index}\nloc: [${(waypoint.lon, waypoint.lat)}];\nalt: ${waypoint.alt}\nspeed:${waypoint.speedKts}`;
+  //   ptStyle.getText()?.setText(label);
+  //   return feature;
+  // }
 
   getStyle() {
     return new Style({
@@ -257,9 +190,28 @@ export class WaypointEditorComponent implements OnInit, OnDestroy {
 
   // non-map functions
 
+  onDrawEnd(points: Coordinate[]) {
+    const waypoints = this.waypoints;
+    const lastPoint = this.waypoints[waypoints.length - 1];
+    const waypointLastIndex = waypoints.length - 1;
+
+    const newCoordinates: Waypoint[] = points.map((point, i) => {
+      return {
+        lat: point[0],
+        lon: point[1],
+        alt: 0,
+        speedKts: lastPoint.speedKts,
+        datetime: new Date(lastPoint.datetime).toISOString(),
+        index: waypointLastIndex + i,
+      } as Waypoint;
+    });
+
+    this.waypoints.push(...newCoordinates);
+  }
+
   addWaypoint() {
     if (
-      this.waypointFormData &&
+      this.waypointPlatformData &&
       this.latInput &&
       this.lonInput &&
       this.speedInput &&
@@ -267,7 +219,7 @@ export class WaypointEditorComponent implements OnInit, OnDestroy {
       this.datetimeInput
     ) {
       if (this.waypoints === undefined) {
-        this.waypointFormData.waypoints = [
+        this.waypointPlatformData.waypoints = [
           {
             index: 0,
             lat: this.latInput,
@@ -317,10 +269,10 @@ export class WaypointEditorComponent implements OnInit, OnDestroy {
   }
 
   validateWaypointValues() {
-    if (this.waypointFormData?.waypoints == undefined) return;
+    if (this.waypointPlatformData?.waypoints == undefined) return;
     this.theresAnError = false;
 
-    for (const waypoint of this.waypointFormData?.waypoints) {
+    for (const waypoint of this.waypointPlatformData?.waypoints) {
       if (
         waypoint === null ||
         waypoint.alt == null ||
@@ -335,17 +287,21 @@ export class WaypointEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  private destroyMap() {
-    if (this.map) {
-      this.aoiLayer.dispose();
-      this.reportSource.dispose();
-      this.reportLayer.dispose();
-      this.map.dispose();
-      this.map = undefined;
-    }
+  override get platformDataToDisplay() {
+    return this.data.filter(
+      (platform) =>
+        this.waypointPlatformData?.platformId &&
+        platform.id != this.waypointPlatformData?.platformId,
+    );
   }
 
-  ngOnDestroy() {
-    this.destroyMap();
+  override getColorIndex(platformId: string): number[] {
+    return [123, 123, 123];
+  }
+
+  override destroyMap() {
+    super.destroyMap();
+    this.reportSource.dispose();
+    this.reportLayer.dispose();
   }
 }
