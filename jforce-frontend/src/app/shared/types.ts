@@ -23,6 +23,7 @@ export interface Platform {
   maxSpeed: number;
   maxDepth: number;
   maxAlt: number;
+  friendly: boolean;
 
   waypoints: Array<Waypoint>;
   reportingFrequency: number; // likely not a number

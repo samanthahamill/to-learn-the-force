@@ -37,7 +37,7 @@ import {
 } from 'ol/control.js';
 import TileLayer from 'ol/layer/Tile';
 import { OSM } from 'ol/source';
-import { createStringYX } from '../../../shared/utils';
+import { addHours, createStringYX } from '../../../shared/utils';
 import Bar from 'ol-ext/control/Bar';
 import Toggle from 'ol-ext/control/Toggle';
 import { Draw, Modify, Snap } from 'ol/interaction';
@@ -143,14 +143,14 @@ export class WaypointEditorComponent extends BaseMapComponent {
     if (!this.reportLayer) return;
 
     const features: any[] = [];
-    this.waypoints.forEach((waypoint) => {
-      const feature = this.createWaypointFeature(
-        waypoint,
-        this.platformName ?? '',
-        this.waypointPlatformData?.platformIndex.toString() ?? '',
-      );
-      features.push(feature);
-    });
+    // this.waypoints.forEach((waypoint) => {
+    //   const feature = this.createWaypointFeature(
+    //     waypoint,
+    //     this.platformName ?? '',
+    //     this.waypointPlatformData?.platformIndex.toString() ?? '',
+    //   );
+    //   features.push(feature);
+    // });
 
     this.reportSource.addFeatures(features);
   }
@@ -192,7 +192,8 @@ export class WaypointEditorComponent extends BaseMapComponent {
 
   onDrawEnd(points: Coordinate[]) {
     const waypoints = this.waypoints;
-    const lastPoint = this.waypoints[waypoints.length - 1];
+    const lastPoint: Waypoint | undefined =
+      this.waypoints[waypoints.length - 1];
     const waypointLastIndex = waypoints.length - 1;
 
     const newCoordinates: Waypoint[] = points.map((point, i) => {
@@ -200,8 +201,10 @@ export class WaypointEditorComponent extends BaseMapComponent {
         lat: point[0],
         lon: point[1],
         alt: 0,
-        speedKts: lastPoint.speedKts,
-        datetime: new Date(lastPoint.datetime).toISOString(),
+        speedKts: lastPoint?.speedKts ?? 0,
+        datetime: !lastPoint?.datetime
+          ? new Date().toISOString()
+          : addHours(new Date(lastPoint.datetime), 1).toISOString(),
         index: waypointLastIndex + i,
       } as Waypoint;
     });

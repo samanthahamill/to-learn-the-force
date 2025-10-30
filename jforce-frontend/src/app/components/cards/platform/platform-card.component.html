@@ -21,6 +21,16 @@
             </option>
           </select>
         </div>
+        <div class="col">
+          <input
+            id="friendly"
+            type="checkbox"
+            formControlName="friendly"
+            (blur)="onUpdate()"
+            class="checkbox"
+          />
+          <label for="friendly">Is Friendly</label>
+        </div>
       </div>
       <div class="row-1 mutli-col">
         <div *ngIf="platformType == 'AIR'" class="col">

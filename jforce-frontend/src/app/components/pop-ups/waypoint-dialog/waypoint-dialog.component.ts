@@ -31,7 +31,7 @@ declare var $: any;
   schemas: [NO_ERRORS_SCHEMA],
 })
 export class WaypointDialogComponent implements OnInit {
-  waypointFormData: WaypointEditorInformation | undefined;
+  waypointPlatformData: WaypointEditorInformation | undefined;
   waypointEditor = inject(WaypointEditorService);
   userState = inject(UserStateService);
   theresAnError: boolean = false;
@@ -40,11 +40,11 @@ export class WaypointDialogComponent implements OnInit {
   constructor() {}
 
   get waypoints(): Waypoint[] {
-    return this.waypointFormData?.waypoints ?? [];
+    return this.waypointPlatformData?.waypoints ?? [];
   }
 
   get platformName(): string {
-    return this.waypointFormData?.platformName ?? '';
+    return this.waypointPlatformData?.platformName ?? '';
   }
 
   ngOnInit() {
@@ -52,7 +52,7 @@ export class WaypointDialogComponent implements OnInit {
       .pipe(untilDestroyed(this))
       .subscribe((info) => {
         if (info !== undefined) {
-          this.waypointFormData = {
+          this.waypointPlatformData = {
             waypoints: deepClone(info.waypoints),
             platformName: info.platformName,
             platformId: info.platformId,
@@ -73,9 +73,9 @@ export class WaypointDialogComponent implements OnInit {
   }
 
   updateOnModelClose(): void {
-    if (this.waypointFormData) {
+    if (this.waypointPlatformData) {
       this.userState.updateWaypoint(
-        this.waypointFormData.platformIndex,
+        this.waypointPlatformData.platformIndex,
         this.waypoints,
       );
     }
@@ -96,9 +96,9 @@ export class WaypointDialogComponent implements OnInit {
   }
 
   validateWaypointValues(): string {
-    if (this.waypointFormData?.waypoints == undefined) return '';
+    if (this.waypointPlatformData?.waypoints == undefined) return '';
 
-    for (const waypoint of this.waypointFormData?.waypoints) {
+    for (const waypoint of this.waypointPlatformData?.waypoints) {
       if (
         waypoint === null ||
         waypoint.alt == null ||

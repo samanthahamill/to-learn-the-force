@@ -152,6 +152,9 @@ export class ScenarioInputCardComponent {
         type: new FormControl(platform?.type ?? 'AIR', {
           validators: Validators.required,
         }),
+        friendly: new FormControl(platform?.friendly ?? true, {
+          validators: Validators.required,
+        }),
         waypoints: this.fb.array(
           platform?.waypoints.map((waypoint: Waypoint) =>
             this.fb.group({

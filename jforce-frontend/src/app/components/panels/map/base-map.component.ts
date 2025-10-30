@@ -20,9 +20,12 @@ import { UserStateService } from '../../../services/user-state.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { AOIType, Platform, Waypoint } from '../../../shared/types';
 import { fromLonLat, getUserProjection, Projection, toLonLat } from 'ol/proj';
-import { Point } from 'ol/geom';
 import GeoJSON from 'ol/format/GeoJSON';
-import { createStringYX, PLATFORM_TRACK_COLORS } from '../../../shared/utils';
+import {
+  createStringYX,
+  GREEN_COLORS,
+  RED_COLORS,
+} from '../../../shared/utils';
 import Feature from 'ol/Feature';
 import { TerraDraw, TerraDrawPointMode } from 'terra-draw';
 import { TerraDrawOpenLayersAdapter } from 'terra-draw-openlayers-adapter';
@@ -271,37 +274,35 @@ export class BaseMapComponent implements OnInit, OnDestroy {
 
     const features = this.platformDataToDisplay.flatMap((platform) => {
       return platform.waypoints.flatMap((waypoint) => {
-        return this.createWaypointFeature(waypoint, platform.name, platform.id);
+        return this.createWaypointFeature(waypoint, platform);
       });
     });
-
-    console.log(features);
 
     this.platformWaypointSource.addFeatures(features);
   }
 
-  createWaypointFeature(
-    waypoint: Waypoint,
-    platformName: string,
-    platformId: string,
-  ) {
-    // const feature = new Feature(
-    //   new Point(fromLonLat([waypoint.lon, waypoint.lat])),
-    // );
+  createWaypointFeature(waypoint: Waypoint, platform: Platform) {
     const pt = point([waypoint.lat, waypoint.lon], {}, { id: 'aoi' });
     const feature = this.geoJson.readFeature(pt) as Feature;
 
-    const color = this.getColorIndex(platformId);
-    const label = `Platform: ${platformName} Waypoint ${waypoint.index}\nloc: [${(waypoint.lon, waypoint.lat)}];\nalt: ${waypoint.alt}\nspeed:${waypoint.speedKts}`;
+    const color = this.getColorIndex(platform.id, platform.friendly);
+    const label =
+      `Platform: ${platform.name} Waypoint ${waypoint.index}\n` +
+      `loc: [${(waypoint.lon, waypoint.lat)}];\n` +
+      `alt: ${waypoint.alt}\n` +
+      `speed:${waypoint.speedKts}`;
 
     feature.setStyle([
       new Styled.Style({
         image: new Styled.Circle({
-          radius: 7,
+          radius: 5,
           fill: new Styled.Fill({
-            color: [...color, 0.5],
+            color: [...color, 0.7],
           }),
-          stroke: new Styled.Stroke({ color: color, width: 2 }),
+          stroke: new Styled.Stroke({
+            color: color,
+            width: 1,
+          }),
         }),
       }),
       new Styled.Style({
@@ -323,19 +324,21 @@ export class BaseMapComponent implements OnInit, OnDestroy {
     ]);
 
     feature.set('label', label);
-    feature.set('id', `${platformName}-${waypoint.index}`);
+    feature.set('id', `${platform.name}-${waypoint.index}`);
 
     return feature;
   }
 
-  getColorIndex(platformId: string): number[] {
+  getColorIndex(platformId: string, friendly: boolean): number[] {
     const uid = '0000'.substr(String(platformId).length) + platformId;
     const hash =
       uid.charCodeAt(0) +
       uid.charCodeAt(1) * 3 +
       uid.charCodeAt(2) * 5 +
       uid.charCodeAt(3) * 7;
-    return PLATFORM_TRACK_COLORS[hash % PLATFORM_TRACK_COLORS.length];
+    return friendly
+      ? GREEN_COLORS[hash % GREEN_COLORS.length]
+      : RED_COLORS[hash % RED_COLORS.length];
   }
 
   destroyMap() {

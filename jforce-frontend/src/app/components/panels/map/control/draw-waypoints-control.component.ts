@@ -10,6 +10,7 @@ import { convertLength } from '@turf/helpers';
 import { ChangeAOIRequest } from '../../../../services/user-state.service';
 import { Snap } from 'ol/interaction';
 import { Coordinate } from 'ol/coordinate';
+import { Decimal } from 'decimal.js';
 
 const PROJECTION_TYPE = 'EPSG:4326';
 
@@ -55,7 +56,11 @@ export class DrawWaypointsControl extends Control {
       const geometry = event.feature.getGeometry() as MultiPoint;
       const viewProjection = this.map!.getView().getProjection();
       const points = geometry.getCoordinates().map((coord) => {
-        return transform(coord, viewProjection, PROJECTION_TYPE);
+        const coordinate = transform(coord, viewProjection, PROJECTION_TYPE);
+        return [
+          new Decimal(coordinate[0]).toDecimalPlaces(2).toNumber(),
+          new Decimal(coordinate[1]).toDecimalPlaces(2).toNumber(),
+        ] as Coordinate;
       });
 
       this.drawEnd(points);

@@ -124,7 +124,7 @@ export class MainContentComponent {
                       }),
                       maxDepth: new FormControl(platform.maxDepth ?? 0),
                       maxAlt: new FormControl(platform.maxAlt ?? 0),
-
+                      friendly: new FormControl(platform.friendly ?? true),
                       waypoints: this.fb.array(
                         platform.waypoints?.map((waypoint) =>
                           this.fb.group({

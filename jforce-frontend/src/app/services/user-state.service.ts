@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { createStore, select, withProps } from '@ngneat/elf';
 import { AOIType, UserInputFormData, Waypoint } from '../shared/types';
+import { addHours } from '../shared/utils';
 
 const BASIC_FORM_DATA: UserInputFormData = {
   scenario: {
@@ -27,6 +28,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
           maxDepth: 0,
           type: 'AIR',
           reportingFrequency: 0,
+          friendly: true,
           waypoints: [
             {
               lat: 2,
@@ -40,7 +42,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
               lat: 1,
               lon: 1,
               alt: 1,
-              datetime: new Date().toISOString(),
+              datetime: addHours(new Date(), 1).toISOString(),
               index: 1,
               speedKts: 13,
             },
@@ -48,7 +50,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
               lat: 1,
               lon: 0,
               alt: 1,
-              datetime: new Date().toISOString(),
+              datetime: addHours(new Date(), 2).toISOString(),
               index: 2,
               speedKts: 13,
             },
