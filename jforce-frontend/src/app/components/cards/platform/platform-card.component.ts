@@ -18,6 +18,7 @@ import {
 import { CommonModule, NgClass, NgFor, NgIf } from '@angular/common';
 import {
   faCopy,
+  faEdit,
   faLock,
   faLockOpen,
   faPencil,
@@ -64,6 +65,7 @@ export class PlatformCardComponent implements AfterViewInit {
   @Input() formUpdated!: () => void;
   @Output() onDeleteClicked = new EventEmitter<void>();
   @Output() onCopyClicked = new EventEmitter<void>();
+  @Output() onEditClicked = new EventEmitter<void>(); // TODO implement
 
   waypointsLocked: boolean = false;
 
@@ -75,6 +77,12 @@ export class PlatformCardComponent implements AfterViewInit {
 
   constructor() {
     this.icons = [
+      {
+        icon: faEdit,
+        type: 'NONE',
+        tooltip: 'Edit Platform',
+        onClick: () => this.onEditClicked.emit(),
+      },
       {
         icon: faCopy,
         type: 'NONE',
@@ -113,20 +121,21 @@ export class PlatformCardComponent implements AfterViewInit {
     this.platformForm.valueChanges.pipe(untilDestroyed(this)).subscribe(() => {
       const type = this.platformForm?.controls['type'].value as PLATFORM_TYPE;
 
-      this.platformForm.controls['depth'].clearValidators();
-      this.platformForm.controls['alt'].clearValidators();
+      this.platformForm.controls['maxDepth'].clearValidators();
+      this.platformForm.controls['maxAlt'].clearValidators();
 
       if (type == 'MARITIME') {
-        this.platformForm.controls['depth'].setValidators(Validators.required);
+        this.platformForm.controls['maxDepth'].setValidators(
+          Validators.required,
+        );
       } else if (type == 'AIR') {
-        this.platformForm.controls['alt'].setValidators(Validators.required);
+        this.platformForm.controls['maxAlt'].setValidators(Validators.required);
       }
-
-      this.formUpdated();
     });
   }
 
   onUpdate(): void {
+    console.log(this.platformForm.controls['friendly']?.value);
     this.formUpdated();
   }
 

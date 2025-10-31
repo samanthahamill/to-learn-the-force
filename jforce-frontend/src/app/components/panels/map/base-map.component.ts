@@ -15,7 +15,7 @@ import {
   ScaleLine,
 } from 'ol/control.js';
 import TileLayer from 'ol/layer/Tile';
-import { OSM } from 'ol/source';
+import { OSM, StadiaMaps } from 'ol/source';
 import { UserStateService } from '../../../services/user-state.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { AOIType, Platform, Waypoint } from '../../../shared/types';
@@ -127,8 +127,15 @@ export class BaseMapComponent implements OnInit, OnDestroy {
         }),
       ]),
       layers: [
+        // new TileLayer({
+        //   source: new OSM(),
+        // }),
         new TileLayer({
-          source: new OSM(),
+          source: new StadiaMaps({
+            layer: 'alidade_smooth_dark',
+            retina: true,
+            // apiKey: 'OPTIONAL'
+          }),
         }),
         this.drawingLayer,
         this.aoiLayer,
@@ -272,7 +279,7 @@ export class BaseMapComponent implements OnInit, OnDestroy {
 
     this.platformWaypointSource.clear();
 
-    const features = this.platformDataToDisplay.flatMap((platform) => {
+    const features = this.data.flatMap((platform) => {
       return platform.waypoints.flatMap((waypoint) => {
         return this.createWaypointFeature(waypoint, platform);
       });
@@ -282,7 +289,11 @@ export class BaseMapComponent implements OnInit, OnDestroy {
   }
 
   createWaypointFeature(waypoint: Waypoint, platform: Platform) {
-    const pt = point([waypoint.lat, waypoint.lon], {}, { id: 'aoi' });
+    const pt = point(
+      [waypoint.lat, waypoint.lon],
+      {},
+      { id: `${platform.name}-${waypoint.index}` },
+    );
     const feature = this.geoJson.readFeature(pt) as Feature;
 
     const color = this.getColorIndex(platform.id, platform.friendly);
@@ -324,7 +335,6 @@ export class BaseMapComponent implements OnInit, OnDestroy {
     ]);
 
     feature.set('label', label);
-    feature.set('id', `${platform.name}-${waypoint.index}`);
 
     return feature;
   }

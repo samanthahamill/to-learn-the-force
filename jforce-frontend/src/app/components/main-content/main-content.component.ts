@@ -43,7 +43,6 @@ export class MainContentComponent {
     this.userStateService.input$
       .pipe(untilDestroyed(this))
       .subscribe((data: UserInputFormData | undefined) => {
-        console.log('input updated');
         if (data !== undefined && data != this.formGroup?.value) {
           this.updateInput(data);
         }
@@ -58,7 +57,17 @@ export class MainContentComponent {
 
   onUpdated() {
     if (this.formGroup) {
-      this.userStateService.updateInput(this.formGroup.value);
+      const inputGroup = this.formGroup
+        .get('input')
+        ?.get('scenario') as FormGroup;
+
+      this.userStateService.updateInput({
+        scenario: {
+          baseInfo: inputGroup?.get('baseInfo')?.value ?? {},
+          scenarioInput: inputGroup?.get('scenarioInput')?.value ?? {},
+        },
+        external: this.formGroup.get('input')?.get('external') ?? {},
+      } as UserInputFormData);
     }
   }
 

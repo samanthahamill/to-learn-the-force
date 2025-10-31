@@ -76,7 +76,7 @@ th:not(:first-child) {
 }
 
 .name {
-  width: 250px;
+  min-width: 150px;
 }
 
 .table-disabled {

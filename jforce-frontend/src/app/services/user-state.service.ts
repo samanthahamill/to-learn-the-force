@@ -100,10 +100,16 @@ export class UserStateService {
   }
 
   updateInput(input: UserInputFormData) {
+    console.log('updated');
+    console.log(input);
+
     store.update((state) => ({
       ...state,
       input: input,
-      aoi: input.scenario.scenarioInput.aoi,
+      aoi:
+        input?.scenario?.scenarioInput?.aoi ??
+        state.aoi ??
+        BASIC_FORM_DATA.scenario.scenarioInput.aoi,
     }));
   }
 
