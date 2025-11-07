@@ -55,7 +55,7 @@ import { WaypointEditorService } from '../../../services/waypoint-editor.service
 export class PlatformCardComponent implements AfterViewInit {
   removeIcon = faRemove;
   copyIcon = faCopy;
-  editIcon = faPencil;
+  editIcon = faEdit;
   lockIcon = faLock;
   lockOpenIcon = faLockOpen;
 
@@ -169,9 +169,8 @@ export class PlatformCardComponent implements AfterViewInit {
   openModal() {
     this.waypointEditorService.updateWaypointAndOpenDialog(
       this.waypoints,
-      this.name,
+      this.platformForm.value,
       this.index,
-      (this.platformForm.get('id')?.value as string) ?? 0,
     );
   }
 

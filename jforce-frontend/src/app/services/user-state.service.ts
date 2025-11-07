@@ -1,7 +1,13 @@
 import { Injectable } from '@angular/core';
 import { createStore, select, withProps } from '@ngneat/elf';
-import { AOIType, UserInputFormData, Waypoint } from '../shared/types';
+import {
+  AOIType,
+  Platform,
+  UserInputFormData,
+  Waypoint,
+} from '../shared/types';
 import { addHours } from '../shared/utils';
+import { FormGroup } from '@angular/forms';
 
 const BASIC_FORM_DATA: UserInputFormData = {
   scenario: {
@@ -99,15 +105,45 @@ export class UserStateService {
     return store.value.aoi;
   }
 
-  updateInput(input: UserInputFormData) {
-    console.log('updated');
-    console.log(input);
+  get platformLength() {
+    return store.value.input?.scenario?.scenarioInput?.platforms?.length ?? 0;
+  }
 
+  updateInput(input: UserInputFormData) {
     store.update((state) => ({
       ...state,
       input: input,
       aoi:
         input?.scenario?.scenarioInput?.aoi ??
+        state.aoi ??
+        BASIC_FORM_DATA.scenario.scenarioInput.aoi,
+    }));
+
+    console.log('FormUpdated');
+    console.log(store.value.input);
+  }
+
+  addPlatform(platform: FormGroup) {
+    store.update((state) => ({
+      ...state,
+      input: {
+        ...state.input,
+        scenario: {
+          ...state.input!.scenario,
+          scenarioInput: {
+            ...state.input!.scenario!.scenarioInput,
+
+            platforms: state.input!.scenario!.scenarioInput!.platforms
+              ? [
+                  ...state.input!.scenario.scenarioInput.platforms,
+                  platform.value,
+                ]
+              : [platform.value],
+          },
+        },
+      },
+      aoi:
+        state.input?.scenario?.scenarioInput?.aoi ??
         state.aoi ??
         BASIC_FORM_DATA.scenario.scenarioInput.aoi,
     }));

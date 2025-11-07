@@ -1,23 +1,32 @@
 import { Map, Overlay } from 'ol';
-import { Control } from 'ol/control';
-import { Options } from 'ol/control/Control';
 import Draw, { DrawEvent } from 'ol/interaction/Draw';
 import VectorLayer from 'ol/layer/Vector';
 import { transform } from 'ol/proj';
 import VectorSource from 'ol/source/Vector';
 import { MultiPoint } from 'ol/geom';
-import { convertLength } from '@turf/helpers';
-import { ChangeAOIRequest } from '../../../../services/user-state.service';
 import { Snap } from 'ol/interaction';
 import { Coordinate } from 'ol/coordinate';
 import { Decimal } from 'decimal.js';
+import Toggle, { Options } from 'ol-ext/control/Toggle';
+import { Style, Text, Fill } from 'ol/style';
 
 const PROJECTION_TYPE = 'EPSG:4326';
+
+const tipStyle = new Style({
+  text: new Text({
+    font: '12px Lato',
+    fill: new Fill({ color: 'rgb(255, 255, 255)' }),
+    backgroundFill: new Fill({ color: 'rgba(255, 255, 255, 0.3)' }),
+    padding: [2, 2, 2, 2],
+    textAlign: 'left',
+    offsetX: 15,
+  }),
+});
 
 export type DrawWaypointsType = { onDrawEnd: (evt: any) => void };
 export type DrawWaypointsOptions = Options & DrawWaypointsType;
 
-export class DrawWaypointsControl extends Control {
+export class DrawWaypointsControl extends Toggle {
   private drawInteraction: Draw;
   private overlayLayer: VectorLayer;
   private drawEnd: (event: Coordinate[]) => void | undefined;
@@ -28,25 +37,25 @@ export class DrawWaypointsControl extends Control {
   map: Map | null = null;
   radiusInNmi: number = 0.0;
   snap: Snap;
+  private tip: string = 'Click to Add New Waypoint';
 
   drawing: boolean = false;
+  private source: VectorSource;
 
   constructor(options: DrawWaypointsOptions) {
-    const button = document.createElement('button');
-    button.title = 'Add Waypoints';
-    button.innerHTML = "<i class='fa fa-dot-circle'></i>"; // change me
-    const element = document.createElement('div');
-    element.className = 'ol-waypoints ol-unselectable ol-control';
-    element.appendChild(button);
-
-    super({ element: element, target: options.target });
+    super(options);
 
     this.drawEnd = options.onDrawEnd;
-    this.overlayLayer = new VectorLayer({ source: new VectorSource() });
+
+    this.source = new VectorSource();
+    this.overlayLayer = new VectorLayer({
+      source: this.source,
+    });
 
     this.drawInteraction = new Draw({
       source: this.overlayLayer.getSource() ?? undefined,
       type: 'MultiPoint',
+      style: () => this.styleFunction(this.tip),
     });
     this.snap = new Snap({
       source: this.overlayLayer.getSource() ?? undefined,
@@ -66,26 +75,67 @@ export class DrawWaypointsControl extends Control {
       this.drawEnd(points);
     });
 
-    button.addEventListener('click', () => {
-      if (this.drawing) {
-        this.map!.removeInteraction(this.drawInteraction);
-        this.drawing = false;
-      } else {
-        this.activate();
-      }
-    });
+    options.onToggle = (val: boolean) => this.handleToggle(val);
+
+    // button.addEventListener('click', () => {
+    //   if (this.drawing) {
+    //     this.map!.removeInteraction(this.drawInteraction);
+    //     this.drawing = false;
+    //   } else {
+    //     this.activate();
+    //   }
+    // });
   }
 
-  activate(): void {
-    if (this.getMap()) {
-      if (this.drawInteraction) {
-        this.getMap()?.addInteraction(this.drawInteraction);
-        this.drawing = true;
+  handleToggle(activate: boolean): void {
+    this.source.clear();
+
+    if (activate) {
+      const map = this.getMap();
+      if (map) {
+        if (this.drawInteraction) {
+          this.tip = 'Click to Add New Waypoint';
+          map.addInteraction(this.drawInteraction);
+          map.addLayer(this.overlayLayer);
+        }
+      }
+    } else {
+      const map = this.getMap();
+      if (map) {
+        if (this.drawInteraction) {
+          map.removeInteraction(this.drawInteraction);
+          this.getMap()?.removeLayer(this.overlayLayer);
+        }
       }
     }
+
+    // if (activate) {
+    //   this.map!.removeInteraction(this.drawInteraction);
+    //   this.drawing = false;
+    // } else {
+    //   this.activate();
+    // }
+
+    // if (this.getMap()) {
+    //   if (this.drawInteraction) {
+    //     this.getMap()?.addInteraction(this.drawInteraction);
+    //     this.drawing = true;
+    //   }
+    // }
   }
 
-  override setMap(map: Map | null) {
+  private styleFunction(tip?: string) {
+    const styles = [];
+
+    if (tip) {
+      tipStyle.getText()?.setText(tip);
+      styles.push(tipStyle);
+    }
+
+    return styles;
+  }
+
+  override setMap(map: Map) {
     super.setMap(map);
     this.map = map;
   }

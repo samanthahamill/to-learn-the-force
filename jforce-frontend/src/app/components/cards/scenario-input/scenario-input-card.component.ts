@@ -26,6 +26,8 @@ import { PlatformCardComponent } from '../platform/platform-card.component';
 import { DialogConfirmationService } from '../../../services/dialog-confirmation.service';
 import { AoiCardComponent } from '../aoi/aoi-card.component';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { getNewPlatformFormGroup } from '../../../shared/create';
+import { UserStateService } from '../../../services/user-state.service';
 
 @UntilDestroy()
 @Component({
@@ -55,6 +57,7 @@ export class ScenarioInputCardComponent {
   icons: Array<ICON_FUNCTION>;
 
   private confirmationService = inject(DialogConfirmationService);
+  private userStateService = inject(UserStateService);
   shouldShowWaypointTableRows: boolean = true;
 
   constructor(private fb: FormBuilder) {
@@ -134,59 +137,8 @@ export class ScenarioInputCardComponent {
     const name = this.getNewPlatformName();
 
     // TODO implement
-    this.platforms.push(
-      this.fb.group({
-        name: new FormControl(platform?.name ?? name, {
-          validators: Validators.required,
-        }),
-        id: new FormControl(name, { validators: Validators.required }), // TODO make better id,
-        maxSpeed: new FormControl(platform?.maxSpeed ?? '', {
-          validators: Validators.required,
-        }),
-        maxAlt: new FormControl(platform?.maxAlt ?? '', {
-          validators: Validators.required,
-        }),
-        maxDepth: new FormControl(platform?.maxDepth ?? '', {
-          validators: Validators.required,
-        }),
-        type: new FormControl(platform?.type ?? 'AIR', {
-          validators: Validators.required,
-        }),
-        friendly: new FormControl(platform?.friendly ?? true, {
-          validators: Validators.required,
-        }),
-        waypoints: this.fb.array(
-          platform?.waypoints.map((waypoint: Waypoint) =>
-            this.fb.group({
-              lat: new FormControl(waypoint.lat, {
-                validators: Validators.required,
-              }),
-              lon: new FormControl(waypoint.lon, {
-                validators: Validators.required,
-              }),
-              alt: new FormControl(waypoint.alt, {
-                validators: Validators.required,
-              }),
-              datetime: new FormControl(waypoint.datetime, {
-                validators: Validators.required,
-              }),
-              index: new FormControl(waypoint.index, {
-                validators: Validators.required,
-              }),
-              speedKts: new FormControl(waypoint.speedKts, {
-                validators: Validators.required,
-              }),
-            }),
-          ) ?? [],
-        ),
-        reportingFrequency: new FormControl(platform?.reportingFrequency ?? 0, {
-          validators: Validators.required,
-        }),
-        readonly: new FormControl(platform?.readonly ?? false, {
-          validators: Validators.required,
-        }), // TODO change to be dynamic once they can add platforms from a predesigned list
-      }),
-    );
+    this.platforms.push(getNewPlatformFormGroup(this.fb, name, platform));
+    this.formUpdated();
   }
 
   duplicatePlatform(index: number) {

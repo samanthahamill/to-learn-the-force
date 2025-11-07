@@ -24,6 +24,7 @@ import GeoJSON from 'ol/format/GeoJSON';
 import {
   createStringYX,
   GREEN_COLORS,
+  MAP_PROJECTION,
   RED_COLORS,
 } from '../../../shared/utils';
 import Feature from 'ol/Feature';
@@ -32,11 +33,12 @@ import { TerraDrawOpenLayersAdapter } from 'terra-draw-openlayers-adapter';
 import { point, circle, polygon } from '@turf/turf';
 import { Extent } from 'ol/extent';
 import BaseLayer from 'ol/layer/Base';
+import { Coordinate } from 'ol/coordinate';
+import { MapContextMenu } from './menu/map-context-menu.component';
 
 // import { FeatureId } from 'terra-draw/dist/store/store';
 export type FeatureId = string | number;
 
-const projection = 'EPSG:4326';
 const aoiStyle = new Style({
   stroke: new Styled.Stroke({ color: 'yellow', width: 2 }),
 });
@@ -65,8 +67,12 @@ export class BaseMapComponent implements OnInit, OnDestroy {
 
   target: string;
 
+  showTrackLabels: boolean;
+  private mapContextMenu: MapContextMenu;
+
   constructor(target: string) {
     this.target = target;
+    this.showTrackLabels = true;
 
     this.drawingLayer = new VectorLayer({
       source: this.drawingSource,
@@ -88,11 +94,16 @@ export class BaseMapComponent implements OnInit, OnDestroy {
     });
 
     this.olMapView = new View({
-      projection: projection,
+      projection: MAP_PROJECTION,
       center: [0, 0],
       zoom: 5,
       minZoom: 1,
       maxZoom: 18,
+    });
+
+    this.mapContextMenu = new MapContextMenu({
+      toggleTrackLabels: () => this.toggleTrackLabels(),
+      document: document,
     });
 
     this.userStateService.aoi$.pipe(untilDestroyed(this)).subscribe((aoi) => {
@@ -117,24 +128,20 @@ export class BaseMapComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.map = new Map({
       target: this.target,
-      controls: defaultControls().extend([
+      controls: defaultControls({ attribution: false }).extend([
         new ScaleLine({ units: 'nautical' }),
         new MousePosition({
           coordinateFormat: createStringYX(4),
-          projection: projection,
+          projection: MAP_PROJECTION,
           className: 'custom-mouse-position',
           target: 'mousePositionDisplay',
         }),
       ]),
       layers: [
-        // new TileLayer({
-        //   source: new OSM(),
-        // }),
         new TileLayer({
           source: new StadiaMaps({
             layer: 'alidade_smooth_dark',
             retina: true,
-            // apiKey: 'OPTIONAL'
           }),
         }),
         this.drawingLayer,
@@ -145,12 +152,29 @@ export class BaseMapComponent implements OnInit, OnDestroy {
       view: this.olMapView,
     });
 
+    // right click menu changes if user clicks on map vs a feature
+    this.map?.getTargetElement().addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+
+      this.mapContextMenu.createContextMenu(
+        document,
+        event.clientX,
+        event.clientY,
+      );
+    });
+
     this.initButtonBar();
     this.initTerraDraw();
   }
 
   addButtonsToBar(): Control[] {
     return [];
+  }
+
+  toggleTrackLabels(): void {
+    console.log('toggled');
+    this.showTrackLabels = !this.showTrackLabels;
+    console.log(this.showTrackLabels);
   }
 
   initButtonBar() {
@@ -256,7 +280,7 @@ export class BaseMapComponent implements OnInit, OnDestroy {
         source.clear(true);
 
         const pt = point(
-          [this.aoiValue.lat, this.aoiValue.lon],
+          [this.aoiValue.lon, this.aoiValue.lat] as Coordinate,
           {},
           { id: 'aoi' },
         );
@@ -280,28 +304,33 @@ export class BaseMapComponent implements OnInit, OnDestroy {
     this.platformWaypointSource.clear();
 
     const features = this.data.flatMap((platform) => {
-      return platform.waypoints.flatMap((waypoint) => {
-        return this.createWaypointFeature(waypoint, platform);
+      return platform.waypoints.flatMap((waypoint, i) => {
+        return this.createWaypointFeature(
+          waypoint,
+          platform,
+          i == platform.waypoints.length - 1
+            ? `Platform: ${platform.name}`
+            : undefined,
+        );
       });
     });
 
     this.platformWaypointSource.addFeatures(features);
   }
 
-  createWaypointFeature(waypoint: Waypoint, platform: Platform) {
+  createWaypointFeature(
+    waypoint: Waypoint,
+    platform: Platform,
+    label?: string,
+  ) {
     const pt = point(
-      [waypoint.lat, waypoint.lon],
+      [waypoint.lon, waypoint.lat],
       {},
       { id: `${platform.name}-${waypoint.index}` },
     );
     const feature = this.geoJson.readFeature(pt) as Feature;
 
     const color = this.getColorIndex(platform.id, platform.friendly);
-    const label =
-      `Platform: ${platform.name} Waypoint ${waypoint.index}\n` +
-      `loc: [${(waypoint.lon, waypoint.lat)}];\n` +
-      `alt: ${waypoint.alt}\n` +
-      `speed:${waypoint.speedKts}`;
 
     feature.setStyle([
       new Styled.Style({
@@ -317,20 +346,22 @@ export class BaseMapComponent implements OnInit, OnDestroy {
         }),
       }),
       new Styled.Style({
-        text: new Styled.Text({
-          // text: label,
-          font: '10px sans-serif',
-          fill: new Styled.Fill({
-            color: 'black',
-          }),
-          stroke: new Styled.Stroke({
-            color: 'white',
-            width: 3,
-          }),
-          offsetX: 15,
-          offsetY: 15,
-          textAlign: 'center',
-        }),
+        text: this.showTrackLabels
+          ? new Styled.Text({
+              text: label,
+              font: '12px sans-serif',
+              fill: new Styled.Fill({
+                color: 'black',
+              }),
+              stroke: new Styled.Stroke({
+                color: 'white',
+                width: 3,
+              }),
+              offsetX: 15,
+              offsetY: 15,
+              textAlign: 'center',
+            })
+          : undefined,
       }),
     ]);
 

@@ -1,5 +1,7 @@
 import { Coordinate, format } from 'ol/coordinate';
 
+export const MAP_PROJECTION = 'EPSG:4326';
+
 export const toRadians = (degrees: number): number => degrees * (Math.PI / 180);
 export const NMI_TO_KM = 1.852;
 export const NMI_TO_M = 1852;

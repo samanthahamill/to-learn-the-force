@@ -44,18 +44,20 @@ export class WaypointDialogComponent implements OnInit {
   }
 
   get platformName(): string {
-    return this.waypointPlatformData?.platformName ?? '';
+    return this.waypointPlatformData?.platform.name ?? '';
   }
 
   ngOnInit() {
     this.waypointEditor.waypointInformation$
       .pipe(untilDestroyed(this))
-      .subscribe((info) => {
+      .subscribe((info: WaypointEditorInformation | undefined) => {
         if (info !== undefined) {
           this.waypointPlatformData = {
             waypoints: deepClone(info.waypoints),
-            platformName: info.platformName,
-            platformId: info.platformId,
+            platform: {
+              ...info.platform,
+              waypoints: deepClone(info.platform.waypoints),
+            },
             platformIndex: info.platformIndex,
           };
 
@@ -74,6 +76,7 @@ export class WaypointDialogComponent implements OnInit {
 
   updateOnModelClose(): void {
     if (this.waypointPlatformData) {
+      console.log(this.waypointPlatformData);
       this.userState.updateWaypoint(
         this.waypointPlatformData.platformIndex,
         this.waypoints,

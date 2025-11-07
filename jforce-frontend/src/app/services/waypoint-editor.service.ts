@@ -1,12 +1,11 @@
 import { inject, Injectable } from '@angular/core';
-import { Waypoint } from '../shared/types';
+import { Platform, Waypoint } from '../shared/types';
 import { createStore, select, withProps } from '@ngneat/elf';
 import { UserStateService } from './user-state.service';
 
 export interface WaypointEditorInformation {
   waypoints: Waypoint[];
-  platformName: string;
-  platformId: string;
+  platform: Platform;
   platformIndex: number;
 }
 
@@ -35,15 +34,13 @@ export class WaypointEditorService {
 
   updateWaypointAndOpenDialog(
     waypoints: Waypoint[],
-    platformName: string,
+    platform: Platform,
     platformIndex: number,
-    platformId: string,
   ) {
     const info = {
       waypoints: waypoints,
-      platformName: platformName,
+      platform: platform,
       platformIndex: platformIndex,
-      platformId: platformId,
     };
     store.update((state) => ({
       ...state,

@@ -1,11 +1,4 @@
-import {
-  Component,
-  inject,
-  Input,
-  NO_ERRORS_SCHEMA,
-  OnDestroy,
-  OnInit,
-} from '@angular/core';
+import { Component, Input, NO_ERRORS_SCHEMA } from '@angular/core';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { WaypointEditorInformation } from '../../../services/waypoint-editor.service';
 import {
@@ -22,37 +15,18 @@ import {
   faObjectGroup,
 } from '@fortawesome/free-solid-svg-icons';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AOIType, Waypoint } from '../../../shared/types';
+import { Waypoint } from '../../../shared/types';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
-import Map from 'ol/Map';
 import Fill from 'ol/style/Fill';
 import Style from 'ol/style/Style';
 import View from 'ol/View';
 import * as Styled from 'ol/style';
-import {
-  defaults as defaultControls,
-  MousePosition,
-  ScaleLine,
-} from 'ol/control.js';
-import TileLayer from 'ol/layer/Tile';
-import { OSM } from 'ol/source';
-import { addHours, createStringYX } from '../../../shared/utils';
-import Bar from 'ol-ext/control/Bar';
-import Toggle from 'ol-ext/control/Toggle';
-import { Draw, Modify, Snap } from 'ol/interaction';
-import { circle, point } from '@turf/turf';
+import { addHours, MAP_PROJECTION } from '../../../shared/utils';
 import CircleStyle from 'ol/style/Circle';
-import Feature from 'ol/Feature';
-import { Point } from 'ol/geom';
-import { fromLonLat } from 'ol/proj';
-import { UserStateService } from '../../../services/user-state.service';
-import GeoJSON from 'ol/format/GeoJSON';
 import { DrawWaypointsControl } from '../../panels/map/control/draw-waypoints-control.component';
 import { Coordinate } from 'ol/coordinate';
 import { BaseMapComponent } from '../../panels/map/base-map.component';
-
-const projection = 'EPSG:4326';
 
 @UntilDestroy()
 @Component({
@@ -97,7 +71,7 @@ export class WaypointEditorComponent extends BaseMapComponent {
     });
 
     this.olMapView = new View({
-      projection: projection,
+      projection: MAP_PROJECTION,
       center: [0, 0],
       zoom: 5,
       minZoom: 1,
@@ -115,6 +89,10 @@ export class WaypointEditorComponent extends BaseMapComponent {
     });
 
     this.drawWaypointControl = new DrawWaypointsControl({
+      className: 'ol-draw-waypoint-tool',
+      // Ruler Icon
+      html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M128 252.6C128 148.4 214 64 320 64C426 64 512 148.4 512 252.6C512 371.9 391.8 514.9 341.6 569.4C329.8 582.2 310.1 582.2 298.3 569.4C248.1 514.9 127.9 371.9 127.9 252.6zM320 320C355.3 320 384 291.3 384 256C384 220.7 355.3 192 320 192C284.7 192 256 220.7 256 256C256 291.3 284.7 320 320 320z"/></svg>`,
+      title: 'Draw Waypoint Tool',
       onDrawEnd: (points) => this.onDrawEnd(points),
     });
 
@@ -122,7 +100,7 @@ export class WaypointEditorComponent extends BaseMapComponent {
   }
 
   get platformName() {
-    return this.waypointPlatformData?.platformName;
+    return this.waypointPlatformData?.platform.name;
   }
 
   get waypoints(): Waypoint[] {
@@ -140,17 +118,17 @@ export class WaypointEditorComponent extends BaseMapComponent {
   }
 
   renderWaypoints() {
-    if (!this.reportLayer) return;
+    if (!this.reportLayer || this.waypointPlatformData === undefined) return;
 
     const features: any[] = [];
-    // this.waypoints.forEach((waypoint) => {
-    //   const feature = this.createWaypointFeature(
-    //     waypoint,
-    //     this.platformName ?? '',
-    //     this.waypointPlatformData?.platformIndex.toString() ?? '',
-    //   );
-    //   features.push(feature);
-    // });
+    this.waypoints.forEach((waypoint) => {
+      const feature = this.createWaypointFeature(
+        waypoint,
+        this.waypointPlatformData!.platform,
+        this.waypointPlatformData!.platform.name,
+      );
+      features.push(feature);
+    });
 
     this.reportSource.addFeatures(features);
   }
@@ -293,13 +271,9 @@ export class WaypointEditorComponent extends BaseMapComponent {
   override get platformDataToDisplay() {
     return this.data.filter(
       (platform) =>
-        this.waypointPlatformData?.platformId &&
-        platform.id != this.waypointPlatformData?.platformId,
+        this.waypointPlatformData?.platform.id &&
+        platform.id !== this.waypointPlatformData?.platform.id,
     );
-  }
-
-  override getColorIndex(platformId: string): number[] {
-    return [123, 123, 123];
   }
 
   override destroyMap() {
