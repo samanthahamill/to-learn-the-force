@@ -308,9 +308,7 @@ export class BaseMapComponent implements OnInit, OnDestroy {
         return this.createWaypointFeature(
           waypoint,
           platform,
-          i == platform.waypoints.length - 1
-            ? `Platform: ${platform.name}`
-            : undefined,
+          i == platform.waypoints.length - 1 ? platform.name : undefined,
         );
       });
     });

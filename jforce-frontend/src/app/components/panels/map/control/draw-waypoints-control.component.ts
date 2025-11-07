@@ -9,6 +9,7 @@ import { Coordinate } from 'ol/coordinate';
 import { Decimal } from 'decimal.js';
 import Toggle, { Options } from 'ol-ext/control/Toggle';
 import { Style, Text, Fill } from 'ol/style';
+import { OnDestroy } from '@angular/core';
 
 const PROJECTION_TYPE = 'EPSG:4326';
 
@@ -76,15 +77,6 @@ export class DrawWaypointsControl extends Toggle {
     });
 
     options.onToggle = (val: boolean) => this.handleToggle(val);
-
-    // button.addEventListener('click', () => {
-    //   if (this.drawing) {
-    //     this.map!.removeInteraction(this.drawInteraction);
-    //     this.drawing = false;
-    //   } else {
-    //     this.activate();
-    //   }
-    // });
   }
 
   handleToggle(activate: boolean): void {
@@ -108,20 +100,6 @@ export class DrawWaypointsControl extends Toggle {
         }
       }
     }
-
-    // if (activate) {
-    //   this.map!.removeInteraction(this.drawInteraction);
-    //   this.drawing = false;
-    // } else {
-    //   this.activate();
-    // }
-
-    // if (this.getMap()) {
-    //   if (this.drawInteraction) {
-    //     this.getMap()?.addInteraction(this.drawInteraction);
-    //     this.drawing = true;
-    //   }
-    // }
   }
 
   private styleFunction(tip?: string) {
@@ -138,5 +116,13 @@ export class DrawWaypointsControl extends Toggle {
   override setMap(map: Map) {
     super.setMap(map);
     this.map = map;
+  }
+
+  onDestroy(): void {
+    if (this.drawInteraction) {
+      this.getMap()?.removeInteraction(this.drawInteraction);
+    }
+    this.getMap()?.removeLayer(this.overlayLayer);
+    this.overlayLayer.dispose();
   }
 }

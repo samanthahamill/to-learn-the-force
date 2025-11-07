@@ -9,6 +9,7 @@ import { Coordinate } from 'ol/coordinate';
 import { Decimal } from 'decimal.js';
 import Toggle, { Options } from 'ol-ext/control/Toggle';
 import { Style, Text, Fill } from 'ol/style';
+import { OnDestroy } from '@angular/core';
 
 const PROJECTION_TYPE = 'EPSG:4326';
 
@@ -64,6 +65,15 @@ export class DragWaypointsControl extends Toggle {
       this.onUpdateFinished();
       this.select = undefined;
       this.translate = undefined;
+    }
+  }
+
+  onDestroy(): void {
+    if (this.translate) {
+      this.getMap()?.removeInteraction(this.translate);
+    }
+    if (this.select) {
+      this.getMap()?.removeInteraction(this.select);
     }
   }
 }

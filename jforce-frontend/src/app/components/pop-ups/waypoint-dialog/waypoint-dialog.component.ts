@@ -1,4 +1,10 @@
-import { Component, inject, NO_ERRORS_SCHEMA, OnInit } from '@angular/core';
+import {
+  Component,
+  inject,
+  NO_ERRORS_SCHEMA,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import {
   WaypointEditorInformation,

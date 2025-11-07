@@ -340,6 +340,9 @@ export class WaypointEditorComponent extends BaseMapComponent {
   }
 
   override destroyMap() {
+    this.drawWaypointControl.onDestroy();
+    this.dragWaypointControl.onDestroy();
+
     super.destroyMap();
     this.reportSource.dispose();
     this.reportLayer.dispose();
