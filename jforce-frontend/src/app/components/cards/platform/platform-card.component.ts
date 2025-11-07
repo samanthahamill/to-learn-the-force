@@ -33,6 +33,7 @@ import {
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { WaypointEditorService } from '../../../services/waypoint-editor.service';
+import { createWaypointId } from '../../../shared/utils';
 
 @UntilDestroy()
 @Component({
@@ -153,7 +154,10 @@ export class PlatformCardComponent implements AfterViewInit {
   }
 
   duplicateWaypoint(index: number) {
-    const duplicateWaypoint = { ...this.waypoints[index] };
+    const duplicateWaypoint = {
+      ...this.waypoints[index],
+      id: createWaypointId(this.name ?? 'platform', this.waypoints),
+    };
     this.waypoints.splice(index, 0, duplicateWaypoint);
     this.shiftWaypoints();
   }

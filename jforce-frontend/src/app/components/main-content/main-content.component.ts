@@ -137,6 +137,9 @@ export class MainContentComponent {
                       waypoints: this.fb.array(
                         platform.waypoints?.map((waypoint) =>
                           this.fb.group({
+                            id: new FormControl(waypoint.id, {
+                              validators: Validators.required,
+                            }),
                             lat: new FormControl(waypoint.lat, {
                               validators: Validators.required,
                             }),

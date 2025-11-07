@@ -1,4 +1,5 @@
 import { Coordinate, format } from 'ol/coordinate';
+import { Waypoint } from './types';
 
 export const MAP_PROJECTION = 'EPSG:4326';
 
@@ -29,6 +30,30 @@ export const RED_COLORS = [
   [173, 14, 7],
   [173, 56, 7],
 ];
+
+export function createWaypointId(
+  platformName: string,
+  waypoints: Waypoint[],
+): string {
+  let newIndex = waypoints.length ?? 0;
+  let foundId = false;
+  let newId = `${platformName}-waypoint-${newIndex}`;
+
+  if (waypoints === undefined || waypoints.length == 0) {
+    return newId;
+  }
+
+  while (!foundId) {
+    newId = `${platformName}-waypoint-${newIndex}`;
+    if (!waypoints.map((waypoint) => waypoint.id).includes(newId)) {
+      foundId = true;
+    } else {
+      newIndex++;
+    }
+  }
+
+  return newId;
+}
 
 export function createStringYX(fractionDigits: number) {
   return (

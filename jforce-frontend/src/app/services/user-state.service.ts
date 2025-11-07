@@ -6,7 +6,7 @@ import {
   UserInputFormData,
   Waypoint,
 } from '../shared/types';
-import { addHours } from '../shared/utils';
+import { addHours, createWaypointId } from '../shared/utils';
 import { FormGroup } from '@angular/forms';
 
 const BASIC_FORM_DATA: UserInputFormData = {
@@ -37,6 +37,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
           friendly: true,
           waypoints: [
             {
+              id: 'test-waypoint-0',
               lat: 2,
               lon: 2,
               alt: 1,
@@ -45,6 +46,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
               speedKts: 13,
             },
             {
+              id: 'test-waypoint-1',
               lat: 1,
               lon: 1,
               alt: 1,
@@ -53,6 +55,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
               speedKts: 13,
             },
             {
+              id: 'test-waypoint-2',
               lat: 1,
               lon: 0,
               alt: 1,
@@ -118,9 +121,6 @@ export class UserStateService {
         state.aoi ??
         BASIC_FORM_DATA.scenario.scenarioInput.aoi,
     }));
-
-    console.log('FormUpdated');
-    console.log(store.value.input);
   }
 
   addPlatform(platform: FormGroup) {

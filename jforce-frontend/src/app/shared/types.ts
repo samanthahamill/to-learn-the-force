@@ -79,6 +79,7 @@ export interface VesselInfo {
 }
 
 export interface Waypoint {
+  id: string; // for frontend us only - utilized to allow dragging on map feature
   lat: number;
   lon: number;
   alt: number;

@@ -14,7 +14,10 @@
         <h5 class="modal-title">{{ platformName }} Waypoint Editor</h5>
       </div>
       <div class="modal-body">
-        <app-waypoint-editor [waypointPlatformData]="waypointPlatformData" />
+        <app-waypoint-editor
+          [waypointPlatformData]="waypointPlatformData"
+          (waypointPlatformDataUpdated)="waypointPlatformDataUpdated($event)"
+        />
       </div>
       <div class="modal-footer">
         <div *ngIf="theresAnError">

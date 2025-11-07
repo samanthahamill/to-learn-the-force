@@ -323,11 +323,7 @@ export class BaseMapComponent implements OnInit, OnDestroy {
     platform: Platform,
     label?: string,
   ) {
-    const pt = point(
-      [waypoint.lon, waypoint.lat],
-      {},
-      { id: `${platform.name}-${waypoint.index}` },
-    );
+    const pt = point([waypoint.lon, waypoint.lat], {}, { id: waypoint.id });
     const feature = this.geoJson.readFeature(pt) as Feature;
 
     const color = this.getColorIndex(platform.id, platform.friendly);

@@ -76,7 +76,6 @@ export class WaypointDialogComponent implements OnInit {
 
   updateOnModelClose(): void {
     if (this.waypointPlatformData) {
-      console.log(this.waypointPlatformData);
       this.userState.updateWaypoint(
         this.waypointPlatformData.platformIndex,
         this.waypoints,
@@ -84,6 +83,10 @@ export class WaypointDialogComponent implements OnInit {
     }
 
     this.closeModal();
+  }
+
+  waypointPlatformDataUpdated(waypointPlatformData: WaypointEditorInformation) {
+    this.waypointPlatformData = waypointPlatformData;
   }
 
   closeAndSaveModal() {
