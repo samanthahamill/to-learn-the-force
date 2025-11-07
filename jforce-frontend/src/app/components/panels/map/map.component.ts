@@ -1,220 +1,75 @@
-import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
+import { Component } from '@angular/core';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
-import { Coordinate, format } from 'ol/coordinate';
-import Map from 'ol/Map';
-import Fill from 'ol/style/Fill';
-import Style from 'ol/style/Style';
-import View from 'ol/View';
-import Bar from 'ol-ext/control/Bar';
-import Toggle from 'ol-ext/control/Toggle';
-import * as Styled from 'ol/style';
-import {
-  defaults as defaultControls,
-  MousePosition,
-  ScaleLine,
-} from 'ol/control.js';
-import TileLayer from 'ol/layer/Tile';
-import { OSM } from 'ol/source';
-import { UserStateService } from '../../../services/user-state.service';
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { AOIType } from '../../../shared/types';
-import { fromLonLat, toLonLat } from 'ol/proj';
-import { Draw } from 'ol/interaction';
-import { DrawEvent } from 'ol/interaction/Draw';
-import { Circle } from 'ol/geom';
-import GeoJSON from 'ol/format/GeoJSON';
-import { point, circle } from '@turf/turf';
+import { Control } from 'ol/control.js';
+import { ChangeAOIRequest } from '../../../services/user-state.service';
+import { UntilDestroy } from '@ngneat/until-destroy';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { DrawCircleAoiControl } from './control/draw-circle-aoi-control.component';
+import { BaseMapComponent } from './base-map.component';
+import { MeasurementToolControl } from './control/measurement-tool.component';
+import { FeatureContextMenu } from './menu/feature-context-menu.component';
+import { MapContextMenu } from './menu/map-context-menu.component';
 
-const projection = 'EPSG:4326';
+export type FeatureId = string | number;
 
 @UntilDestroy()
 @Component({
   selector: 'app-map',
-  imports: [],
+  imports: [CommonModule, FontAwesomeModule],
   templateUrl: './map.component.html',
   styleUrl: './map.component.scss',
 })
-export class MapComponent implements OnInit {
-  map: Map | undefined;
-  olMapView: View;
-  aoiValue: AOIType | undefined;
-  vectorSource: VectorSource | undefined;
-  vectorLayer: VectorLayer | undefined;
+export class MapComponent extends BaseMapComponent {
+  private drawCircleAoiControl: DrawCircleAoiControl;
+  private measureToolControl: MeasurementToolControl;
+  vectorSource: VectorSource;
+  vectorLayer: VectorLayer;
 
-  private geoJson: GeoJSON = new GeoJSON();
-
-  private aoiLayer: VectorLayer<any>;
-  private drawingSource = new VectorSource();
-  private drawingLayer!: VectorLayer<VectorSource>;
-  private selectionBar!: Bar;
-
-  private userStateService = inject(UserStateService);
-  // private drawCircleAoiControl: DrawCircleAoiControl;
-
-  @Output() currentAOI = new EventEmitter<AOIType>();
+  private featureContextMenu: FeatureContextMenu;
 
   constructor() {
-    this.drawingLayer = new VectorLayer({
-      source: this.drawingSource,
-      style: new Style({
-        fill: new Fill({ color: 'rgba(250, 0, 234, 0.1' }),
-        stroke: new Styled.Stroke({ color: 'rgb(255, 0, 235' }),
-      }),
+    super('mapContainer');
+    this.drawCircleAoiControl = new DrawCircleAoiControl({
+      onDrawEnd: (evt: any) => this.onDrawCircleAoiComplete(evt),
     });
 
-    this.aoiLayer = new VectorLayer({ source: new VectorSource() });
-
-    this.olMapView = new View({
-      projection: projection,
-      center: [0, 0],
-      zoom: 5,
-      minZoom: 1,
-      maxZoom: 18,
+    this.measureToolControl = new MeasurementToolControl({
+      className: 'ol-measure-tool',
+      // Ruler Icon
+      html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M241.1 580.2C222.4 598.9 192 598.9 173.2 580.2L60.1 467.1C41.4 448.4 41.4 418 60.1 399.2L77.1 382.2L150.6 455.7C160 465.1 175.2 465.1 184.5 455.7C193.8 446.3 193.9 431.1 184.5 421.8L111 348.3L144.9 314.4L195.8 365.3C205.2 374.7 220.4 374.7 229.7 365.3C239 355.9 239.1 340.7 229.7 331.4L178.8 280.5L212.7 246.6L286.2 320.1C295.6 329.5 310.8 329.5 320.1 320.1C329.4 310.7 329.5 295.5 320.1 286.2L246.6 212.7L280.5 178.8L331.4 229.7C340.8 239.1 356 239.1 365.3 229.7C374.6 220.3 374.7 205.1 365.3 195.8L314.4 144.9L348.3 111L421.8 184.5C431.2 193.9 446.4 193.9 455.7 184.5C465 175.1 465.1 159.9 455.7 150.6L382.2 77.1L399.2 60.1C417.9 41.4 448.3 41.4 467.1 60.1L580.5 172.9C599.2 191.6 599.2 222 580.5 240.8L241.1 580.2z"/></svg>`,
+      title: 'Measure tool',
+      onToggle: () => {
+        // internally handled
+      },
     });
 
-    this.userStateService.aoi$.pipe(untilDestroyed(this)).subscribe((aoi) => {
-      if (aoi != this.aoiValue && this.aoiLayer) {
-        this.aoiValue = aoi;
-        this.renderAOI();
-      }
-    });
-
-    // this.drawCircleAoiControl = new DrawCircleAoiControl({
-    //   onDrawEnd: (evt: any) => this.onDrawAoiComplete(evt),
-    // });
-  }
-
-  ngOnInit() {
     this.vectorSource = new VectorSource();
     this.vectorLayer = new VectorLayer({
       source: this.vectorSource,
     });
 
-    this.map = new Map({
-      target: 'mapContainer',
-      controls: defaultControls().extend([
-        new ScaleLine({ units: 'nautical' }),
-        new MousePosition({
-          coordinateFormat: this.createStringYX(4),
-          projection: projection,
-          className: 'custom-mouse-position',
-          target: 'mousePositionDisplay',
-        }),
-      ]),
-      layers: [
-        this.drawingLayer,
-        this.aoiLayer,
-        this.vectorLayer,
-        new TileLayer({
-          source: new OSM(),
-        }),
-      ],
-      view: this.olMapView,
-    });
-
-    this.initButtonBar();
-  }
-
-  updateMapCenter() {
-    if (this.map && this.aoiValue) {
-      this.map
-        .getView()
-        .setCenter(fromLonLat([this.aoiValue.lon, this.aoiValue.lat]));
-    }
-  }
-
-  renderAOI() {
-    if (this.aoiValue) {
-      const aoiSource = this.aoiLayer.getSource();
-      if (aoiSource) {
-        aoiSource.clear(true);
-        const pt = point(
-          [this.aoiValue.lon, this.aoiValue.lat],
-          {},
-          { id: 'aoi' },
-        );
-
-        const aoi = circle(pt, this.aoiValue.radius, {
-          steps: 180,
-          units: 'kilometers',
-        });
-        aoiSource.addFeature(this.geoJson.readFeature(aoi));
-        // this.fixExtent = aoiSource.getExtent();
-      }
-    }
-  }
-
-  drawNewAOI() {
-    const customAOI = new Draw({
-      source: this.vectorSource,
-      type: 'Circle',
-    });
-
-    this.map!.addInteraction(customAOI);
-
-    customAOI.on('drawend', (event: DrawEvent) => {
-      const geometry = event.feature.getGeometry() as Circle;
-      const center = toLonLat(geometry.getCenter());
-      const radius = geometry.getRadius() * 0.7;
-      this.currentAOI.emit({
-        lat: center[1],
-        lon: center[0],
-        alt: 0.0,
-        radius: radius / 1852,
-      });
-      requestAnimationFrame(() => {
-        this.map!.removeInteraction(customAOI);
-      });
+    this.featureContextMenu = new FeatureContextMenu({
+      document: document,
     });
   }
 
-  initButtonBar() {
-    const btnBar = new Bar();
-    btnBar.setPosition('left');
-
-    this.selectionBar = new Bar({
-      className: 'ol-feature-select-bar',
-      autoDeactivate: true,
-    });
-
-    // btnBar.addControl(
-    //   new ZoomToAoiControl({
-    //     source: this.aoiLayer.getSource() ?? undefined,
-    //   }),
-    // );
-    // btnBar.addControl(
-    //   new ZoomToFeatureControl({
-    //     source: this.trackHeadOnlyLayer.getSource() ?? undefined,
-    //   }),
-    // );
-    // btnBar.addControl(
-    //   new DrawAoiControl({
-    //     source: this.trackHeadOnlyLayer.getSource() ?? undefined,
-    //   }),
-    // );
-
-    const featureToggleSelection = new Toggle({
-      className: 'ol-selection-bar-toggle',
-      html: `<i class="fa-solid fa-object-group"></i>`,
-      title: 'Report Selection Filter',
-      bar: this.selectionBar,
-    });
-    btnBar.addControl(featureToggleSelection);
-
-    // TODO add back in
-    this.map?.addControl(btnBar);
+  override customLayers() {
+    return [this.vectorLayer];
   }
 
-  createStringYX(fractionDigits: number) {
-    return (
-      /**
-       * @param {Coordinate} coordinate Coordinate.
-       * @return {string} String YX.
-       */
-      function (coordinate: Coordinate | undefined) {
-        return format(coordinate!, '{x}, {y}', fractionDigits);
-      }
-    );
+  override addButtonsToBar(): Control[] {
+    return [this.drawCircleAoiControl, this.measureToolControl];
+  }
+
+  private onDrawCircleAoiComplete(evt: ChangeAOIRequest) {
+    this.userStateService.updateAOIRequest(evt);
+  }
+
+  override destroyMap() {
+    super.destroyMap();
+    this.vectorSource.dispose();
+    this.vectorLayer.dispose();
   }
 }

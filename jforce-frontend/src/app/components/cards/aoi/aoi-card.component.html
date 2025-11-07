@@ -13,18 +13,6 @@
           />
         </div>
         <div class="col">
-          <label for="alt">Altitude:</label>
-          <input
-            id="alt"
-            type="number"
-            formControlName="alt"
-            class="readonly input"
-            placeholder="Altitude"
-          />
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
           <label for="lon">Longitude:</label>
           <input
             id="lon"
@@ -32,6 +20,19 @@
             class="input"
             formControlName="lon"
             placeholder="Longitude"
+          />
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <label for="alt">Altitude:</label>
+          <input
+            id="alt"
+            type="number"
+            formControlName="alt"
+            class="readonly input"
+            placeholder="Altitude"
+            (blur)="onFormUpdate()"
           />
         </div>
 

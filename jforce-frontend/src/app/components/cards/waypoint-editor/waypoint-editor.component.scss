@@ -1,0 +1,32 @@
+@use "styles" as style;
+@use "../card.component.scss";
+
+fa-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+}
+
+.custom-table,
+.table-custom {
+  height: 100%;
+  max-width: 600px !important;
+  min-width: 400px !important;
+  overflow: hidden;
+}
+
+.datetime-dimensions {
+  width: 150px !important;
+}
+
+.flex-modal {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  width: 100%;
+}
+
+.map-dimensions {
+  height: 100%;
+  width: 50%;
+}

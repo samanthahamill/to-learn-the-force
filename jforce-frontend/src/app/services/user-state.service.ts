@@ -1,10 +1,84 @@
 import { Injectable } from '@angular/core';
 import { createStore, select, withProps } from '@ngneat/elf';
-import { AOIType, UserInputFormData, Waypoint } from '../shared/types';
+import {
+  AOIType,
+  Platform,
+  UserInputFormData,
+  Waypoint,
+} from '../shared/types';
+import { addHours, createWaypointId } from '../shared/utils';
+import { FormGroup } from '@angular/forms';
+
+const BASIC_FORM_DATA: UserInputFormData = {
+  scenario: {
+    baseInfo: {
+      scenarioName: 'Test',
+      scenarioAuthor: 'TBD',
+      dateOfCreation: new Date(),
+      details: '',
+    },
+    scenarioInput: {
+      aoi: {
+        lat: 0,
+        lon: 0,
+        alt: 0,
+        radius: 150,
+      },
+      platforms: [
+        {
+          name: 'test',
+          id: 'test',
+          readonly: false,
+          maxSpeed: 0,
+          maxAlt: 0,
+          maxDepth: 0,
+          type: 'AIR',
+          reportingFrequency: 0,
+          friendly: true,
+          waypoints: [
+            {
+              id: 'test-waypoint-0',
+              lat: 2,
+              lon: 2,
+              alt: 1,
+              datetime: new Date().toISOString(),
+              index: 0,
+              speedKts: 13,
+            },
+            {
+              id: 'test-waypoint-1',
+              lat: 1,
+              lon: 1,
+              alt: 1,
+              datetime: addHours(new Date(), 1).toISOString(),
+              index: 1,
+              speedKts: 13,
+            },
+            {
+              id: 'test-waypoint-2',
+              lat: 1,
+              lon: 0,
+              alt: 1,
+              datetime: addHours(new Date(), 2).toISOString(),
+              index: 2,
+              speedKts: 13,
+            },
+          ],
+        },
+      ],
+    },
+  },
+};
 
 interface UserStoreState {
   input: UserInputFormData | undefined;
   aoi: AOIType | undefined;
+}
+
+export interface ChangeAOIRequest {
+  centerLat: number;
+  centerLon: number;
+  radius: number;
 }
 
 const store = createStore(
@@ -22,14 +96,67 @@ export class UserStateService {
   input$ = store.pipe(select((state) => state.input));
   aoi$ = store.pipe(select((state) => state.aoi));
 
-  constructor() {}
+  constructor() {
+    store.update((state) => ({
+      ...state,
+      input: BASIC_FORM_DATA,
+      aoi: BASIC_FORM_DATA.scenario.scenarioInput.aoi,
+    }));
+  }
 
   get getAOI() {
     return store.value.aoi;
   }
 
+  get platformLength() {
+    return store.value.input?.scenario?.scenarioInput?.platforms?.length ?? 0;
+  }
+
   updateInput(input: UserInputFormData) {
-    store.update((state) => ({ ...state, input: input }));
+    store.update((state) => ({
+      ...state,
+      input: input,
+      aoi:
+        input?.scenario?.scenarioInput?.aoi ??
+        state.aoi ??
+        BASIC_FORM_DATA.scenario.scenarioInput.aoi,
+    }));
+  }
+
+  addPlatform(platform: FormGroup) {
+    store.update((state) => ({
+      ...state,
+      input: {
+        ...state.input,
+        scenario: {
+          ...state.input!.scenario,
+          scenarioInput: {
+            ...state.input!.scenario!.scenarioInput,
+
+            platforms: state.input!.scenario!.scenarioInput!.platforms
+              ? [
+                  ...state.input!.scenario.scenarioInput.platforms,
+                  platform.value,
+                ]
+              : [platform.value],
+          },
+        },
+      },
+      aoi:
+        state.input?.scenario?.scenarioInput?.aoi ??
+        state.aoi ??
+        BASIC_FORM_DATA.scenario.scenarioInput.aoi,
+    }));
+  }
+
+  updateAOIRequest(aoi: ChangeAOIRequest) {
+    // TODO implement
+    this.updateAOI({
+      lat: aoi.centerLat,
+      lon: aoi.centerLon,
+      radius: aoi.radius,
+      alt: 0.0,
+    });
   }
 
   updateAOI(newAoi: AOIType) {
@@ -48,6 +175,18 @@ export class UserStateService {
       store.update((state) => ({
         ...state,
         aoi: newAoi as AOIType,
+        input: state.input
+          ? {
+              ...state.input,
+              scenario: {
+                ...state.input?.scenario,
+                scenarioInput: {
+                  ...state.input?.scenario?.scenarioInput,
+                  aoi: newAoi,
+                },
+              },
+            }
+          : undefined,
       }));
     }
   }

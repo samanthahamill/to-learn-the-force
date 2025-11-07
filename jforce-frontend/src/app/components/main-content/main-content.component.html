@@ -6,12 +6,16 @@
           class="input-panel"
           [formGroup]="getFormGroup('input')"
           (onSubmit)="onSubmit()"
+          [formUpdated]="onUpdated.bind(this)"
         />
       </div>
 
       <div class="col">
         <!-- TODO add form group -->
-        <app-external-card [formGroup]="getFormGroup('external')" />
+        <app-external-card
+          [formGroup]="getFormGroup('external')"
+          [formUpdated]="onUpdated.bind(this)"
+        />
         <!-- Not part of the form. If possible, would be ideal to move -->
         <app-map />
       </div>

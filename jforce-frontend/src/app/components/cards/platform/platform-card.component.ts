@@ -1,10 +1,10 @@
 import {
+  AfterViewInit,
   Component,
   EventEmitter,
   inject,
   Input,
   NO_ERRORS_SCHEMA,
-  OnInit,
   Output,
 } from '@angular/core';
 import { CardComponent, ICON_FUNCTION } from '../card.component';
@@ -18,6 +18,7 @@ import {
 import { CommonModule, NgClass, NgFor, NgIf } from '@angular/common';
 import {
   faCopy,
+  faEdit,
   faLock,
   faLockOpen,
   faPencil,
@@ -32,6 +33,7 @@ import {
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { WaypointEditorService } from '../../../services/waypoint-editor.service';
+import { createWaypointId } from '../../../shared/utils';
 
 @UntilDestroy()
 @Component({
@@ -41,7 +43,6 @@ import { WaypointEditorService } from '../../../services/waypoint-editor.service
     CardComponent,
     FormsModule,
     ReactiveFormsModule,
-    CommonModule,
     DragDropModule,
     FontAwesomeModule,
     NgClass,
@@ -52,19 +53,20 @@ import { WaypointEditorService } from '../../../services/waypoint-editor.service
   styleUrl: './platform-card.component.scss',
   schemas: [NO_ERRORS_SCHEMA],
 })
-export class PlatformCardComponent implements OnInit {
+export class PlatformCardComponent implements AfterViewInit {
   removeIcon = faRemove;
   copyIcon = faCopy;
-  editIcon = faPencil;
+  editIcon = faEdit;
   lockIcon = faLock;
   lockOpenIcon = faLockOpen;
 
   @Input() platformForm!: FormGroup;
   @Input() index!: number;
   @Input() shouldShowWaypointTableRows!: boolean;
-
+  @Input() formUpdated!: () => void;
   @Output() onDeleteClicked = new EventEmitter<void>();
   @Output() onCopyClicked = new EventEmitter<void>();
+  @Output() onEditClicked = new EventEmitter<void>(); // TODO implement
 
   waypointsLocked: boolean = false;
 
@@ -76,6 +78,12 @@ export class PlatformCardComponent implements OnInit {
 
   constructor() {
     this.icons = [
+      {
+        icon: faEdit,
+        type: 'NONE',
+        tooltip: 'Edit Platform',
+        onClick: () => this.onEditClicked.emit(),
+      },
       {
         icon: faCopy,
         type: 'NONE',
@@ -110,26 +118,26 @@ export class PlatformCardComponent implements OnInit {
     return this.platformForm.get('readonly')?.value;
   }
 
-  ngOnInit(): void {
-    this.platformForm.valueChanges
-      .pipe(untilDestroyed(this))
-      .subscribe((value) => {
-        const type = this.platformForm?.controls['type'].value as PLATFORM_TYPE;
+  ngAfterViewInit(): void {
+    this.platformForm.valueChanges.pipe(untilDestroyed(this)).subscribe(() => {
+      const type = this.platformForm?.controls['type'].value as PLATFORM_TYPE;
 
-        // if (this.platformType != type) {
-        //   this.platformType = type;
-        // }
-        this.platformForm.controls['depth'].clearValidators();
-        this.platformForm.controls['alt'].clearValidators();
+      this.platformForm.controls['maxDepth'].clearValidators();
+      this.platformForm.controls['maxAlt'].clearValidators();
 
-        if (type == 'MARITIME') {
-          this.platformForm.controls['depth'].setValidators(
-            Validators.required,
-          );
-        } else if (type == 'AIR') {
-          this.platformForm.controls['alt'].setValidators(Validators.required);
-        }
-      });
+      if (type == 'MARITIME') {
+        this.platformForm.controls['maxDepth'].setValidators(
+          Validators.required,
+        );
+      } else if (type == 'AIR') {
+        this.platformForm.controls['maxAlt'].setValidators(Validators.required);
+      }
+    });
+  }
+
+  onUpdate(): void {
+    console.log(this.platformForm.controls['friendly']?.value);
+    this.formUpdated();
   }
 
   deleteWaypoint(index: number) {
@@ -146,7 +154,10 @@ export class PlatformCardComponent implements OnInit {
   }
 
   duplicateWaypoint(index: number) {
-    const duplicateWaypoint = { ...this.waypoints[index] };
+    const duplicateWaypoint = {
+      ...this.waypoints[index],
+      id: createWaypointId(this.name ?? 'platform', this.waypoints),
+    };
     this.waypoints.splice(index, 0, duplicateWaypoint);
     this.shiftWaypoints();
   }
@@ -162,7 +173,7 @@ export class PlatformCardComponent implements OnInit {
   openModal() {
     this.waypointEditorService.updateWaypointAndOpenDialog(
       this.waypoints,
-      this.name,
+      this.platformForm.value,
       this.index,
     );
   }
@@ -173,5 +184,6 @@ export class PlatformCardComponent implements OnInit {
 
   shiftWaypoints() {
     this.waypoints.forEach((waypoint, i) => (waypoint.index = i));
+    this.formUpdated();
   }
 }

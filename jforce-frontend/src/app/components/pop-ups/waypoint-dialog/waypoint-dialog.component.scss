@@ -1,5 +1,26 @@
 @use "styles" as style;
 
+.btn-error {
+  background-color: style.$danger;
+}
+
+.custom-table,
+.table-custom {
+  height: 100%;
+  max-width: 600px !important;
+  min-width: 400px !important;
+  overflow: hidden;
+}
+
+.error {
+  color: style.$danger;
+}
+
+.modal-dimensions {
+  height: 600px;
+  width: 1100px;
+}
+
 .modal-custom {
   position: absolute;
   width: 100vw;

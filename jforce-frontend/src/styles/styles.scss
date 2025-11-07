@@ -1,5 +1,12 @@
 @use "sass:map";
+@use "ol/ol.css";
+@use "ol-ext/dist/ol-ext.css";
 @use "./variables" as customVars;
+
+$fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
+@import "../../node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
+@import "../../node_modules/@fortawesome/fontawesome-free/scss/solid";
+@import "../../node_modules/@fortawesome/fontawesome-free/scss/regular";
 
 @import "../../node_modules/bootstrap/scss/functions";
 @import "../../node_modules/bootstrap/scss/variables";
