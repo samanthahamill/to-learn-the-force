@@ -47,7 +47,7 @@ export type ICON_FUNCTION = {
   styleUrl: './card.component.scss',
   schemas: [NO_ERRORS_SCHEMA],
 })
-export class CardComponent implements OnChanges {
+export class CardComponent {
   @Input() header: string = '';
   @Input() icons: Array<ICON_FUNCTION> = [];
 
@@ -62,17 +62,10 @@ export class CardComponent implements OnChanges {
   filterIcon = faFilter;
   questionIcon = faQuestion;
 
-  @Input()
-  platformColor: string | undefined = undefined;
-  previousColor: string | undefined = undefined;
+  @Input() platformColor: string | undefined = undefined;
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['platformColor']) {
-      if (this.platformColor !== this.previousColor) {
-        this.previousColor = this.platformColor;
-        this.onColorChange?.emit(this.platformColor);
-      }
-    }
+  ngModelChange(newValue: string) {
+    this.onColorChange?.emit(newValue);
   }
 
   getIconDefinition(i: number) {

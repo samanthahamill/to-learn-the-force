@@ -126,14 +126,14 @@ export class PlatformCardComponent implements AfterViewInit {
       this.platformForm.controls['maxDepth'].clearValidators();
       this.platformForm.controls['maxAlt'].clearValidators();
 
-      // const color = this.platformForm?.get('color')?.value;
-      // if (
-      //   this.defaultColor === undefined &&
-      //   color !== undefined &&
-      //   color !== this.defaultColor
-      // ) {
-      //   this.defaultColor = color;
-      // }
+      const color = this.platformForm?.get('color')?.value;
+      if (
+        this.defaultColor === undefined &&
+        color !== undefined &&
+        color !== this.defaultColor
+      ) {
+        this.defaultColor = color;
+      }
 
       if (type == 'MARITIME') {
         this.platformForm.controls['maxDepth'].setValidators(

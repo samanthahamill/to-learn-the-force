@@ -11,6 +11,7 @@
       <span *ngIf="platformColor">
         <p-colorpicker
           [(ngModel)]="platformColor"
+          (ngModelChange)="ngModelChange($event)"
           inputId="cp-hex"
           class="mb-4"
         />
