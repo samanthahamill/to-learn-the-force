@@ -1,10 +1,8 @@
 import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
-  EventEmitter,
   Input,
   OnInit,
-  Output,
 } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
@@ -42,7 +40,7 @@ export class ExternalComponent implements OnInit {
   // TODO set up actual connections
 
   constructor() {
-    this.importData = true;
+    this.importData = false;
   }
 
   ngOnInit(): void {

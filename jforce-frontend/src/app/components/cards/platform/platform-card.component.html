@@ -1,4 +1,10 @@
-<app-card header="{{ name }}" [lighterCard]="true" [icons]="icons">
+<app-card
+  header="{{ name }}"
+  [lighterCard]="true"
+  [icons]="icons"
+  [platformColor]="defaultColor"
+  (onColorChange)="onColorChange($event)"
+>
   <form class="formGroup" [formGroup]="platformForm">
     <div class="container">
       <div class="row-1 mutli-col">

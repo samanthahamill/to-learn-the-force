@@ -22,18 +22,27 @@ h3 {
   border-color: style.$light;
 }
 
-.card-title {
+.card-header {
   border-bottom: solid 1px whitesmoke;
   display: flex;
   justify-content: space-between;
 
-  overflow: hidden;
+  overflow: visible;
   text-overflow: ellipsis;
   white-space: nowrap;
 
   height: $card-header-height;
   margin-bottom: $card-header-margin;
   align-items: center;
+  z-index: 10px;
+  padding-right: 0px;
+  padding-left: 0px;
+}
+
+.card-title {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
 }
 
 .checkbox {
@@ -107,4 +116,8 @@ h3 {
   display: flex;
   align-content: center;
   padding-top: 4px;
+}
+
+.space-header {
+  padding-left: 4px;
 }

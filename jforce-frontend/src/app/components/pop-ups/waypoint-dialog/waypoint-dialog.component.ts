@@ -113,6 +113,7 @@ export class WaypointDialogComponent implements OnInit {
     for (const waypoint of this.waypointPlatformData?.waypoints) {
       if (
         waypoint === null ||
+        waypoint.id == null ||
         waypoint.alt == null ||
         waypoint.lat == null ||
         waypoint.lon == null ||

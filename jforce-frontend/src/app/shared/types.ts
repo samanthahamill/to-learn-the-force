@@ -24,6 +24,7 @@ export interface Platform {
   maxDepth: number;
   maxAlt: number;
   friendly: boolean;
+  color: string; // hex
 
   waypoints: Array<Waypoint>;
   reportingFrequency: number; // likely not a number

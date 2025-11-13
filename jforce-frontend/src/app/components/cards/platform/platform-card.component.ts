@@ -5,6 +5,7 @@ import {
   inject,
   Input,
   NO_ERRORS_SCHEMA,
+  OnInit,
   Output,
 } from '@angular/core';
 import { CardComponent, ICON_FUNCTION } from '../card.component';
@@ -21,7 +22,6 @@ import {
   faEdit,
   faLock,
   faLockOpen,
-  faPencil,
   faRemove,
 } from '@fortawesome/free-solid-svg-icons';
 import { PLATFORM_TYPE, Waypoint } from '../../../shared/types';
@@ -73,6 +73,7 @@ export class PlatformCardComponent implements AfterViewInit {
   platformTypeOptions: Array<PLATFORM_TYPE> = ['AIR', 'GROUND', 'MARITIME'];
 
   icons: Array<ICON_FUNCTION>;
+  defaultColor: string | undefined = undefined; // default color at the time the platform was made
 
   private waypointEditorService = inject(WaypointEditorService);
 
@@ -101,21 +102,21 @@ export class PlatformCardComponent implements AfterViewInit {
 
   get waypoints(): Waypoint[] {
     return (
-      ((this.platformForm.get('waypoints') as FormArray)
+      ((this.platformForm?.get('waypoints') as FormArray)
         ?.value as Waypoint[]) ?? []
     );
   }
 
   get name(): string {
-    return this.platformForm.get('name')?.value;
+    return this.platformForm?.get('name')?.value;
   }
 
   get platformType(): PLATFORM_TYPE {
-    return this.platformForm.get('type')?.value;
+    return this.platformForm?.get('type')?.value;
   }
 
   get readonly(): boolean {
-    return this.platformForm.get('readonly')?.value;
+    return this.platformForm?.get('readonly')?.value;
   }
 
   ngAfterViewInit(): void {
@@ -125,6 +126,15 @@ export class PlatformCardComponent implements AfterViewInit {
       this.platformForm.controls['maxDepth'].clearValidators();
       this.platformForm.controls['maxAlt'].clearValidators();
 
+      // const color = this.platformForm?.get('color')?.value;
+      // if (
+      //   this.defaultColor === undefined &&
+      //   color !== undefined &&
+      //   color !== this.defaultColor
+      // ) {
+      //   this.defaultColor = color;
+      // }
+
       if (type == 'MARITIME') {
         this.platformForm.controls['maxDepth'].setValidators(
           Validators.required,
@@ -133,11 +143,19 @@ export class PlatformCardComponent implements AfterViewInit {
         this.platformForm.controls['maxAlt'].setValidators(Validators.required);
       }
     });
+
+    this.platformForm.get('type')?.setValue(this.platformForm.get('type'));
   }
 
   onUpdate(): void {
-    console.log(this.platformForm.controls['friendly']?.value);
     this.formUpdated();
+  }
+
+  onColorChange(color: string): void {
+    if (color !== this.platformForm?.controls['color']?.value) {
+      this.platformForm?.controls['color']?.setValue(color);
+      this.formUpdated();
+    }
   }
 
   deleteWaypoint(index: number) {

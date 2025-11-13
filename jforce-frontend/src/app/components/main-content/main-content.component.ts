@@ -16,6 +16,7 @@ import { ToastService } from '../../services/toast.service';
 import { UserStateService } from '../../services/user-state.service';
 import { ExternalComponent } from '../panels/external/external.component';
 import { AOIType, Platform, UserInputFormData } from '../../shared/types';
+import { getNewPlatformFormGroup } from '../../shared/create';
 
 @UntilDestroy()
 @Component({
@@ -73,7 +74,7 @@ export class MainContentComponent {
 
   updateInput(input: UserInputFormData) {
     if (input !== null) {
-      console.log('Default Form Initiated');
+      console.log('Form Updated');
       this.formGroup = this.fb.group({
         input: this.fb.group({
           scenario: this.fb.group({
@@ -118,57 +119,7 @@ export class MainContentComponent {
               platforms: this.fb.array([
                 ...(input.scenario?.scenarioInput.platforms.map(
                   (platform: Platform, i: number) =>
-                    this.fb.group({
-                      id: new FormControl(platform.id ?? `Unknown ${i}`, {
-                        validators: Validators.required,
-                      }),
-                      name: new FormControl(platform.name ?? 'Name', {
-                        validators: Validators.required,
-                      }),
-                      type: new FormControl(platform.type ?? 'AIR', {
-                        validators: Validators.required,
-                      }),
-                      maxSpeed: new FormControl(platform.maxSpeed ?? 0, {
-                        validators: Validators.required,
-                      }),
-                      maxDepth: new FormControl(platform.maxDepth ?? 0),
-                      maxAlt: new FormControl(platform.maxAlt ?? 0),
-                      friendly: new FormControl(platform.friendly ?? true),
-                      waypoints: this.fb.array(
-                        platform.waypoints?.map((waypoint) =>
-                          this.fb.group({
-                            id: new FormControl(waypoint.id, {
-                              validators: Validators.required,
-                            }),
-                            lat: new FormControl(waypoint.lat, {
-                              validators: Validators.required,
-                            }),
-                            lon: new FormControl(waypoint.lon, {
-                              validators: Validators.required,
-                            }),
-                            alt: new FormControl(waypoint.alt, {
-                              validators: Validators.required,
-                            }),
-                            datetime: new FormControl(waypoint.datetime, {
-                              validators: Validators.required,
-                            }),
-                            index: new FormControl(waypoint.index, {
-                              validators: Validators.required,
-                            }),
-                            speedKts: new FormControl(waypoint.speedKts, {
-                              validators: Validators.required,
-                            }),
-                          }),
-                        ) ?? [],
-                      ),
-                      reportingFrequency: new FormControl(
-                        platform.reportingFrequency ?? 0,
-                        { validators: Validators.required },
-                      ), // likely not a number
-                      readonly: new FormControl(platform.readonly ?? false, {
-                        validators: Validators.required,
-                      }),
-                    }),
+                    getNewPlatformFormGroup(this.fb, platform.name, platform),
                 ) ?? []),
               ]),
             }),

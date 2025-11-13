@@ -11,6 +11,8 @@ export const MAP_FACTOR = 0.7;
 export const DEFAULT_ZOOM = 9;
 export const MINS_PER_DAY = 86400;
 
+export type RGB_TYPE = { r: number; b: number; g: number };
+
 export const GREEN_COLORS = [
   [1, 50, 32],
   [1, 25, 16],
@@ -87,4 +89,26 @@ export function addHours(date: Date, hours: number) {
   const hoursToAdd = hours * 60 * 60 * 1000;
   date.setTime(date.getTime() + hoursToAdd);
   return date;
+}
+
+export function hexToRgb(hex: string): RGB_TYPE {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16),
+      }
+    : { r: 225, g: 225, b: 225 };
+}
+
+function componentToHex(c: number) {
+  var hex = c.toString(16);
+  return hex.length == 1 ? '0' + hex : hex;
+}
+
+export function rgbToHex(rgb: RGB_TYPE) {
+  return (
+    '#' + componentToHex(rgb.r) + componentToHex(rgb.g) + componentToHex(rgb.b)
+  );
 }

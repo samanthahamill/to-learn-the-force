@@ -35,6 +35,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
           type: 'AIR',
           reportingFrequency: 0,
           friendly: true,
+          color: '#6466f1',
           waypoints: [
             {
               id: 'test-waypoint-0',
@@ -84,7 +85,7 @@ export interface ChangeAOIRequest {
 const store = createStore(
   { name: 'user-state' },
   withProps<UserStoreState>({
-    input: undefined,
+    input: BASIC_FORM_DATA,
     aoi: undefined,
   }),
 );
