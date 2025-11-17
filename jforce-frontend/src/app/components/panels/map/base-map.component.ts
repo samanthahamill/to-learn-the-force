@@ -30,17 +30,23 @@ import {
 import Feature from 'ol/Feature';
 import { TerraDraw, TerraDrawPointMode } from 'terra-draw';
 import { TerraDrawOpenLayersAdapter } from 'terra-draw-openlayers-adapter';
-import { point, circle, polygon } from '@turf/turf';
+import { point, circle, polygon, lineString } from '@turf/turf';
 import { Extent } from 'ol/extent';
 import BaseLayer from 'ol/layer/Base';
 import { Coordinate } from 'ol/coordinate';
 import { MapContextMenu } from './menu/map-context-menu.component';
+import Toggle from 'ol-ext/control/Toggle';
+import { LineString } from 'ol/geom';
 
 // import { FeatureId } from 'terra-draw/dist/store/store';
 export type FeatureId = string | number;
 
 const aoiStyle = new Style({
   stroke: new Styled.Stroke({ color: 'yellow', width: 2 }),
+});
+
+const vectorStyle = new Style({
+  stroke: new Styled.Stroke({ color: 'white', width: 2 }),
 });
 
 @UntilDestroy()
@@ -60,6 +66,9 @@ export class BaseMapComponent implements OnInit, OnDestroy {
 
   platformWaypointSource: VectorSource = new VectorSource();
   platformWaypointLayer: VectorLayer;
+  platformVectorSource: VectorSource = new VectorSource();
+  platformVectorLayer: VectorLayer;
+
   terraDraw: TerraDraw | undefined;
   terraDrawOpenLayerAdapter: TerraDrawOpenLayersAdapter | undefined;
   fitExtent: Extent | undefined;
@@ -68,11 +77,13 @@ export class BaseMapComponent implements OnInit, OnDestroy {
   target: string;
 
   showTrackLabels: boolean;
+  platformVectorVisible: boolean;
   private mapContextMenu: MapContextMenu;
 
   constructor(target: string) {
     this.target = target;
     this.showTrackLabels = true;
+    this.platformVectorVisible = true;
 
     this.drawingLayer = new VectorLayer({
       source: this.drawingSource,
@@ -90,6 +101,12 @@ export class BaseMapComponent implements OnInit, OnDestroy {
     this.platformWaypointSource = new VectorSource();
     this.platformWaypointLayer = new VectorLayer({
       visible: true,
+      source: this.platformWaypointSource,
+      style: vectorStyle,
+    });
+
+    this.platformVectorLayer = new VectorLayer({
+      visible: this.platformVectorVisible,
       source: this.platformWaypointSource,
     });
 
@@ -118,6 +135,7 @@ export class BaseMapComponent implements OnInit, OnDestroy {
       .subscribe((input) => {
         this.data = input?.scenario?.scenarioInput?.platforms ?? [];
         this.updateTracks();
+        this.updateVectors();
       });
   }
 
@@ -146,6 +164,7 @@ export class BaseMapComponent implements OnInit, OnDestroy {
         }),
         this.drawingLayer,
         this.aoiLayer,
+        this.platformVectorLayer,
         this.platformWaypointLayer,
         ...this.customLayers(),
       ],
@@ -172,14 +191,25 @@ export class BaseMapComponent implements OnInit, OnDestroy {
   }
 
   toggleTrackLabels(): void {
-    console.log('toggled');
     this.showTrackLabels = !this.showTrackLabels;
-    console.log(this.showTrackLabels);
   }
 
   initButtonBar() {
     const btnBar = new Bar();
     btnBar.setPosition('left');
+
+    btnBar.addControl(
+      new Toggle({
+        title: 'Toggle Track Vectors',
+        className: 'ol-vector-toggle',
+        html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M287.9 96L211.7 96C182.3 96 156.6 116.1 149.6 144.6L65.4 484.5C57.9 514.7 80.8 544 112 544L287.9 544L287.9 480C287.9 462.3 302.2 448 319.9 448C337.6 448 351.9 462.3 351.9 480L351.9 544L528 544C559.2 544 582.1 514.7 574.6 484.5L490.5 144.6C483.4 116.1 457.8 96 428.3 96L351.9 96L351.9 160C351.9 177.7 337.6 192 319.9 192C302.2 192 287.9 177.7 287.9 160L287.9 96zM351.9 288L351.9 352C351.9 369.7 337.6 384 319.9 384C302.2 384 287.9 369.7 287.9 352L287.9 288C287.9 270.3 302.2 256 319.9 256C337.6 256 351.9 270.3 351.9 288z"/></svg>`,
+        active: this.platformVectorVisible,
+        onToggle: (activate) => {
+          this.platformVectorVisible = activate;
+          this.platformVectorLayer.setVisible(this.platformVectorVisible);
+        },
+      }),
+    );
 
     this.addButtonsToBar().forEach((control) => btnBar.addControl(control));
     this.map?.addControl(btnBar);
@@ -298,6 +328,29 @@ export class BaseMapComponent implements OnInit, OnDestroy {
     return this.data;
   }
 
+  updateVectors() {
+    if (!this.platformWaypointLayer) return;
+
+    this.platformVectorSource.clear();
+
+    const features = this.data
+      .filter(
+        (platform) =>
+          platform.waypoints !== undefined && platform.waypoints.length > 1,
+      )
+      .flatMap((platform) => {
+        return this.geoJson.readFeature(
+          lineString(
+            platform.waypoints.map(
+              (waypoint) => [waypoint.lon, waypoint.lat] as Coordinate,
+            ),
+          ),
+        ) as Feature;
+      });
+
+    this.platformWaypointSource.addFeatures(features);
+  }
+
   updateTracks() {
     if (!this.platformWaypointLayer) return;
 
@@ -324,14 +377,14 @@ export class BaseMapComponent implements OnInit, OnDestroy {
     const pt = point([waypoint.lon, waypoint.lat], {}, { id: waypoint.id });
     const feature = this.geoJson.readFeature(pt) as Feature;
 
-    const color = this.getColorIndex(platform.id, platform.friendly);
+    const color = platform.color;
 
     feature.setStyle([
       new Styled.Style({
         image: new Styled.Circle({
           radius: 5,
           fill: new Styled.Fill({
-            color: [...color, 0.7],
+            color: color,
           }),
           stroke: new Styled.Stroke({
             color: color,

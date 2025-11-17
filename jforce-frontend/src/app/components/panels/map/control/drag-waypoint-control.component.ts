@@ -39,8 +39,7 @@ export class DragWaypointsControl extends Toggle {
   constructor(options: DragWaypointsOptions) {
     super(options);
 
-    this.updateCoordinate = (newCoords, waypointId) =>
-      options.updateCoordinate(newCoords, waypointId);
+    this.updateCoordinate = options.updateCoordinate;
     this.onUpdateFinished = () => options.onUpdateFinished();
     options.onToggle = (activated) => this.handleToggle(activated);
   }
@@ -57,6 +56,9 @@ export class DragWaypointsControl extends Toggle {
 
       this.translate.on('translating', (evt) => {
         const id = this.select?.getFeatures().getArray()[0].getId();
+        console.log(this.select?.getFeatures());
+        console.log(id);
+        console.log(id as string);
         this.updateCoordinate(evt.coordinate, id ? (id as string) : 'unknown');
       });
     } else {

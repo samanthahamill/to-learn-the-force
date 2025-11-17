@@ -1,5 +1,13 @@
-import { CommonModule } from '@angular/common';
-import { Component, Input, NO_ERRORS_SCHEMA } from '@angular/core';
+import { CommonModule, NgClass, NgFor, NgIf } from '@angular/common';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  NO_ERRORS_SCHEMA,
+  OnChanges,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faFilter,
@@ -7,7 +15,11 @@ import {
   IconDefinition,
   faQuestion,
 } from '@fortawesome/free-solid-svg-icons';
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { ButtonModule } from 'primeng/button';
+import { ColorPicker, ColorPickerModule } from 'primeng/colorpicker';
+import { hexToRgb } from '../../shared/utils';
+import { FormsModule } from '@angular/forms';
 
 export type TypeOfButton = 'CONFIRM' | 'DELETE' | 'NONE';
 
@@ -18,9 +30,19 @@ export type ICON_FUNCTION = {
   onClick: () => void;
 };
 
+@UntilDestroy()
 @Component({
   selector: 'app-card',
-  imports: [CommonModule, ButtonModule, FontAwesomeModule],
+  imports: [
+    CommonModule,
+    ButtonModule,
+    FontAwesomeModule,
+    ColorPicker,
+    FormsModule,
+    NgIf,
+    NgClass,
+    NgFor,
+  ],
   templateUrl: './card.component.html',
   styleUrl: './card.component.scss',
   schemas: [NO_ERRORS_SCHEMA],
@@ -34,9 +56,17 @@ export class CardComponent {
   @Input() redIcon: boolean = false;
   @Input() greenIcon: boolean = false;
 
+  @Output() onColorChange = new EventEmitter<string>();
+
   refreshIcon = faRotate;
   filterIcon = faFilter;
   questionIcon = faQuestion;
+
+  @Input() platformColor: string | undefined = undefined;
+
+  ngModelChange(newValue: string) {
+    this.onColorChange?.emit(newValue);
+  }
 
   getIconDefinition(i: number) {
     return this.icons.at(i)!.icon;

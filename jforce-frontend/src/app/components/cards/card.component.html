@@ -6,11 +6,20 @@
     'default-card': !innerCard && !lighterCard,
   }"
 >
-  <span class="card-title">
-    <h3>
-      {{ header }}
-    </h3>
-
+  <span class="card-header">
+    <span class="card-title">
+      <span *ngIf="platformColor">
+        <p-colorpicker
+          [(ngModel)]="platformColor"
+          (ngModelChange)="ngModelChange($event)"
+          inputId="cp-hex"
+          class="mb-4"
+        />
+      </span>
+      <h3 [ngClass]="{ 'space-header': platformColor }">
+        {{ header }}
+      </h3>
+    </span>
     <div class="icon-group">
       <span *ngFor="let icon of icons; let i = index">
         <fa-icon

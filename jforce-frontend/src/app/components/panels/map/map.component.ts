@@ -10,7 +10,6 @@ import { DrawCircleAoiControl } from './control/draw-circle-aoi-control.componen
 import { BaseMapComponent } from './base-map.component';
 import { MeasurementToolControl } from './control/measurement-tool.component';
 import { FeatureContextMenu } from './menu/feature-context-menu.component';
-import { MapContextMenu } from './menu/map-context-menu.component';
 
 export type FeatureId = string | number;
 

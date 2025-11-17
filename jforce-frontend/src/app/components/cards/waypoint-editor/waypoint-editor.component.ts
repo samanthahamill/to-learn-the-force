@@ -164,24 +164,6 @@ export class WaypointEditorComponent extends BaseMapComponent {
     this.reportSource.addFeatures(features);
   }
 
-  // createWaypointFeature(waypoint: Waypoint) {
-  //   const pt = point(
-  //     [waypoint.lon, waypoint.lat],
-  //     { data: waypoint },
-  //     { id: waypoint.index },
-  //   );
-
-  //   const feature = new Feature(
-  //     new Point(fromLonLat([waypoint.lon, waypoint.lat])),
-  //   );
-  //   const ptStyle = this.getStyle();
-  //   feature.setStyle(ptStyle);
-
-  //   const label = `Waypoint ${waypoint.index}\nloc: [${(waypoint.lon, waypoint.lat)}];\nalt: ${waypoint.alt}\nspeed:${waypoint.speedKts}`;
-  //   ptStyle.getText()?.setText(label);
-  //   return feature;
-  // }
-
   getStyle() {
     return new Style({
       text: new Styled.Text({
@@ -225,7 +207,10 @@ export class WaypointEditorComponent extends BaseMapComponent {
 
   dragPointOnMap(coord: Coordinate, waypointId: string) {
     if (waypointId && waypointId !== '' && this.waypointPlatformData) {
+      console.log(this.waypoints);
       const newCoordinates = this.waypoints.map((point) => {
+        console.log(`point.id ${point.id}`);
+        console.log(`waypointId ${waypointId}`);
         if (point.id === waypointId) {
           return {
             ...point,
