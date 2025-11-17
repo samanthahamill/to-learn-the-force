@@ -97,12 +97,7 @@ export class MeasurementToolControl extends Toggle {
     const last = line.getLastCoordinate();
     const length = getDistance(first, last);
     const nmi = convertLength(length, 'meters', 'nauticalmiles');
-    if (nmi > 1) {
-      return `${nmi.toFixed(1)} nmi`;
-    }
-
-    const ft = convertLength(length, 'meters', 'feet');
-    return `${ft.toFixed(0)} ft`;
+    return `${nmi.toFixed(1)} nmi`;
   }
 
   private styleFunction(feature: FeatureLike, tip?: string) {
