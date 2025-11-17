@@ -38,7 +38,7 @@ export function getNewPlatformFormGroup(
     }),
     waypoints: fb.array(
       platform?.waypoints.map((waypoint: Waypoint) =>
-        createNewWaypoint(fb, platform.name, waypoint.index, waypoint),
+        createNewWaypointFormGroup(fb, platform.name, waypoint.index, waypoint),
       ) ?? [],
     ),
     reportingFrequency: new FormControl(platform?.reportingFrequency ?? 0, {
@@ -50,12 +50,12 @@ export function getNewPlatformFormGroup(
   });
 }
 
-export function createNewWaypoint(
+export function createNewWaypointFormGroup(
   fb: FormBuilder,
   platformName: string,
   waypointIndex?: number,
   waypoint?: Waypoint,
-) {
+): FormGroup {
   return fb.group({
     id: new FormControl(
       waypoint?.id ?? `${platformName}-waypoint-${waypointIndex}`,
@@ -72,9 +72,12 @@ export function createNewWaypoint(
     alt: new FormControl(waypoint?.alt ?? 0, {
       validators: Validators.required,
     }),
-    datetime: new FormControl(waypoint?.datetime ?? new Date().toISOString(), {
-      validators: Validators.required,
-    }),
+    datetime: new FormControl(
+      (waypoint?.datetime ?? new Date()).toISOString().substring(0, 16),
+      {
+        validators: Validators.required,
+      },
+    ),
     index: new FormControl(waypointIndex ?? waypoint?.index ?? 0, {
       validators: Validators.required,
     }),

@@ -98,6 +98,18 @@ export class MainContentComponent {
               ),
             }),
             scenarioInput: this.fb.group({
+              startTime: new FormControl(
+                (input.scenario?.scenarioInput?.startTime ?? new Date())
+                  .toISOString()
+                  .substring(0, 16),
+                { validators: Validators.required },
+              ),
+              endTime: new FormControl(
+                (input.scenario?.scenarioInput?.endTime ?? new Date())
+                  .toISOString()
+                  .substring(0, 16),
+                { validators: Validators.required },
+              ),
               aoi: this.fb.group({
                 lat: new FormControl(
                   input.scenario?.scenarioInput?.aoi.lat ?? 0,
@@ -133,16 +145,22 @@ export class MainContentComponent {
         external: this.fb.group({
           dataType: new FormControl(input.external?.dataType ?? 'IMPORT'),
           newStartTime: new FormControl(
-            input.external?.newStartTime ?? new Date(),
+            (input.external?.newStartTime ?? new Date())
+              .toISOString()
+              .substring(0, 16),
             { validators: Validators.required },
           ),
           import: this.fb.group({
             ogStartTime: new FormControl(
-              input.external?.import?.ogStartTime ?? new Date(),
+              (input.external?.import?.ogStartTime ?? new Date())
+                .toISOString()
+                .substring(0, 16),
               { validators: Validators.required },
             ),
             ogEndTime: new FormControl(
-              input.external?.import?.ogEndTime ?? new Date(),
+              (input.external?.import?.ogEndTime ?? new Date())
+                .toISOString()
+                .substring(0, 16),
               { validators: Validators.required },
             ),
             type1: new FormControl(input.external?.import?.type1 ?? false, {

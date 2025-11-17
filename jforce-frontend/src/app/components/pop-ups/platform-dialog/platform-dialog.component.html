@@ -1,0 +1,115 @@
+<div
+  class="modal fade modal-custom"
+  tabindex="-1"
+  role="dialog"
+  #platformModal
+  id="platformModal"
+  aria-labelledby="platformModalLabel"
+  aria-hidden="true"
+  data-bs-backdrop="static"
+>
+  <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+    <div *ngIf="platform" class="modal-content modal-dimensions">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ platformName }} Editor</h5>
+      </div>
+      <div class="modal-body">
+        <div class="row-1 mutli-col">
+          <div class="col">
+            <label for="name">Name</label>
+            <input id="name" type="text" [(ngModel)]="name" class="name" />
+          </div>
+          <div class="col">
+            <label tooltip="Type" for="type">Type</label>
+            <select [(ngModel)]="type" id="type" size="small">
+              <option
+                *ngFor="let option of platformTypeOptions"
+                [value]="option"
+              >
+                {{ option }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col">
+            <input
+              id="friendly"
+              type="checkbox"
+              [(ngModel)]="friendly"
+              class="checkbox"
+            />
+            <label for="friendly">Is Friendly</label>
+          </div>
+        </div>
+        <div class="row-1 mutli-col">
+          <div *ngIf="platformType == 'AIR'" class="col">
+            <label for="maxAlt">Max Alt</label>
+            <input
+              class="input-small"
+              id="maxAlt"
+              type="number"
+              [(ngModel)]="maxAlt"
+            />
+          </div>
+          <div *ngIf="platformType == 'MARITIME'" class="col">
+            <label for="maxDepth">Max Depth</label>
+            <input
+              class="input-small"
+              id="maxDepth"
+              type="number"
+              [(ngModel)]="maxDepth"
+            />
+          </div>
+          <div class="col">
+            <label for="maxSpeed">Max Speed</label>
+            <input
+              class="input-small"
+              id="maxSpeed"
+              type="number"
+              [(ngModel)]="maxSpeed"
+            />
+          </div>
+          <div class="col">
+            <label for="reportingFrequency">Reporting Freq</label>
+            <input
+              class="input-small"
+              id="reportingFrequency"
+              type="number"
+              [(ngModel)]="reportingFrequency"
+            />
+          </div>
+        </div>
+
+        <!-- waypoints -->
+        <div class="col-4 waypoint-title"><h1>Waypoints</h1></div>
+        <app-waypoint-editor
+          [waypointPlatformData]="waypointPlatformData"
+          (waypointPlatformDataUpdated)="waypointPlatformDataUpdated($event)"
+        />
+      </div>
+      <div class="modal-footer">
+        <div *ngIf="theresAnError">
+          <p class="error">
+            {{ errorMessage }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="closeAndSaveModal()"
+        >
+          Save changes
+        </button>
+        <button
+          type="button"
+          class="btn btn-error"
+          data-dismiss="modal"
+          (click)="closeModal()"
+        >
+          Quit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

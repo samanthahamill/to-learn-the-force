@@ -24,7 +24,11 @@ import {
   faLockOpen,
   faRemove,
 } from '@fortawesome/free-solid-svg-icons';
-import { PLATFORM_TYPE, Waypoint } from '../../../shared/types';
+import {
+  PLATFORM_TYPE,
+  PLATFORM_TYPE_OPTIONS,
+  Waypoint,
+} from '../../../shared/types';
 import {
   CdkDragDrop,
   moveItemInArray,
@@ -34,6 +38,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { WaypointEditorService } from '../../../services/waypoint-editor.service';
 import { createWaypointId } from '../../../shared/utils';
+import { PlatformEditorService } from '../../../services/platform-editor.service';
 
 @UntilDestroy()
 @Component({
@@ -70,12 +75,12 @@ export class PlatformCardComponent implements AfterViewInit {
 
   waypointsLocked: boolean = false;
 
-  platformTypeOptions: Array<PLATFORM_TYPE> = ['AIR', 'GROUND', 'MARITIME'];
-
+  platformTypeOptions = PLATFORM_TYPE_OPTIONS;
   icons: Array<ICON_FUNCTION>;
   defaultColor: string | undefined = undefined; // default color at the time the platform was made
 
   private waypointEditorService = inject(WaypointEditorService);
+  private platformEditorService = inject(PlatformEditorService);
 
   constructor() {
     this.icons = [
@@ -83,7 +88,7 @@ export class PlatformCardComponent implements AfterViewInit {
         icon: faEdit,
         type: 'NONE',
         tooltip: 'Edit Platform',
-        onClick: () => this.onEditClicked.emit(),
+        onClick: () => this.editPlatformClicked(),
       },
       {
         icon: faCopy,
@@ -180,15 +185,11 @@ export class PlatformCardComponent implements AfterViewInit {
     this.shiftWaypoints();
   }
 
-  gearClicked() {
-    // create popup
-  }
-
   lockClicked() {
     this.waypointsLocked = !this.waypointsLocked;
   }
 
-  openModal() {
+  openWaypointModal() {
     this.waypointEditorService.updateWaypointAndOpenDialog(
       this.waypoints,
       this.platformForm.value,
@@ -196,9 +197,12 @@ export class PlatformCardComponent implements AfterViewInit {
     );
   }
 
-  // nameUpdated() {
-  //   this.name = this.platformForm.get('name')?.value ?? 'Platform';
-  // }
+  editPlatformClicked() {
+    this.platformEditorService.updatePlatformAndOpenDialog(
+      this.platformForm.value,
+      this.index,
+    );
+  }
 
   shiftWaypoints() {
     this.waypoints.forEach((waypoint, i) => (waypoint.index = i));

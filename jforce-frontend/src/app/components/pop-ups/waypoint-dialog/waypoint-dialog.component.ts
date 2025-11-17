@@ -1,10 +1,4 @@
-import {
-  Component,
-  inject,
-  NO_ERRORS_SCHEMA,
-  OnDestroy,
-  OnInit,
-} from '@angular/core';
+import { Component, inject, NO_ERRORS_SCHEMA, OnInit } from '@angular/core';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import {
   WaypointEditorInformation,
@@ -38,8 +32,8 @@ declare var $: any;
 })
 export class WaypointDialogComponent implements OnInit {
   waypointPlatformData: WaypointEditorInformation | undefined;
-  waypointEditor = inject(WaypointEditorService);
-  userState = inject(UserStateService);
+  waypointEditorService = inject(WaypointEditorService);
+  userStateService = inject(UserStateService);
   theresAnError: boolean = false;
   errorMessage: string | undefined;
 
@@ -54,7 +48,7 @@ export class WaypointDialogComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.waypointEditor.waypointInformation$
+    this.waypointEditorService.waypointInformation$
       .pipe(untilDestroyed(this))
       .subscribe((info: WaypointEditorInformation | undefined) => {
         if (info !== undefined) {
@@ -82,7 +76,7 @@ export class WaypointDialogComponent implements OnInit {
 
   updateOnModelClose(): void {
     if (this.waypointPlatformData) {
-      this.userState.updateWaypoint(
+      this.userStateService.updateWaypoint(
         this.waypointPlatformData.platformIndex,
         this.waypoints,
       );

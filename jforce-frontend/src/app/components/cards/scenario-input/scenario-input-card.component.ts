@@ -11,23 +11,20 @@ import {
 import {
   FormArray,
   FormBuilder,
-  FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
-  Validators,
 } from '@angular/forms';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { faAdd, faTable, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { ButtonModule } from 'primeng/button';
-import { Platform, Waypoint } from '../../../shared/types';
+import { Platform } from '../../../shared/types';
 import { CardComponent, ICON_FUNCTION } from '../card.component';
 import { PlatformCardComponent } from '../platform/platform-card.component';
 import { DialogConfirmationService } from '../../../services/dialog-confirmation.service';
 import { AoiCardComponent } from '../aoi/aoi-card.component';
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { getNewPlatformFormGroup } from '../../../shared/create';
-import { UserStateService } from '../../../services/user-state.service';
 
 @UntilDestroy()
 @Component({
@@ -57,7 +54,6 @@ export class ScenarioInputCardComponent {
   icons: Array<ICON_FUNCTION>;
 
   private confirmationService = inject(DialogConfirmationService);
-  private userStateService = inject(UserStateService);
   shouldShowWaypointTableRows: boolean = true;
 
   constructor(private fb: FormBuilder) {

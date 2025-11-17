@@ -10,6 +10,7 @@
             class="input"
             formControlName="lat"
             placeholder="Latitude"
+            (blur)="onFormUpdate()"
           />
         </div>
         <div class="col">
@@ -20,6 +21,7 @@
             class="input"
             formControlName="lon"
             placeholder="Longitude"
+            (blur)="onFormUpdate()"
           />
         </div>
         <div class="col">
@@ -42,6 +44,7 @@
             formControlName="radius"
             class="input"
             placeholder="Radius"
+            (blur)="onFormUpdate()"
           />
         </div>
       </div>

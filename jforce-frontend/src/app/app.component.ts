@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { DialogConfirmationComponent } from './components/pop-ups/dialog-confirmation/dialog-confirmation.component';
 import { ToastComponent } from './components/pop-ups/toast/toast.component';
 import { WaypointDialogComponent } from './components/pop-ups/waypoint-dialog/waypoint-dialog.component';
+import { PlatformDialogComponent } from './components/pop-ups/platform-dialog/platform-dialog.component';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +16,7 @@ import { WaypointDialogComponent } from './components/pop-ups/waypoint-dialog/wa
     ToastComponent,
     ClassificationBannerComponent,
     WaypointDialogComponent,
+    PlatformDialogComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

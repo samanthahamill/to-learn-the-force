@@ -196,8 +196,8 @@ export class WaypointEditorComponent extends BaseMapComponent {
         alt: 0,
         speedKts: lastPoint?.speedKts ?? 0,
         datetime: !lastPoint?.datetime
-          ? new Date().toISOString()
-          : addHours(new Date(lastPoint.datetime), 1).toISOString(),
+          ? new Date()
+          : addHours(new Date(lastPoint.datetime), 1),
         index: waypointLastIndex + i,
       } as Waypoint;
     });
@@ -251,7 +251,7 @@ export class WaypointEditorComponent extends BaseMapComponent {
             lon: this.lonInput,
             alt: this.altInput,
             speedKts: this.speedInput,
-            datetime: this.datetimeInput,
+            datetime: new Date(this.datetimeInput),
           },
         ];
       } else {
@@ -265,7 +265,7 @@ export class WaypointEditorComponent extends BaseMapComponent {
           lon: this.lonInput,
           alt: this.altInput,
           speedKts: this.speedInput,
-          datetime: this.datetimeInput,
+          datetime: new Date(this.datetimeInput),
         });
       }
     }
