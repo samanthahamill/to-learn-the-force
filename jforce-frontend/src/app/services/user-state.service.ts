@@ -28,7 +28,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
       },
       platforms: [
         {
-          name: 'test',
+          name: 'Test',
           id: 'test',
           readonly: false,
           maxSpeed: 0,

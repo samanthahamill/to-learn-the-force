@@ -53,8 +53,8 @@ export class CardComponent {
 
   @Input() innerCard: boolean = false;
   @Input() lighterCard: boolean = false;
-  @Input() redIcon: boolean = false;
-  @Input() greenIcon: boolean = false;
+  /** allows the card to fill the height of it's entire container  */
+  @Input() fullHeight: boolean = false;
 
   @Output() onColorChange = new EventEmitter<string>();
 

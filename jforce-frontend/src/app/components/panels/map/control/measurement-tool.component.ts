@@ -67,7 +67,13 @@ export class MeasurementToolControl extends Toggle {
       style: (feature) => this.styleFunction(feature, this.tip),
     });
 
-    this.tip = 'Click to Start Measuring';
+    this.drawInteraction.on('drawstart', () => {
+      this.tip = '';
+    });
+
+    this.drawInteraction.on('drawend', () => {
+      this.tip = 'Click to start measuring';
+    });
   }
 
   private handleToggle(value: boolean) {

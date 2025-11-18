@@ -1,20 +1,26 @@
 <app-card header="Scenario Input">
   <form class="formGroup" [formGroup]="scenarioInput">
-    <app-card [inner]="true">
-      <label name="startTime" for="startTime"> Start Time </label>
-      <input
-        type="datetime-local"
-        formControlName="startTime"
-        id="startTime"
-        (blur)="onUpdated()"
-      />
-      <label name="endTime" for="endTime"> End Time </label>
-      <input
-        type="datetime-local"
-        formControlName="endTime"
-        id="endTime"
-        (blur)="onUpdated()"
-      />
+    <app-card [innerCard]="true" header="Info">
+      <div class="row-1 mutli-col">
+        <div class="col">
+          <label name="startTime" for="startTime"> Start Time </label>
+          <input
+            type="datetime-local"
+            formControlName="startTime"
+            id="startTime"
+            (blur)="onUpdated()"
+          />
+        </div>
+        <div class="col">
+          <label name="endTime" for="endTime"> End Time </label>
+          <input
+            type="datetime-local"
+            formControlName="endTime"
+            id="endTime"
+            (blur)="onUpdated()"
+          />
+        </div>
+      </div>
     </app-card>
     <app-aoi-card
       [aoiFormGroup]="getFormGroup('aoi')"
@@ -42,10 +48,44 @@
         </div>
 
         <div class="buttons">
-          <button class="btn button" (click)="addPlatform()">
+          <button
+            class="btn button dropdown-toggle"
+            type="button"
+            data-bs-target="navbarDropdown"
+            data-bs-toggle="dropdown"
+            id="dropdownmenu"
+          >
             <fa-icon [icon]="addIcon"></fa-icon>
             Add Custom Platform
           </button>
+          <div
+            class="dropdown-menu dropdown-menu-end"
+            id="navbarDropdown"
+            aria-labelledby="navbarDropdown"
+          >
+            <a class="dropdown-item disabled">Add Platform</a>
+            <a class="dropdown-item disabled">Help</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item disabled">System Settings</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item disabled">Logout</a>
+          </div>
+
+          <!-- <button
+            class="btn button dropdown-toggle"
+            type="button"
+            id="dropdownMenuButton"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            
+          </button> -->
+          <!-- <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="#" (click)="addPlatform()">Action</a>
+            <a class="dropdown-item" href="#">Another action</a>
+            <a class="dropdown-item" href="#">Something else here</a>
+          </div> -->
           <button class="btn button disabled" (click)="addPlatform()" disabled>
             <fa-icon [icon]="addIcon"></fa-icon>
             Import Platform

@@ -62,6 +62,7 @@ export class WaypointEditorComponent extends BaseMapComponent {
   removeIcon = faRemove;
   copyIcon = faCopy;
   addIcon = faAdd;
+  groupObject = faObjectGroup;
 
   reportSource: VectorSource = new VectorSource();
   reportLayer: VectorLayer;
@@ -85,23 +86,8 @@ export class WaypointEditorComponent extends BaseMapComponent {
       source: this.reportSource,
     });
 
-    this.olMapView = new View({
-      projection: MAP_PROJECTION,
-      center: [0, 0],
-      zoom: 5,
-      minZoom: 1,
-      maxZoom: 18,
-    });
-
     this.allowDraw = false;
     this.theresAnError = false;
-
-    this.userStateService.aoi$.pipe(untilDestroyed(this)).subscribe((aoi) => {
-      if (aoi !== undefined && aoi != this.aoiValue && this.aoiLayer) {
-        this.aoiValue = aoi;
-        this.renderAOI();
-      }
-    });
 
     this.drawWaypointControl = new DrawWaypointsControl({
       className: 'ol-draw-waypoint-tool',
@@ -141,8 +127,6 @@ export class WaypointEditorComponent extends BaseMapComponent {
   override customLayers() {
     return [this.reportLayer];
   }
-
-  groupObject = faObjectGroup;
 
   override addButtonsToBar() {
     return [this.drawWaypointControl, this.dragWaypointControl];

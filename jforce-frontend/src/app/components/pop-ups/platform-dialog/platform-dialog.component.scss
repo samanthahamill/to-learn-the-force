@@ -1,2 +1,69 @@
 @use "styles" as style;
 @use "../../cards/platform/platform-card.component.scss";
+
+$waypoint-row-height: 280px;
+$table-height: 240px;
+
+.app-card {
+  width: 100%;
+  height: 100%;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: style.$panel-padding !important;
+}
+
+.custom-table {
+  max-height: $table-height !important;
+  overflow: hidden;
+}
+
+.table-custom {
+  max-height: $table-height !important;
+  overflow-y: auto;
+}
+
+.error {
+  color: style.$danger;
+}
+
+.flex-modal {
+  height: 100%;
+  width: 100%;
+}
+
+.map-dimensions {
+  height: 100%;
+  width: 100%;
+}
+
+.map-div {
+  height: $waypoint-row-height;
+  width: 100%;
+}
+
+.modal-body {
+  overflow: auto;
+}
+
+.modal-custom {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2000;
+}
+
+.modal-dimensions {
+  height: 610px;
+  width: 1100px;
+  min-width: 1100px;
+}
+
+.waypoint {
+  max-height: $waypoint-row-height;
+  overflow: auto;
+}

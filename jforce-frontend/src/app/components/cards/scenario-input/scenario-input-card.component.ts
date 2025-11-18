@@ -1,13 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  EventEmitter,
-  inject,
-  Input,
-  NO_ERRORS_SCHEMA,
-  OnInit,
-  Output,
-} from '@angular/core';
+import { Component, inject, Input, NO_ERRORS_SCHEMA } from '@angular/core';
 import {
   FormArray,
   FormBuilder,

@@ -9,83 +9,264 @@
   data-bs-backdrop="static"
 >
   <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-    <div *ngIf="platform" class="modal-content modal-dimensions">
+    <div class="modal-content modal-dimensions">
       <div class="modal-header">
         <h5 class="modal-title">{{ platformName }} Editor</h5>
       </div>
       <div class="modal-body">
-        <div class="row-1 mutli-col">
+        <div *ngIf="platform" class="row">
           <div class="col">
-            <label for="name">Name</label>
-            <input id="name" type="text" [(ngModel)]="name" class="name" />
-          </div>
-          <div class="col">
-            <label tooltip="Type" for="type">Type</label>
-            <select [(ngModel)]="type" id="type" size="small">
-              <option
-                *ngFor="let option of platformTypeOptions"
-                [value]="option"
-              >
-                {{ option }}
-              </option>
-            </select>
-          </div>
+            <app-card header="Info" class="app-card" [fullHeight]="true">
+              <div class="row mutli-col">
+                <div class="col">
+                  <label for="name">Name</label>
+                  <input
+                    id="name"
+                    type="text"
+                    [(ngModel)]="name"
+                    class="name"
+                  />
+                  <label tooltip="Type" for="type">Type</label>
+                  <select [(ngModel)]="type" id="type" size="small">
+                    <option
+                      *ngFor="let option of platformTypeOptions"
+                      [value]="option"
+                    >
+                      {{ option }}
+                    </option>
+                  </select>
+                </div>
+                <div class="col">
+                  <label for="reportingFrequency">Reporting Freq</label>
+                  <input
+                    class="input-small"
+                    id="reportingFrequency"
+                    type="number"
+                    [(ngModel)]="reportingFrequency"
+                  />
+                  <label for="maxSpeed">Max Speed</label>
+                  <input
+                    class="input-small"
+                    id="maxSpeed"
+                    type="number"
+                    [(ngModel)]="maxSpeed"
+                  />
+                  <div *ngIf="type == 'AIR'" class="col">
+                    <label for="maxAlt">Max Alt</label>
+                    <input
+                      class="input-small"
+                      id="maxAlt"
+                      type="number"
+                      [(ngModel)]="maxAlt"
+                    />
+                  </div>
+                  <div *ngIf="type == 'MARITIME'" class="col">
+                    <label for="maxDepth">Max Depth</label>
+                    <input
+                      class="input-small"
+                      id="maxDepth"
+                      type="number"
+                      [(ngModel)]="maxDepth"
+                    />
+                  </div>
+                </div>
+                <div class="col">
+                  <label for="friendly">Is Friendly</label>
+                  <input
+                    id="friendly"
+                    type="checkbox"
+                    [(ngModel)]="friendly"
+                    class="checkbox"
+                  />
 
+                  <label for="color">Platform Waypoint Color</label>
+                  <p-colorpicker
+                    [(ngModel)]="color"
+                    (ngModelChange)="ngModelChange($event)"
+                    inputId="cp-hex"
+                    class="mb-4"
+                  />
+                </div>
+              </div>
+            </app-card>
+          </div>
           <div class="col">
-            <input
-              id="friendly"
-              type="checkbox"
-              [(ngModel)]="friendly"
-              class="checkbox"
-            />
-            <label for="friendly">Is Friendly</label>
+            <app-card header="ELONTs" class="app-card" [fullHeight]="true">
+            </app-card>
           </div>
         </div>
-        <div class="row-1 mutli-col">
-          <div *ngIf="platformType == 'AIR'" class="col">
-            <label for="maxAlt">Max Alt</label>
-            <input
-              class="input-small"
-              id="maxAlt"
-              type="number"
-              [(ngModel)]="maxAlt"
-            />
+        <div class="row">
+          <!-- waypoints -->
+          <div class="col waypoints">
+            <app-card header="Waypoints" class="app-card">
+              <div class="flex-modal">
+                <div clas="custom-table">
+                  <div class="add-waypoint"></div>
+                  <div class="table-responsive table-custom">
+                    <table
+                      class="table table-striped table-dark table-hover table-condensed"
+                    >
+                      <thead>
+                        <tr>
+                          <th scope="col" class="actions">#</th>
+                          <th scope="col">Lat</th>
+                          <th scope="col">Lon</th>
+                          <th scope="col">Altitude</th>
+                          <th scope="col">Speed</th>
+                          <th scope="col">Date/Time</th>
+                          <th scope="col" class="actions">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody cdkDropList (cdkDropListDropped)="drop($event)">
+                        <tr>
+                          <th></th>
+                          <td>
+                            <input
+                              class="input-small"
+                              id="LatInput"
+                              type="number"
+                              [(ngModel)]="latInput"
+                              required
+                            />
+                          </td>
+                          <td>
+                            <input
+                              class="input-small"
+                              id="LonInput"
+                              type="number"
+                              [(ngModel)]="lonInput"
+                              required
+                            />
+                          </td>
+                          <td>
+                            <input
+                              class="input-small"
+                              id="AltInput"
+                              type="number"
+                              [(ngModel)]="altInput"
+                              required
+                            />
+                          </td>
+                          <td>
+                            <input
+                              class="input-small"
+                              id="SpeedInput"
+                              type="number"
+                              [(ngModel)]="speedInput"
+                              required
+                            />
+                          </td>
+                          <td>
+                            <input
+                              class="input-small datetime-dimensions"
+                              id="datetimeInput"
+                              type="datetime-local"
+                              [(ngModel)]="datetimeInput"
+                              required
+                            />
+                          </td>
+                          <td>
+                            <fa-icon
+                              [icon]="addIcon"
+                              (click)="addWaypoint()"
+                              title="Add Waypoint"
+                              [ngClass]="{
+                                'icon-button': true,
+                                'green-icon': true,
+                              }"
+                            ></fa-icon>
+                          </td>
+                        </tr>
+                        <tr
+                          *ngFor="let waypoint of waypoints; let i = index"
+                          cdkDrag
+                          cdkDragLockAxis="y"
+                        >
+                          <th class="col-xs">
+                            <div class="drag-handle">
+                              <ng-container [ngTemplateOutlet]="dragHandleTmpl">
+                              </ng-container>
+                            </div>
+                          </th>
+                          <td>
+                            <input
+                              class="input-small"
+                              id="LatInput"
+                              type="number"
+                              [(ngModel)]="waypoint.lat"
+                              required
+                            />
+                          </td>
+                          <td>
+                            <input
+                              class="input-small"
+                              id="LonInput"
+                              type="number"
+                              [(ngModel)]="waypoint.lon"
+                              required
+                            />
+                          </td>
+                          <td>
+                            <input
+                              class="input-small"
+                              id="AltInput"
+                              type="number"
+                              [(ngModel)]="waypoint.alt"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              class="input-small"
+                              id="SpeedInput"
+                              type="number"
+                              [(ngModel)]="waypoint.speedKts"
+                              required
+                            />
+                          </td>
+                          <td>
+                            <input
+                              class="input-small datetime-dimensions"
+                              id="datetimeInput"
+                              type="datetime-local"
+                              [(ngModel)]="waypoint.datetime"
+                              required
+                            />
+                          </td>
+                          <td class="actions">
+                            <div class="table-buttons">
+                              <fa-icon
+                                [icon]="copyIcon"
+                                (click)="duplicateWaypoint(i)"
+                                title="Duplicate Waypoint"
+                                class="icon-button"
+                              ></fa-icon>
+                              <fa-icon
+                                [icon]="removeIcon"
+                                (click)="deleteWaypoint(i)"
+                                title="Delete Waypoint"
+                                [ngClass]="{
+                                  'icon-button': true,
+                                  'red-icon': true,
+                                }"
+                              ></fa-icon>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </app-card>
           </div>
-          <div *ngIf="platformType == 'MARITIME'" class="col">
-            <label for="maxDepth">Max Depth</label>
-            <input
-              class="input-small"
-              id="maxDepth"
-              type="number"
-              [(ngModel)]="maxDepth"
-            />
-          </div>
-          <div class="col">
-            <label for="maxSpeed">Max Speed</label>
-            <input
-              class="input-small"
-              id="maxSpeed"
-              type="number"
-              [(ngModel)]="maxSpeed"
-            />
-          </div>
-          <div class="col">
-            <label for="reportingFrequency">Reporting Freq</label>
-            <input
-              class="input-small"
-              id="reportingFrequency"
-              type="number"
-              [(ngModel)]="reportingFrequency"
-            />
+          <div class="col map-div">
+            <div
+              #mapContainerPlatform
+              id="mapContainerPlatform"
+              class="map-dimensions"
+            ></div>
           </div>
         </div>
-
-        <!-- waypoints -->
-        <div class="col-4 waypoint-title"><h1>Waypoints</h1></div>
-        <app-waypoint-editor
-          [waypointPlatformData]="waypointPlatformData"
-          (waypointPlatformDataUpdated)="waypointPlatformDataUpdated($event)"
-        />
       </div>
       <div class="modal-footer">
         <div *ngIf="theresAnError">
@@ -113,3 +294,20 @@
     </div>
   </div>
 </div>
+
+<ng-template #dragHandleTmpl>
+  <svg
+    class="bi bi-list handle"
+    width="1em"
+    height="1em"
+    viewBox="0 0 16 16"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fill-rule="evenodd"
+      d="M2.5 11.5A.5.5 0 013 11h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4A.5.5 0 013 7h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5zm0-4A.5.5 0 013 3h10a.5.5 0 010 1H3a.5.5 0 01-.5-.5z"
+      clip-rule="evenodd"
+    />
+  </svg>
+</ng-template>

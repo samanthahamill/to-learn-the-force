@@ -75,6 +75,7 @@ export class PlatformCardComponent implements AfterViewInit {
 
   waypointsLocked: boolean = false;
 
+  type: PLATFORM_TYPE | undefined = undefined;
   platformTypeOptions = PLATFORM_TYPE_OPTIONS;
   icons: Array<ICON_FUNCTION>;
   defaultColor: string | undefined = undefined; // default color at the time the platform was made
@@ -104,7 +105,6 @@ export class PlatformCardComponent implements AfterViewInit {
       },
     ];
   }
-
   get waypoints(): Waypoint[] {
     return (
       ((this.platformForm?.get('waypoints') as FormArray)
@@ -147,9 +147,13 @@ export class PlatformCardComponent implements AfterViewInit {
       } else if (type == 'AIR') {
         this.platformForm.controls['maxAlt'].setValidators(Validators.required);
       }
+
+      this.type = type;
     });
 
-    this.platformForm.get('type')?.setValue(this.platformForm.get('type'));
+    this.platformForm.setValue({
+      type: this.platformForm.get('type')?.value ?? 'AIR',
+    });
   }
 
   onUpdate(): void {
@@ -161,6 +165,10 @@ export class PlatformCardComponent implements AfterViewInit {
       this.platformForm?.controls['color']?.setValue(color);
       this.formUpdated();
     }
+  }
+
+  getWaypointCount(): number {
+    return this.waypoints.length ?? 0;
   }
 
   deleteWaypoint(index: number) {
