@@ -32,10 +32,7 @@ export function getNewPlatformFormGroup(
     maxSpeed: new FormControl(platform?.maxSpeed ?? '', {
       validators: Validators.required,
     }),
-    maxAlt: new FormControl(platform?.maxAlt ?? '', {
-      validators: Validators.required,
-    }),
-    maxDepth: new FormControl(platform?.maxDepth ?? '', {
+    maxZ: new FormControl(platform?.maxZ ?? '', {
       validators: Validators.required,
     }),
     type: new FormControl(platform?.type ?? 'AIR', {
@@ -77,7 +74,7 @@ export function createNewWaypointFormGroup(
     lon: new FormControl(waypoint?.lon ?? 0, {
       validators: Validators.required,
     }),
-    alt: new FormControl(waypoint?.alt ?? 0, {
+    z: new FormControl(waypoint?.z ?? 0, {
       validators: Validators.required,
     }),
     datetime: new FormControl(

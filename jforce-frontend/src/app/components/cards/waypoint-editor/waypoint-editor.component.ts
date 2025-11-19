@@ -182,7 +182,7 @@ export class WaypointEditorComponent extends BaseMapComponent {
         ),
         lat: point[0],
         lon: point[1],
-        alt: 0,
+        z: 0,
         speedKts: lastPoint?.speedKts ?? 0,
         datetime: !lastPoint?.datetime
           ? new Date()
@@ -235,7 +235,7 @@ export class WaypointEditorComponent extends BaseMapComponent {
             index: 0,
             lat: this.latInput,
             lon: this.lonInput,
-            alt: this.altInput,
+            z: this.altInput,
             speedKts: this.speedInput,
             datetime: new Date(this.datetimeInput),
           },
@@ -249,7 +249,7 @@ export class WaypointEditorComponent extends BaseMapComponent {
           index: this.waypoints.length,
           lat: this.latInput,
           lon: this.lonInput,
-          alt: this.altInput,
+          z: this.altInput,
           speedKts: this.speedInput,
           datetime: new Date(this.datetimeInput),
         });
@@ -290,7 +290,7 @@ export class WaypointEditorComponent extends BaseMapComponent {
     for (const waypoint of this.waypointPlatformData?.waypoints) {
       if (
         waypoint === null ||
-        waypoint.alt == null ||
+        waypoint.z == null ||
         waypoint.lat == null ||
         waypoint.lon == null ||
         waypoint.datetime == null ||

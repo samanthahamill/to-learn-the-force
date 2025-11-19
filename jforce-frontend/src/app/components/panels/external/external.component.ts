@@ -1,6 +1,7 @@
 import {
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
+  inject,
   Input,
   OnInit,
 } from '@angular/core';
@@ -11,6 +12,7 @@ import { NgClass, NgIf } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { ButtonGroupModule } from 'primeng/buttongroup';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { SystemStateService } from '../../../services/system-state.service';
 
 @UntilDestroy()
 @Component({
@@ -31,16 +33,20 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 export class ExternalComponent implements OnInit {
   @Input() formGroup!: FormGroup;
   @Input() formUpdated!: () => void;
-  importData: boolean;
 
+  private systemStateService = inject(SystemStateService);
+
+  importData: boolean;
   ogStartTime!: NgbDateStruct;
   ogEndTime!: NgbDateStruct;
   newStartTime!: NgbDateStruct;
+  maxDateTime: Date;
 
   // TODO set up actual connections
 
   constructor() {
     this.importData = false;
+    this.maxDateTime = this.systemStateService.maxDate;
   }
 
   ngOnInit(): void {

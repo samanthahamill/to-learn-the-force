@@ -6,7 +6,7 @@ import {
   UserInputFormData,
   Waypoint,
 } from '../shared/types';
-import { addHours } from '../shared/utils';
+import { addHours, minusHours } from '../shared/utils';
 import { FormGroup } from '@angular/forms';
 
 const BASIC_FORM_DATA: UserInputFormData = {
@@ -23,7 +23,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
       aoi: {
         lat: 0,
         lon: 0,
-        alt: 0,
+        altitude: 0,
         radius: 150,
       },
       platforms: [
@@ -32,8 +32,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
           id: 'test',
           readonly: false,
           maxSpeed: 0,
-          maxAlt: 0,
-          maxDepth: 0,
+          maxZ: 0,
           type: 'AIR',
           reportingFrequency: 0,
           friendly: true,
@@ -43,8 +42,8 @@ const BASIC_FORM_DATA: UserInputFormData = {
               id: 'test-waypoint-0',
               lat: 2,
               lon: 2,
-              alt: 1,
-              datetime: new Date(),
+              z: 1,
+              datetime: minusHours(new Date(), 12),
               index: 0,
               speedKts: 13,
             },
@@ -52,8 +51,8 @@ const BASIC_FORM_DATA: UserInputFormData = {
               id: 'test-waypoint-1',
               lat: 1,
               lon: 1,
-              alt: 1,
-              datetime: addHours(new Date(), 1),
+              z: 1,
+              datetime: minusHours(new Date(), 11),
               index: 1,
               speedKts: 13,
             },
@@ -61,8 +60,8 @@ const BASIC_FORM_DATA: UserInputFormData = {
               id: 'test-waypoint-2',
               lat: 1,
               lon: 0,
-              alt: 1,
-              datetime: addHours(new Date(), 2),
+              z: 1,
+              datetime: minusHours(new Date(), 10),
               index: 2,
               speedKts: 13,
             },
@@ -158,7 +157,7 @@ export class UserStateService {
       lat: aoi.centerLat,
       lon: aoi.centerLon,
       radius: aoi.radius,
-      alt: 0.0,
+      altitude: 0.0,
     });
   }
 
@@ -167,10 +166,10 @@ export class UserStateService {
     if (
       newAoi.lat !== undefined &&
       newAoi.lon !== undefined &&
-      newAoi.alt !== undefined &&
+      newAoi.altitude !== undefined &&
       newAoi.radius !== undefined &&
       (aoi === undefined ||
-        newAoi.alt != aoi.alt ||
+        newAoi.altitude != aoi.altitude ||
         newAoi.lat != aoi.lat ||
         newAoi.lon != aoi.lon ||
         newAoi.radius != aoi.radius)

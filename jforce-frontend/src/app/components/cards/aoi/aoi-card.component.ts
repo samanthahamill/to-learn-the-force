@@ -40,7 +40,7 @@ export class AoiCardComponent implements AfterViewInit {
 
     const lat: number | undefined = this.aoiFormGroup.controls['lat']?.value;
     const lon: number | undefined = this.aoiFormGroup.controls['lon']?.value;
-    const alt: number | undefined = this.aoiFormGroup.controls['alt']?.value;
+    const z: number | undefined = this.aoiFormGroup.controls['alt']?.value;
     const radius: number | undefined =
       this.aoiFormGroup.controls['radius']?.value;
     const aoi = this.userState.getAOI;
@@ -48,12 +48,12 @@ export class AoiCardComponent implements AfterViewInit {
     if (
       lat &&
       lon &&
-      alt &&
+      z &&
       radius &&
       (aoi == undefined ||
         aoi.lat != lat ||
         aoi.lon != lon ||
-        aoi.alt != alt ||
+        aoi.altitude != z ||
         aoi.radius != radius)
     ) {
       this.updateDataSourceService();
@@ -63,12 +63,12 @@ export class AoiCardComponent implements AfterViewInit {
   updateDataSourceService(): void {
     const lat = this.aoiFormGroup.controls['lat'].value as number;
     const lon = this.aoiFormGroup.controls['lon'].value as number;
-    const alt = this.aoiFormGroup.controls['elevation'].value as number;
+    const alt = this.aoiFormGroup.controls['alt'].value as number;
     const radius = this.aoiFormGroup.controls['radius'].value as number;
     this.userState.updateAOI({
       lat: lat,
       lon: lon,
-      alt: alt,
+      altitude: alt,
       radius: radius,
     });
   }

@@ -132,8 +132,7 @@ export class PlatformCardComponent implements AfterViewInit {
     this.platformForm?.valueChanges.pipe(untilDestroyed(this)).subscribe(() => {
       const type = this.platformForm?.controls['type'].value as PLATFORM_TYPE;
 
-      this.platformForm.controls['maxDepth'].clearValidators();
-      this.platformForm.controls['maxAlt'].clearValidators();
+      this.platformForm.controls['maxZ'].clearValidators();
 
       const color = this.platformForm?.get('color')?.value;
       if (
@@ -144,12 +143,8 @@ export class PlatformCardComponent implements AfterViewInit {
         this.defaultColor = color;
       }
 
-      if (type == 'MARITIME') {
-        this.platformForm.controls['maxDepth'].setValidators(
-          Validators.required,
-        );
-      } else if (type == 'AIR') {
-        this.platformForm.controls['maxAlt'].setValidators(Validators.required);
+      if (type != 'GROUND') {
+        this.platformForm.controls['maxZ'].setValidators(Validators.required);
       }
 
       this.type = type;

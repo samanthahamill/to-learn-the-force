@@ -153,9 +153,11 @@ export class MainContentComponent {
                   input.scenario?.scenarioInput?.aoi.lon ?? 0,
                   { validators: Validators.required },
                 ),
-                alt: new FormControl(
-                  input.scenario?.scenarioInput?.aoi.alt ?? 0,
-                  { validators: Validators.required },
+                z: new FormControl(
+                  input.scenario?.scenarioInput?.aoi.altitude ?? 0,
+                  {
+                    validators: Validators.required,
+                  },
                 ),
                 radius: new FormControl(
                   input.scenario?.scenarioInput?.aoi.radius ?? 0,

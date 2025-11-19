@@ -95,6 +95,12 @@ export function addHours(date: Date, hours: number) {
   return date;
 }
 
+export function minusHours(date: Date, hours: number) {
+  const hoursToAdd = hours * 60 * 60 * 1000;
+  date.setTime(date.getTime() - hoursToAdd);
+  return date;
+}
+
 export function hexToRgb(hex: string): RGB_TYPE {
   var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
