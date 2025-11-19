@@ -73,7 +73,7 @@ export function createNewWaypointFormGroup(
       validators: Validators.required,
     }),
     datetime: new FormControl(
-      (waypoint?.datetime ?? new Date()).toISOString().substring(0, 16),
+      createFormDateString(waypoint?.datetime ?? new Date()),
       {
         validators: Validators.required,
       },
@@ -85,4 +85,8 @@ export function createNewWaypointFormGroup(
       validators: Validators.required,
     }),
   });
+}
+
+export function createFormDateString(date: Date): string {
+  return (date as Date).toISOString().substring(0, 16);
 }

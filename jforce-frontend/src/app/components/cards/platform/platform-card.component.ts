@@ -113,7 +113,7 @@ export class PlatformCardComponent implements AfterViewInit {
   }
 
   get name(): string {
-    return this.platformForm?.get('name')?.value;
+    return this.platformForm?.get('name')?.value ?? 'Unknown';
   }
 
   get platformType(): PLATFORM_TYPE {
@@ -125,7 +125,7 @@ export class PlatformCardComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.platformForm.valueChanges.pipe(untilDestroyed(this)).subscribe(() => {
+    this.platformForm?.valueChanges.pipe(untilDestroyed(this)).subscribe(() => {
       const type = this.platformForm?.controls['type'].value as PLATFORM_TYPE;
 
       this.platformForm.controls['maxDepth'].clearValidators();
@@ -151,9 +151,9 @@ export class PlatformCardComponent implements AfterViewInit {
       this.type = type;
     });
 
-    this.platformForm.setValue({
-      type: this.platformForm.get('type')?.value ?? 'AIR',
-    });
+    this.platformForm
+      ?.get('type')
+      ?.setValue(this.platformForm?.get('type')?.value ?? 'AIR');
   }
 
   onUpdate(): void {

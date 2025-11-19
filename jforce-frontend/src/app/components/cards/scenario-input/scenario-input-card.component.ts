@@ -122,8 +122,6 @@ export class ScenarioInputCardComponent {
 
   addPlatform(platform?: Platform) {
     const name = this.getNewPlatformName();
-
-    // TODO implement
     this.platforms.push(getNewPlatformFormGroup(this.fb, name, platform));
     this.formUpdated();
   }
