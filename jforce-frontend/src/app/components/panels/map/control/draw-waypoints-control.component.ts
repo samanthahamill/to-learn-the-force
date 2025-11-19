@@ -123,6 +123,13 @@ export class DrawWaypointsControl extends Toggle {
     this.map = map;
   }
 
+  deactivate() {
+    if (this.drawInteraction) {
+      this.getMap()?.removeInteraction(this.drawInteraction);
+      this.getMap()?.removeLayer(this.overlayLayer);
+    }
+  }
+
   onDestroy(): void {
     if (this.drawInteraction) {
       this.getMap()?.removeInteraction(this.drawInteraction);

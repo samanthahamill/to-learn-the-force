@@ -230,7 +230,7 @@ export class WaypointEditorComponent extends BaseMapComponent {
           {
             id: createNewWaypointId(
               this.platformId ?? this.platformName ?? 'platform',
-              this.waypointPlatformData?.waypoints,
+              this.waypointPlatformData?.waypoints ?? [],
             ),
             index: 0,
             lat: this.latInput,
@@ -244,7 +244,7 @@ export class WaypointEditorComponent extends BaseMapComponent {
         this.waypoints.push({
           id: createNewWaypointId(
             this.platformId ?? this.platformName ?? 'platform',
-            this.waypointPlatformData?.waypoints,
+            this.waypointPlatformData?.waypoints ?? [],
           ),
           index: this.waypoints.length,
           lat: this.latInput,

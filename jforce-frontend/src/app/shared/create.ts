@@ -7,6 +7,10 @@ import {
 import { Platform, Waypoint } from './types';
 import { getPlatformIdFormat } from './utils';
 
+export function createFormDateString(date: Date): string {
+  return (date as Date).toISOString().substring(0, 16);
+}
+
 export function getNewPlatformFormGroup(
   fb: FormBuilder,
   platformName: string,
@@ -16,7 +20,6 @@ export function getNewPlatformFormGroup(
   const compliantPlatformId = (platformId ?? platformName)
     .replace(' ', '-')
     .toLowerCase();
-  console.log(platformId);
 
   // TODO implement
   return fb.group({
@@ -51,13 +54,8 @@ export function getNewPlatformFormGroup(
       validators: Validators.required,
     }), // TODO change to be dynamic once they can add platforms from a predesigned list
     waypoints: fb.array(
-      platform?.waypoints.map((waypoint: Waypoint) =>
-        createNewWaypointFormGroup(
-          fb,
-          compliantPlatformId,
-          waypoint.index,
-          waypoint,
-        ),
+      platform?.waypoints.map((waypoint: Waypoint, i: number) =>
+        createNewWaypointFormGroup(fb, compliantPlatformId, i, waypoint),
       ) ?? [],
     ),
   });
@@ -95,10 +93,6 @@ export function createNewWaypointFormGroup(
       validators: Validators.required,
     }),
   });
-}
-
-export function createFormDateString(date: Date): string {
-  return (date as Date).toISOString().substring(0, 16);
 }
 
 export function formGroupPlatformsToPlatformArray(platforms: any): Platform[] {

@@ -171,6 +171,7 @@ export class PlatformDialogComponent
             platformIndex: info.platformIndex,
           };
 
+          this.renderWaypoints();
           this.updateData();
           this.openModal();
         }
@@ -194,8 +195,37 @@ export class PlatformDialogComponent
     this.color = this.platformData?.platform.color;
   }
 
-  override ngOnInit() {
-    super.ngOnInit();
+  override customLayers() {
+    return [this.reportLayer];
+  }
+
+  override addButtonsToBar() {
+    return [this.drawWaypointControl, this.dragWaypointControl];
+  }
+
+  override updateTracks() {
+    if (!this.platformWaypointLayer) return;
+
+    this.platformWaypointSource.clear();
+
+    const features = this.data
+      .filter(
+        (platform) =>
+          this.platformData?.platform.id == undefined ||
+          platform.id !== this.platformData?.platform.id,
+      )
+      .flatMap((platform) => {
+        return platform.waypoints.flatMap((waypoint, i) => {
+          return this.createWaypointFeature(
+            waypoint,
+            platform,
+            i == platform.waypoints.length - 1 ? platform.name : undefined,
+            'gray',
+          );
+        });
+      });
+
+    this.platformWaypointSource.addFeatures(features);
   }
 
   get platform(): Platform | undefined {
@@ -210,6 +240,10 @@ export class PlatformDialogComponent
     return this.platformData?.platform.name ?? '';
   }
 
+  get waypoints(): Waypoint[] {
+    return this.platformData?.platform.waypoints ?? [];
+  }
+
   platformDataUpdated(waypointPlatformData: PlatformEditorInformation) {
     this.platformData = {
       ...this.platformData!,
@@ -218,14 +252,6 @@ export class PlatformDialogComponent
         waypoints: waypointPlatformData.platform.waypoints,
       },
     };
-  }
-
-  openModal() {
-    $('#platformModal').modal('show');
-  }
-
-  closeModal() {
-    $('#platformModal').modal('hide');
   }
 
   closeAndSaveModal() {
@@ -252,18 +278,6 @@ export class PlatformDialogComponent
       } as Platform);
     }
     this.closeModal();
-  }
-
-  get waypoints(): Waypoint[] {
-    return this.platformData?.platform.waypoints ?? [];
-  }
-
-  override customLayers() {
-    return [this.reportLayer];
-  }
-
-  override addButtonsToBar() {
-    return [this.drawWaypointControl, this.dragWaypointControl];
   }
 
   renderWaypoints() {
@@ -307,13 +321,12 @@ export class PlatformDialogComponent
     const waypoints = this.waypoints;
     const lastPoint: Waypoint | undefined =
       this.waypoints[waypoints.length - 1];
-    const waypointLastIndex = waypoints.length - 1;
 
     const newCoordinates: Waypoint[] = points.map((point, i) => {
       return {
         id: createNewWaypointId(
           this.platformData?.platform.id ?? this.platformName ?? 'platform',
-          this.platformData?.platform?.waypoints ?? [],
+          this.waypoints ?? [],
         ),
         lat: point[0],
         lon: point[1],
@@ -322,7 +335,7 @@ export class PlatformDialogComponent
         datetime: !lastPoint?.datetime
           ? new Date()
           : addHours(new Date(lastPoint.datetime), 1),
-        index: waypointLastIndex + i,
+        index: waypoints.length,
       } as Waypoint;
     });
 
@@ -372,7 +385,7 @@ export class PlatformDialogComponent
           {
             id: createNewWaypointId(
               this.platformData?.platform.id ?? this.platformName ?? 'platform',
-              this.platformData.platform.waypoints,
+              this.waypoints,
             ),
             index: 0,
             lat: this.latInput,
@@ -386,7 +399,7 @@ export class PlatformDialogComponent
         this.waypoints.push({
           id: createNewWaypointId(
             this.platformData?.platform.id ?? this.platformName ?? 'platform',
-            this.platformData.platform.waypoints,
+            this.waypoints,
           ),
           index: this.waypoints.length,
           lat: this.latInput,
@@ -444,12 +457,16 @@ export class PlatformDialogComponent
     }
   }
 
-  override get platformDataToDisplay() {
-    return this.data.filter(
-      (platform) =>
-        this.platformData?.platform.id &&
-        platform.id !== this.platformData?.platform.id,
-    );
+  openModal() {
+    $('#platformModal').modal('show');
+  }
+
+  closeModal() {
+    this.drawWaypointControl.deactivate();
+    this.drawWaypointControl.setActive(false);
+    this.dragWaypointControl.deactivate();
+    this.dragWaypointControl.setActive(false);
+    $('#platformModal').modal('hide');
   }
 
   override destroyMap() {
