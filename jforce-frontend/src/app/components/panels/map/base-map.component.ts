@@ -21,12 +21,7 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { AOIType, Platform, Waypoint } from '../../../shared/types';
 import { fromLonLat, getUserProjection, Projection, toLonLat } from 'ol/proj';
 import GeoJSON from 'ol/format/GeoJSON';
-import {
-  createStringYX,
-  GREEN_COLORS,
-  MAP_PROJECTION,
-  RED_COLORS,
-} from '../../../shared/utils';
+import { createStringYX, MAP_PROJECTION } from '../../../shared/utils';
 import Feature from 'ol/Feature';
 import { TerraDraw, TerraDrawPointMode } from 'terra-draw';
 import { TerraDrawOpenLayersAdapter } from 'terra-draw-openlayers-adapter';
@@ -102,12 +97,13 @@ export class BaseMapComponent implements OnInit, OnDestroy {
     this.platformWaypointLayer = new VectorLayer({
       visible: true,
       source: this.platformWaypointSource,
-      style: vectorStyle,
     });
 
+    this.platformVectorSource = new VectorSource();
     this.platformVectorLayer = new VectorLayer({
       visible: this.platformVectorVisible,
-      source: this.platformWaypointSource,
+      source: this.platformVectorSource,
+      style: vectorStyle,
     });
 
     this.olMapView = new View({
@@ -134,8 +130,7 @@ export class BaseMapComponent implements OnInit, OnDestroy {
       .pipe(untilDestroyed(this))
       .subscribe((input) => {
         this.data = input?.scenario?.scenarioInput?.platforms ?? [];
-        this.updateTracks();
-        this.updateVectors();
+        this.updateMap();
       });
   }
 
@@ -324,27 +319,39 @@ export class BaseMapComponent implements OnInit, OnDestroy {
     }
   }
 
+  get displayData() {
+    return this.data;
+  }
+
+  updateMap() {
+    this.updateVectors();
+    this.updateTracks();
+  }
+
   updateVectors() {
-    if (!this.platformWaypointLayer) return;
+    if (!this.platformVectorLayer) return;
 
     this.platformVectorSource.clear();
 
-    const features = this.data
+    const features = this.displayData
       .filter(
         (platform) =>
           platform.waypoints !== undefined && platform.waypoints.length > 1,
       )
       .flatMap((platform) => {
-        return this.geoJson.readFeature(
+        const feature = this.geoJson.readFeature(
           lineString(
             platform.waypoints.map(
               (waypoint) => [waypoint.lon, waypoint.lat] as Coordinate,
             ),
           ),
         ) as Feature;
+        feature.set('draggable', false);
+
+        return feature;
       });
 
-    this.platformWaypointSource.addFeatures(features);
+    this.platformVectorSource.addFeatures(features);
   }
 
   updateTracks() {
@@ -352,17 +359,25 @@ export class BaseMapComponent implements OnInit, OnDestroy {
 
     this.platformWaypointSource.clear();
 
-    const features = this.data.flatMap((platform) => {
+    const features = this.displayData.flatMap((platform) => {
       return platform.waypoints.flatMap((waypoint, i) => {
         return this.createWaypointFeature(
           waypoint,
           platform,
           i == platform.waypoints.length - 1 ? platform.name : undefined,
+          this.getWaypointTrack(platform),
         );
       });
     });
 
     this.platformWaypointSource.addFeatures(features);
+  }
+
+  /**
+   * Created so that waypoint colors can be overrided if need be. Otherwise returns the platform color.
+   */
+  getWaypointTrack(platform: Platform): string | undefined {
+    return platform.color;
   }
 
   createWaypointFeature(
@@ -376,6 +391,9 @@ export class BaseMapComponent implements OnInit, OnDestroy {
 
     const color = presetColor ?? platform.color;
 
+    const isLastWaypoint: boolean =
+      waypoint.index === platform.waypoints.length - 1;
+
     feature.setStyle([
       new Styled.Style({
         image: new Styled.Circle({
@@ -384,15 +402,14 @@ export class BaseMapComponent implements OnInit, OnDestroy {
             color: color,
           }),
           stroke: new Styled.Stroke({
-            color: color,
-            width: 1,
+            color: isLastWaypoint ? 'white' : color,
+            width: 2,
           }),
         }),
       }),
       new Styled.Style({
         text:
-          this.showTrackLabels &&
-          waypoint.index === platform.waypoints.length - 1
+          this.showTrackLabels && isLastWaypoint
             ? new Styled.Text({
                 text: label,
                 font: '12px sans-serif',
@@ -411,6 +428,7 @@ export class BaseMapComponent implements OnInit, OnDestroy {
       }),
     ]);
 
+    feature.set('draggable', false);
     feature.set('label', label);
 
     return feature;
