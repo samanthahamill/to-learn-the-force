@@ -51,22 +51,15 @@
                     type="number"
                     [(ngModel)]="maxSpeed"
                   />
-                  <div *ngIf="type == 'AIR'" class="col">
-                    <label for="maxAlt">Max Alt</label>
+                  <div *ngIf="type != 'GROUND'" class="col">
+                    <label for="maxZ"
+                      >Max {{ type == "AIR" ? "Alt" : "Depth" }}</label
+                    >
                     <input
                       class="input-small"
-                      id="maxAlt"
+                      id="maxZ"
                       type="number"
-                      [(ngModel)]="maxAlt"
-                    />
-                  </div>
-                  <div *ngIf="type == 'MARITIME'" class="col">
-                    <label for="maxDepth">Max Depth</label>
-                    <input
-                      class="input-small"
-                      id="maxDepth"
-                      type="number"
-                      [(ngModel)]="maxDepth"
+                      [(ngModel)]="maxZ"
                     />
                   </div>
                 </div>
@@ -111,7 +104,9 @@
                           <th scope="col" class="actions">#</th>
                           <th scope="col">Lat</th>
                           <th scope="col">Lon</th>
-                          <th scope="col">Altitude</th>
+                          <th *ngIf="type != 'GROUND'" scope="col">
+                            {{ type == "AIR" ? "Altitude" : "Depth" }}
+                          </th>
                           <th scope="col">Speed</th>
                           <th scope="col">Date/Time</th>
                           <th scope="col" class="actions">Actions</th>
@@ -158,10 +153,11 @@
                           </td>
                           <td>
                             <input
-                              class="input-small datetime-dimensions"
+                              class="datetime-dimensions"
                               id="datetimeInput"
                               type="datetime-local"
                               [(ngModel)]="datetimeInput"
+                              [max]="maxDateTime"
                               required
                             />
                           </td>
@@ -206,12 +202,12 @@
                               required
                             />
                           </td>
-                          <td>
+                          <td *ngIf="type != 'GROUND'">
                             <input
                               class="input-small"
-                              id="AltInput"
+                              id="ZInput"
                               type="number"
-                              [(ngModel)]="waypoint.alt"
+                              [(ngModel)]="waypoint.z"
                             />
                           </td>
                           <td>
@@ -225,10 +221,12 @@
                           </td>
                           <td>
                             <input
-                              class="input-small datetime-dimensions"
+                              class="datetime-dimensions"
                               id="datetimeInput"
                               type="datetime-local"
                               [(ngModel)]="waypoint.datetime"
+                              [max]="maxDateTime"
+                              [min]="minDateTime"
                               required
                             />
                           </td>
@@ -269,7 +267,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <div *ngIf="theresAnError">
+        <div *ngIf="errorMessage">
           <p class="error">
             {{ errorMessage }}
           </p>

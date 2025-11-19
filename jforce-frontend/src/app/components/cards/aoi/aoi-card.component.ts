@@ -63,7 +63,7 @@ export class AoiCardComponent implements AfterViewInit {
   updateDataSourceService(): void {
     const lat = this.aoiFormGroup.controls['lat'].value as number;
     const lon = this.aoiFormGroup.controls['lon'].value as number;
-    const alt = this.aoiFormGroup.controls['elevation'].value as number;
+    const alt = this.aoiFormGroup.controls['alt'].value as number;
     const radius = this.aoiFormGroup.controls['radius'].value as number;
     this.userState.updateAOI({
       lat: lat,

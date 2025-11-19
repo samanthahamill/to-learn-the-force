@@ -16,6 +16,8 @@ import {
   addHours,
   createNewWaypointId,
   deepClone,
+  MAP_PROJECTION,
+  minusHours,
 } from '../../../shared/utils';
 import {
   CdkDragDrop,
@@ -46,6 +48,7 @@ import VectorSource from 'ol/source/Vector';
 import { DragWaypointsControl } from '../../panels/map/control/drag-waypoint-control.component';
 import { DrawWaypointsControl } from '../../panels/map/control/draw-waypoints-control.component';
 import { ColorPickerModule } from 'primeng/colorpicker';
+import { SystemStateService } from '../../../services/system-state.service';
 import { formGroupWaypointToWaypointArray } from '../../../shared/create';
 import { lineString } from '@turf/turf';
 import { Feature } from 'ol';
@@ -72,9 +75,12 @@ export class PlatformDialogComponent
   extends BaseMapComponent
   implements AfterViewInit
 {
-  platformData: PlatformEditorInformation | undefined;
-  platformEditorService = inject(PlatformEditorService);
-  userState = inject(UserStateService);
+  private platformData: PlatformEditorInformation | undefined;
+  private platformEditorService = inject(PlatformEditorService);
+  private systemStateService = inject(SystemStateService);
+
+  maxDateTime: string;
+  minDateTime: string;
 
   @Output() waypointPlatformDataUpdated =
     new EventEmitter<PlatformEditorInformation>();
@@ -94,13 +100,11 @@ export class PlatformDialogComponent
   private dragWaypointControl: DragWaypointsControl;
 
   allowDraw: boolean;
-  theresAnError: boolean = false;
   errorMessage: string | undefined;
 
   type: PLATFORM_TYPE | undefined = undefined;
   maxSpeed: number | undefined = undefined;
-  maxDepth: number | undefined = undefined;
-  maxAlt: number | undefined = undefined;
+  maxZ: number | undefined = undefined;
   friendly: boolean | undefined = undefined;
   color: string | undefined = undefined;
 
@@ -117,10 +121,20 @@ export class PlatformDialogComponent
   constructor() {
     super('mapContainerPlatform');
 
+    this.maxDateTime = this.userStateService.maxDate;
+    this.minDateTime = this.userStateService.minDate;
+
+    this.userStateService.minDate$
+      .pipe(untilDestroyed(this))
+      .subscribe((val) => (this.minDateTime = val));
+
+    this.userStateService.maxDate$
+      .pipe(untilDestroyed(this))
+      .subscribe((val) => (this.maxDateTime = val));
+
     this.name = this.platformData?.platform.name;
     this.maxSpeed = this.platformData?.platform.maxSpeed;
-    this.maxDepth = this.platformData?.platform.maxDepth;
-    this.maxAlt = this.platformData?.platform.maxAlt;
+    this.maxZ = this.platformData?.platform.maxZ;
     this.friendly = this.platformData?.platform.friendly;
     this.color = this.platformData?.platform.color;
     this.type = this.platformData?.platform.type;
@@ -136,7 +150,6 @@ export class PlatformDialogComponent
     });
 
     this.allowDraw = false;
-    this.theresAnError = false;
 
     this.drawWaypointControl = new DrawWaypointsControl({
       className: 'ol-draw-waypoint-tool',
@@ -203,8 +216,7 @@ export class PlatformDialogComponent
   updateData() {
     this.name = this.platformData?.platform.name;
     this.maxSpeed = this.platformData?.platform.maxSpeed;
-    this.maxDepth = this.platformData?.platform.maxDepth;
-    this.maxAlt = this.platformData?.platform.maxAlt;
+    this.maxZ = this.platformData?.platform.maxZ;
     this.friendly = this.platformData?.platform.friendly;
     this.color = this.platformData?.platform.color;
     this.type = this.platformData?.platform.type;
@@ -271,32 +283,6 @@ export class PlatformDialogComponent
     };
   }
 
-  closeAndSaveModal() {
-    if (this.platformData) {
-      // TODO validate everything
-      // if not valid, display error message
-      // if valid, update user service
-      const platform = this.platformData.platform;
-
-      this.userStateService.updatePlatform(this.platformData.platformIndex, {
-        ...platform, // handles 'id' and 'readonly' which should not be changed
-        name: this.name ?? platform.name,
-        type: this.type ?? platform.type,
-        maxSpeed: this.maxSpeed ?? platform.maxSpeed,
-        maxDepth: this.maxDepth ?? platform.maxDepth,
-        maxAlt: this.maxAlt ?? platform.maxAlt,
-        friendly: this.friendly ?? platform.friendly,
-        color: this.color ?? platform.color,
-        waypoints: this.waypoints
-          ? formGroupWaypointToWaypointArray(this.waypoints)
-          : formGroupWaypointToWaypointArray(platform.waypoints),
-        reportingFrequency:
-          this.reportingFrequency ?? platform.reportingFrequency,
-      } as Platform);
-    }
-    this.closeModal();
-  }
-
   renderWaypoints() {
     if (!this.reportLayer || this.platformData === undefined) return;
 
@@ -352,11 +338,13 @@ export class PlatformDialogComponent
         ),
         lat: point[0],
         lon: point[1],
-        alt: 0,
+        z: 0,
         speedKts: lastPoint?.speedKts ?? 0,
         datetime: !lastPoint?.datetime
           ? new Date()
-          : addHours(new Date(lastPoint.datetime), 1),
+          : lastPoint.datetime < minusHours(new Date(this.maxDateTime), 1)
+            ? addHours(new Date(lastPoint.datetime), 1)
+            : lastPoint.datetime,
         index: waypoints.length,
       } as Waypoint;
     });
@@ -415,7 +403,7 @@ export class PlatformDialogComponent
             index: 0,
             lat: this.latInput,
             lon: this.lonInput,
-            alt: this.altInput,
+            z: this.altInput,
             speedKts: this.speedInput,
             datetime: new Date(this.datetimeInput),
           },
@@ -429,7 +417,7 @@ export class PlatformDialogComponent
           index: this.waypoints.length,
           lat: this.latInput,
           lon: this.lonInput,
-          alt: this.altInput,
+          z: this.altInput,
           speedKts: this.speedInput,
           datetime: new Date(this.datetimeInput),
         });
@@ -463,22 +451,100 @@ export class PlatformDialogComponent
     }
   }
 
-  validateWaypointValues() {
-    if (this.platformData?.platform?.waypoints == undefined) return;
-    this.theresAnError = false;
+  ///
 
-    for (const waypoint of this.platformData.platform.waypoints) {
-      if (
-        waypoint === null ||
-        waypoint.alt == null ||
-        waypoint.lat == null ||
-        waypoint.lon == null ||
-        waypoint.datetime == null ||
-        waypoint.speedKts == null
-      ) {
-        this.theresAnError = true;
-        break;
+  private validate(): boolean {
+    if (this.platformData === undefined) {
+      return false;
+    }
+
+    // ensure all fields are filled
+    if (this.color === undefined) {
+      this.errorMessage = `Platform color cannot be undefined. Please set to a valid value before proceeding.`;
+      return false;
+    }
+    if (this.name === undefined || this.name === '') {
+      this.errorMessage = `Platform name cannot be undefined. Please set to a valid value before proceeding.`;
+      return false;
+    }
+    if (
+      this.type === 'AIR' &&
+      (this.maxZ === undefined || Number.isNaN(this.maxZ))
+    ) {
+      this.errorMessage = `Platform color cannot be undefined for an air platform. Please set to a valid value before proceeding.`;
+      return false;
+    }
+    if (
+      this.type !== 'GROUND' &&
+      (this.maxZ === undefined || Number.isNaN(this.maxZ))
+    ) {
+      this.errorMessage = `Platform ${this.type == 'AIR' ? 'Alt' : 'Depth'} cannot be undefined for a ${this.type} platform. Please set to a valid value before proceeding.`;
+      return false;
+    }
+    if (
+      this.reportingFrequency === undefined ||
+      Number.isNaN(this.reportingFrequency)
+    ) {
+      this.errorMessage = `Platform reporting frequency cannot be undefined. Please set to a valid value before proceeding.`;
+      return false;
+    }
+
+    const invalidWapoint = this.waypoints.find(
+      (waypoint) =>
+        waypoint.lat == undefined ||
+        Number.isNaN(waypoint.lat) ||
+        waypoint.lon == undefined ||
+        Number.isNaN(waypoint.lon) ||
+        waypoint.speedKts == undefined ||
+        Number.isNaN(waypoint.speedKts) ||
+        waypoint.datetime == undefined,
+    );
+
+    if (invalidWapoint) {
+      this.errorMessage = `Waypoint with index ${invalidWapoint.index} has invalid entries. Please fix these before saving.`;
+      return false;
+    }
+
+    const earliestTime = new Date(this.minDateTime);
+    const latestTime = new Date(this.maxDateTime);
+
+    for (let waypoint of this.waypoints) {
+      if (waypoint.datetime < earliestTime) {
+        this.errorMessage = `Waypoint with index ${waypoint.index} has a date that is earlier than the scenario start time.`;
+        return false;
       }
+      if (waypoint.datetime > latestTime) {
+        this.errorMessage = `Waypoint with index ${waypoint.index} has a date that is later than the scenario end time.`;
+        return false;
+      }
+    }
+
+    this.errorMessage = undefined;
+    return true;
+  }
+
+  closeAndSaveModal() {
+    if (this.validate()) {
+      // TODO validate everything
+      // if not valid, display error message
+      // if valid, update user service
+      const platform = this.platformData!.platform;
+
+      this.userStateService.updatePlatform(this.platformData!.platformIndex, {
+        ...platform, // handles 'id' and 'readonly' which should not be changed
+        name: this.name ?? platform.name,
+        type: this.type ?? platform.type,
+        maxSpeed: this.maxSpeed ?? platform.maxSpeed,
+        maxZ: this.maxZ ?? platform.maxZ,
+        friendly: this.friendly ?? platform.friendly,
+        color: this.color ?? platform.color,
+        waypoints: this.waypoints
+          ? formGroupWaypointToWaypointArray(this.waypoints)
+          : formGroupWaypointToWaypointArray(platform.waypoints),
+        reportingFrequency:
+          this.reportingFrequency ?? platform.reportingFrequency,
+      } as Platform);
+      this.closeModal();
     }
   }
 

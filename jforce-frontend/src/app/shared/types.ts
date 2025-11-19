@@ -21,8 +21,7 @@ export interface Platform {
   name: string;
   type: PLATFORM_TYPE;
   maxSpeed: number;
-  maxDepth: number;
-  maxAlt: number;
+  maxZ: number;
   friendly: boolean;
   color: string; // hex
 
@@ -90,7 +89,7 @@ export interface Waypoint {
   id: string; // for frontend us only - utilized to allow dragging on map feature
   lat: number;
   lon: number;
-  alt: number;
+  z: number; // altitude or depth
   speedKts: number;
   datetime: Date; // should there be a start/end time? Possibly a different type
   index: number; // backend variable only to ensure proper ordering

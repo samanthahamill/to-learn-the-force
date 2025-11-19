@@ -60,13 +60,17 @@ input {
   flex-direction: column;
 }
 
+.main-content {
+  overflow: hidden;
+}
+
 .platforms {
   margin-top: 4px;
 }
 
 .platform-inner {
   overflow-y: auto;
-  max-height: 515px;
+  max-height: 415px;
 }
 
 .title {

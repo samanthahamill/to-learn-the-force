@@ -45,24 +45,15 @@
             (blur)="onUpdate()"
             [readonly]="readonly"
           />
-          <div class="col-inner" *ngIf="platformType == 'AIR'">
-            <label for="maxAlt">Max Alt</label>
+          <div class="col-inner" *ngIf="platformType != 'GROUND'">
+            <label for="maxZ"
+              >Max {{ platformType == "AIR" ? "Alt" : "Depth" }}</label
+            >
             <input
               class="input-small"
-              id="maxAlt"
+              id="maxZ"
               type="number"
-              formControlName="maxAlt"
-              (blur)="onUpdate()"
-              [readonly]="readonly"
-            />
-          </div>
-          <div class="col-inner" *ngIf="platformType == 'MARITIME'">
-            <label for="maxDepth">Max Depth</label>
-            <input
-              class="input-small"
-              id="maxDepth"
-              type="number"
-              formControlName="maxDepth"
+              formControlName="maxZ"
               (blur)="onUpdate()"
               [readonly]="readonly"
             />
@@ -119,7 +110,9 @@
                 <th scope="col" class="actions">#</th>
                 <th scope="col">Lat</th>
                 <th scope="col">Lon</th>
-                <th scope="col">Altitude</th>
+                <th scope="col" *ngIf="type !== 'GROUND'">
+                  {{ type == "AIR" ? "Altitude" : "Depth" }}
+                </th>
                 <th scope="col">Speed</th>
                 <th scope="col">Date/Time</th>
                 <th scope="col" class="actions">Actions</th>
@@ -146,7 +139,7 @@
                 </th>
                 <td>{{ waypoint.lat }}</td>
                 <td>{{ waypoint.lon }}</td>
-                <td>{{ waypoint.alt }}</td>
+                <td *ngIf="type !== 'GROUND'">{{ waypoint.z }}</td>
                 <td>{{ waypoint.speedKts }}</td>
                 <td>{{ waypoint.datetime }}</td>
                 <td class="actions">

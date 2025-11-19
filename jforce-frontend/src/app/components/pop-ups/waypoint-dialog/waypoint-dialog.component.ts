@@ -112,7 +112,7 @@ export class WaypointDialogComponent implements OnInit {
       if (
         waypoint === null ||
         waypoint.id == null ||
-        waypoint.alt == null ||
+        waypoint.z == null ||
         waypoint.lat == null ||
         waypoint.lon == null ||
         waypoint.datetime == null ||
