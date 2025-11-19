@@ -145,6 +145,9 @@ export class PlatformDialogComponent
       title: 'Draw Waypoint Tool',
       onDrawEnd: () => this.onDrawEnd(),
       onDrawNewWaypoint: (points) => this.onDrawNewWaypoint(points),
+      onDrawStart: () => {
+        this.updateToggles(true, 'DRAW');
+      },
     });
     this.dragWaypointControl = new DragWaypointsControl({
       className: 'ol-drag-waypoint-control',
@@ -155,7 +158,11 @@ export class PlatformDialogComponent
         this.dragPointOnMap(points, waypointId);
       },
       onUpdateFinished: () => {
+        this.updateToggles(false, 'DRAG');
         this.waypointPlatformDataUpdated.emit(this.platformData!);
+      },
+      onDrawStart: () => {
+        this.updateToggles(true, 'DRAG');
       },
     });
 
@@ -177,6 +184,20 @@ export class PlatformDialogComponent
       });
 
     this.updateMap();
+  }
+
+  updateToggles(editing: boolean, control: 'DRAG' | 'DRAW') {
+    if (!editing) {
+      this.dragWaypointControl.setDisable(false);
+      this.drawWaypointControl.setDisable(false);
+      return;
+    }
+
+    if (control == 'DRAG') {
+      this.drawWaypointControl.setDisable(true);
+    } else {
+      this.dragWaypointControl.setDisable(true);
+    }
   }
 
   updateData() {
@@ -305,11 +326,13 @@ export class PlatformDialogComponent
         ),
       ),
     ) as Feature;
+    feature.set('draggable', false);
 
     this.vectorSource.addFeature(feature);
   }
 
   onDrawEnd() {
+    this.updateToggles(false, 'DRAW');
     this.updateMap();
   }
 

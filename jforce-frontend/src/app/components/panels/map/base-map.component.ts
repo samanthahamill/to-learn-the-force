@@ -339,13 +339,16 @@ export class BaseMapComponent implements OnInit, OnDestroy {
           platform.waypoints !== undefined && platform.waypoints.length > 1,
       )
       .flatMap((platform) => {
-        return this.geoJson.readFeature(
+        const feature = this.geoJson.readFeature(
           lineString(
             platform.waypoints.map(
               (waypoint) => [waypoint.lon, waypoint.lat] as Coordinate,
             ),
           ),
         ) as Feature;
+        feature.set('draggable', false);
+
+        return feature;
       });
 
     this.platformVectorSource.addFeatures(features);
@@ -425,6 +428,7 @@ export class BaseMapComponent implements OnInit, OnDestroy {
       }),
     ]);
 
+    feature.set('draggable', false);
     feature.set('label', label);
 
     return feature;
