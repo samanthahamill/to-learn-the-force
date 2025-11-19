@@ -18,6 +18,7 @@ import { ExternalComponent } from '../panels/external/external.component';
 import { Platform, UserInputFormData } from '../../shared/types';
 import {
   createFormDateString,
+  formGroupPlatformsToPlatformArray,
   getNewPlatformFormGroup,
 } from '../../shared/create';
 
@@ -83,21 +84,7 @@ export class MainContentComponent {
                 ...scenarioInput,
                 startTime: new Date(scenarioInput.startTime),
                 endTime: new Date(scenarioInput.endTime),
-                platforms: platforms
-                  ? platforms.map((platform: any) => {
-                      return {
-                        ...platform,
-                        waypoints: platform.waypoints
-                          ? platform.waypoints.map((waypoint: any) => {
-                              return {
-                                ...waypoint,
-                                datetime: new Date(waypoint.datetime),
-                              };
-                            })
-                          : [],
-                      };
-                    })
-                  : [],
+                platforms: formGroupPlatformsToPlatformArray(platforms),
               }
             : {},
         },

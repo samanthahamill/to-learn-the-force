@@ -90,3 +90,33 @@ export function createNewWaypointFormGroup(
 export function createFormDateString(date: Date): string {
   return (date as Date).toISOString().substring(0, 16);
 }
+
+export function formGroupPlatformsToPlatformArray(platforms: any): Platform[] {
+  return platforms
+    ? platforms.map((platform: any) => {
+        return formGroupPlatformToPlatformType(platform);
+      })
+    : [];
+}
+
+export function formGroupPlatformToPlatformType(platform: any): Platform {
+  return {
+    ...platform,
+    waypoints: formGroupWaypointToWaypointArray(platform.waypoints),
+  };
+}
+
+export function formGroupWaypointToWaypointArray(waypoints: any): Waypoint[] {
+  return waypoints
+    ? waypoints.map((waypoint: any) => {
+        return formGroupWaypointToWaypointType(waypoint);
+      })
+    : [];
+}
+
+export function formGroupWaypointToWaypointType(waypoint: any): Waypoint {
+  return {
+    ...waypoint,
+    datetime: new Date(waypoint.datetime),
+  };
+}
