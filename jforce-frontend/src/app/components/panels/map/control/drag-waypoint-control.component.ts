@@ -1,10 +1,12 @@
 import { Select, Translate } from 'ol/interaction';
 import { Coordinate } from 'ol/coordinate';
 import Toggle, { Options } from 'ol-ext/control/Toggle';
+import { Collection } from 'ol';
 
 export type DragWaypointsType = {
   updateCoordinate: (newCoord: Coordinate, waypointId: string) => void;
   onUpdateFinished: () => void;
+  onDrawStart: () => void;
 };
 export type DragWaypointsOptions = Options & DragWaypointsType;
 
@@ -13,10 +15,12 @@ export class DragWaypointsControl extends Toggle {
   translate: Translate | undefined;
   updateCoordinate: (newCoord: Coordinate, waypointId: string) => void;
   onUpdateFinished: () => void;
+  private drawStart: () => void | undefined;
 
   constructor(options: DragWaypointsOptions) {
     super(options);
 
+    this.drawStart = options.onDrawStart;
     this.updateCoordinate = options.updateCoordinate;
     this.onUpdateFinished = () => options.onUpdateFinished();
     options.onToggle = (activated) => this.handleToggle(activated);
@@ -24,13 +28,18 @@ export class DragWaypointsControl extends Toggle {
 
   handleToggle(activated: boolean) {
     if (activated) {
-      this.select = new Select();
+      this.select = new Select({
+        filter: function (feature) {
+          return feature.get('draggable');
+        },
+      });
       this.translate = new Translate({
         features: this.select.getFeatures(),
       });
 
       this.getMap()?.addInteraction(this.translate);
       this.getMap()?.addInteraction(this.select);
+      this.drawStart();
 
       this.translate.on('translating', (evt) => {
         const id = this.select?.getFeatures().getArray()[0].getId();

@@ -23,8 +23,8 @@ const BASIC_FORM_DATA: UserInputFormData = {
       aoi: {
         lat: 0,
         lon: 0,
-        altitude: 0,
-        radius: 150,
+        alt: 0,
+        radius: 450,
       },
       platforms: [
         {
@@ -62,6 +62,46 @@ const BASIC_FORM_DATA: UserInputFormData = {
               lon: 0,
               z: 1,
               datetime: minusHours(new Date(), 10),
+              index: 2,
+              speedKts: 13,
+            },
+          ],
+        },
+        {
+          name: 'Second Test',
+          id: 'second-test',
+          readonly: false,
+          maxSpeed: 0,
+          maxZ: 0,
+          type: 'GROUND',
+          reportingFrequency: 0,
+          friendly: true,
+          color: '#51e68fff',
+          waypoints: [
+            {
+              id: 'second-test-waypoint-0',
+              lat: 3,
+              lon: 1,
+              z: 1,
+              datetime: new Date(),
+              index: 0,
+              speedKts: 13,
+            },
+            {
+              id: 'second-test-waypoint-1',
+              lat: 2,
+              lon: 3,
+              z: 1,
+              datetime: addHours(new Date(), 1),
+              index: 1,
+              speedKts: 13,
+            },
+            {
+              id: 'second-test-waypoint-2',
+              lat: 2,
+              lon: 4,
+              z: 1,
+              datetime: addHours(new Date(), 2),
               index: 2,
               speedKts: 13,
             },
@@ -157,7 +197,7 @@ export class UserStateService {
       lat: aoi.centerLat,
       lon: aoi.centerLon,
       radius: aoi.radius,
-      altitude: 0.0,
+      alt: 0.0,
     });
   }
 
@@ -166,10 +206,10 @@ export class UserStateService {
     if (
       newAoi.lat !== undefined &&
       newAoi.lon !== undefined &&
-      newAoi.altitude !== undefined &&
+      newAoi.alt !== undefined &&
       newAoi.radius !== undefined &&
       (aoi === undefined ||
-        newAoi.altitude != aoi.altitude ||
+        newAoi.alt != aoi.alt ||
         newAoi.lat != aoi.lat ||
         newAoi.lon != aoi.lon ||
         newAoi.radius != aoi.radius)

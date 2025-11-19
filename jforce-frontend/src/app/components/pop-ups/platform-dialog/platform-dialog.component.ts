@@ -4,7 +4,6 @@ import {
   EventEmitter,
   inject,
   NO_ERRORS_SCHEMA,
-  OnInit,
   Output,
 } from '@angular/core';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
@@ -46,17 +45,13 @@ import { Coordinate } from 'ol/coordinate';
 import VectorLayer from 'ol/layer/Vector';
 import { toFixed } from 'ol/math';
 import VectorSource from 'ol/source/Vector';
-import { Style, Fill } from 'ol/style';
-import CircleStyle from 'ol/style/Circle';
 import { DragWaypointsControl } from '../../panels/map/control/drag-waypoint-control.component';
 import { DrawWaypointsControl } from '../../panels/map/control/draw-waypoints-control.component';
-import * as Styled from 'ol/style';
 import { ColorPickerModule } from 'primeng/colorpicker';
-import {
-  formGroupWaypointToWaypointArray,
-  formGroupWaypointToWaypointType,
-} from '../../../shared/create';
 import { SystemStateService } from '../../../services/system-state.service';
+import { formGroupWaypointToWaypointArray } from '../../../shared/create';
+import { lineString } from '@turf/turf';
+import { Feature } from 'ol';
 
 declare var $: any;
 
@@ -98,6 +93,8 @@ export class PlatformDialogComponent
 
   reportSource: VectorSource = new VectorSource();
   reportLayer: VectorLayer;
+  vectorSource: VectorSource = new VectorSource();
+  vectorLayer: VectorLayer;
   private drawWaypointControl: DrawWaypointsControl;
   private dragWaypointControl: DragWaypointsControl;
 
@@ -137,6 +134,10 @@ export class PlatformDialogComponent
     this.reportLayer = new VectorLayer({
       source: this.reportSource,
     });
+    this.vectorSource = new VectorSource();
+    this.vectorLayer = new VectorLayer({
+      source: this.vectorSource,
+    });
 
     this.allowDraw = false;
 
@@ -147,6 +148,9 @@ export class PlatformDialogComponent
       title: 'Draw Waypoint Tool',
       onDrawEnd: () => this.onDrawEnd(),
       onDrawNewWaypoint: (points) => this.onDrawNewWaypoint(points),
+      onDrawStart: () => {
+        this.updateToggles(true, 'DRAW');
+      },
     });
     this.dragWaypointControl = new DragWaypointsControl({
       className: 'ol-drag-waypoint-control',
@@ -157,7 +161,11 @@ export class PlatformDialogComponent
         this.dragPointOnMap(points, waypointId);
       },
       onUpdateFinished: () => {
+        this.updateToggles(false, 'DRAG');
         this.waypointPlatformDataUpdated.emit(this.platformData!);
+      },
+      onDrawStart: () => {
+        this.updateToggles(true, 'DRAG');
       },
     });
 
@@ -173,13 +181,26 @@ export class PlatformDialogComponent
             platformIndex: info.platformIndex,
           };
 
-          this.renderWaypoints();
-          this.updateData();
+          this.updateMap();
           this.openModal();
         }
       });
 
-    this.renderWaypoints();
+    this.updateMap();
+  }
+
+  updateToggles(editing: boolean, control: 'DRAG' | 'DRAW') {
+    if (!editing) {
+      this.dragWaypointControl.setDisable(false);
+      this.drawWaypointControl.setDisable(false);
+      return;
+    }
+
+    if (control == 'DRAG') {
+      this.drawWaypointControl.setDisable(true);
+    } else {
+      this.dragWaypointControl.setDisable(true);
+    }
   }
 
   updateData() {
@@ -196,37 +217,34 @@ export class PlatformDialogComponent
     this.color = this.platformData?.platform.color;
   }
 
+  override updateMap() {
+    super.updateMap();
+    this.renderWaypoints();
+    this.renderVector();
+    this.updateData();
+  }
+
   override customLayers() {
-    return [this.reportLayer];
+    return [this.vectorLayer, this.reportLayer];
   }
 
   override addButtonsToBar() {
     return [this.drawWaypointControl, this.dragWaypointControl];
   }
 
-  override updateTracks() {
-    if (!this.platformWaypointLayer) return;
+  override get displayData() {
+    return this.data.filter(
+      (platform) =>
+        this.platformData?.platform.id == undefined ||
+        platform.id !== this.platformData.platform.id,
+    );
+  }
 
-    this.platformWaypointSource.clear();
-
-    const features = this.data
-      .filter(
-        (platform) =>
-          this.platformData?.platform.id == undefined ||
-          platform.id !== this.platformData?.platform.id,
-      )
-      .flatMap((platform) => {
-        return platform.waypoints.flatMap((waypoint, i) => {
-          return this.createWaypointFeature(
-            waypoint,
-            platform,
-            i == platform.waypoints.length - 1 ? platform.name : undefined,
-            'gray',
-          );
-        });
-      });
-
-    this.platformWaypointSource.addFeatures(features);
+  override getWaypointTrack(platform: Platform): string | undefined {
+    return this.platformData?.platform.id == undefined ||
+      platform.id !== this.platformData?.platform.id
+      ? 'gray'
+      : this.platform?.color;
   }
 
   get platform(): Platform | undefined {
@@ -259,37 +277,42 @@ export class PlatformDialogComponent
     if (!this.reportLayer || this.platformData === undefined) return;
 
     this.reportSource.clear();
-    const features: any[] = [];
-    this.waypoints.forEach((waypoint) => {
+
+    const features = this.waypoints.map((waypoint) => {
       const feature = this.createWaypointFeature(
         waypoint,
         this.platformData!.platform,
-        this.platformData!.platform.name,
+        this.name,
         this.color,
       );
-      features.push(feature);
+
+      feature.set('draggable', true);
+      return feature;
     });
 
     this.reportSource.addFeatures(features);
   }
 
-  getStyle() {
-    return new Style({
-      text: new Styled.Text({
-        font: '12px monospace',
-        offsetX: 5,
-        offsetY: 5,
-        textAlign: 'left',
-        overflow: true,
-        fill: new Fill({ color: 'red' }),
-      }),
-      image: new CircleStyle({ radius: 3, fill: new Fill({ color: 'red' }) }),
-      stroke: new Styled.Stroke({ width: 1, color: 'red' }),
-    });
+  renderVector() {
+    if (!this.vectorLayer || this.waypoints.length < 2) return;
+
+    this.vectorSource.clear();
+
+    const feature = this.geoJson.readFeature(
+      lineString(
+        this.waypoints.map(
+          (waypoint) => [waypoint.lon, waypoint.lat] as Coordinate,
+        ),
+      ),
+    ) as Feature;
+    feature.set('draggable', false);
+
+    this.vectorSource.addFeature(feature);
   }
 
   onDrawEnd() {
-    this.updateData();
+    this.updateToggles(false, 'DRAW');
+    this.updateMap();
   }
 
   onDrawNewWaypoint(points: Coordinate[]) {
@@ -297,7 +320,7 @@ export class PlatformDialogComponent
     const lastPoint: Waypoint | undefined =
       this.waypoints[waypoints.length - 1];
 
-    const newCoordinates: Waypoint[] = points.map((point, i) => {
+    const newCoordinates: Waypoint[] = points.map((point) => {
       return {
         id: createNewWaypointId(
           this.platformData?.platform.id ?? this.platformName ?? 'platform',
@@ -317,6 +340,7 @@ export class PlatformDialogComponent
     });
 
     this.waypoints.push(...newCoordinates);
+    this.renderVector();
   }
 
   dragPointOnMap(coord: Coordinate, waypointId: string) {
@@ -339,6 +363,8 @@ export class PlatformDialogComponent
           waypoints: newCoordinates,
         },
       };
+
+      this.renderVector();
     }
   }
 

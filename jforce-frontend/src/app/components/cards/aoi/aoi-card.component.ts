@@ -53,7 +53,7 @@ export class AoiCardComponent implements AfterViewInit {
       (aoi == undefined ||
         aoi.lat != lat ||
         aoi.lon != lon ||
-        aoi.altitude != z ||
+        aoi.alt != z ||
         aoi.radius != radius)
     ) {
       this.updateDataSourceService();
@@ -68,7 +68,7 @@ export class AoiCardComponent implements AfterViewInit {
     this.userState.updateAOI({
       lat: lat,
       lon: lon,
-      altitude: alt,
+      alt: alt,
       radius: radius,
     });
   }

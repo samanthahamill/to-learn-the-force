@@ -25,7 +25,8 @@ const tipStyle = new Style({
 });
 
 export type DrawWaypointsType = {
-  onDrawEnd: (evt: any) => void;
+  onDrawStart: () => void;
+  onDrawEnd: () => void;
   onDrawNewWaypoint: (evt: any) => void;
 };
 export type DrawWaypointsOptions = Options & DrawWaypointsType;
@@ -33,7 +34,8 @@ export type DrawWaypointsOptions = Options & DrawWaypointsType;
 export class DrawWaypointsControl extends Toggle {
   private drawInteraction: Draw;
   private overlayLayer: VectorLayer;
-  private drawEnd: (event: Coordinate[]) => void | undefined;
+  private drawStart: () => void | undefined;
+  private drawEnd: () => void | undefined;
   private onDrawNewWaypoint: (event: Coordinate[]) => void | undefined;
   lengthOverlay: Overlay | undefined;
   lengthElement: HTMLElement | undefined;
@@ -50,6 +52,7 @@ export class DrawWaypointsControl extends Toggle {
   constructor(options: DrawWaypointsOptions) {
     super(options);
 
+    this.drawStart = options.onDrawStart;
     this.drawEnd = options.onDrawEnd;
     this.onDrawNewWaypoint = options.onDrawNewWaypoint;
 
@@ -94,6 +97,7 @@ export class DrawWaypointsControl extends Toggle {
           this.tip = 'Click to Add New Waypoint';
           map.addInteraction(this.drawInteraction);
           map.addLayer(this.overlayLayer);
+          this.drawStart();
         }
       }
     } else {
@@ -102,6 +106,7 @@ export class DrawWaypointsControl extends Toggle {
         if (this.drawInteraction) {
           map.removeInteraction(this.drawInteraction);
           this.getMap()?.removeLayer(this.overlayLayer);
+          this.drawEnd();
         }
       }
     }
@@ -127,6 +132,7 @@ export class DrawWaypointsControl extends Toggle {
     if (this.drawInteraction) {
       this.getMap()?.removeInteraction(this.drawInteraction);
       this.getMap()?.removeLayer(this.overlayLayer);
+      this.drawEnd();
     }
   }
 

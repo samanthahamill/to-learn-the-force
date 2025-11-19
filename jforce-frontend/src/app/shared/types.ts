@@ -1,7 +1,7 @@
 export interface AOIType {
   lat: number;
   lon: number;
-  altitude: number;
+  alt: number;
   radius: number;
 }
 
