@@ -63,6 +63,11 @@ $table-height: 240px;
   min-width: 1100px;
 }
 
+.row {
+  padding-left: style.$panel-padding;
+  padding-right: style.$panel-padding;
+}
+
 .waypoint {
   max-height: $waypoint-row-height;
   overflow: auto;

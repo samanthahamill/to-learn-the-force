@@ -15,7 +15,10 @@ import { PlatformCardComponent } from '../platform/platform-card.component';
 import { DialogConfirmationService } from '../../../services/dialog-confirmation.service';
 import { AoiCardComponent } from '../aoi/aoi-card.component';
 import { UntilDestroy } from '@ngneat/until-destroy';
-import { getNewPlatformFormGroup } from '../../../shared/create';
+import {
+  formGroupPlatformToPlatformType,
+  getNewPlatformFormGroup,
+} from '../../../shared/create';
 
 @UntilDestroy()
 @Component({
@@ -127,7 +130,9 @@ export class ScenarioInputCardComponent {
   }
 
   duplicatePlatform(index: number) {
-    this.addPlatform({ ...this.platforms.value[index] });
+    this.addPlatform(
+      formGroupPlatformToPlatformType({ ...this.platforms.value[index] }),
+    );
   }
 
   removeAllPlatforms() {

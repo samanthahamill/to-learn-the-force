@@ -6,7 +6,7 @@ import {
   UserInputFormData,
   Waypoint,
 } from '../shared/types';
-import { addHours, createWaypointId } from '../shared/utils';
+import { addHours } from '../shared/utils';
 import { FormGroup } from '@angular/forms';
 
 const BASIC_FORM_DATA: UserInputFormData = {

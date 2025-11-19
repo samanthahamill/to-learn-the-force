@@ -15,7 +15,7 @@ import {
 import { UserStateService } from '../../../services/user-state.service';
 import {
   addHours,
-  createWaypointId,
+  createNewWaypointId,
   deepClone,
   MAP_PROJECTION,
 } from '../../../shared/utils';
@@ -311,8 +311,8 @@ export class PlatformDialogComponent
 
     const newCoordinates: Waypoint[] = points.map((point, i) => {
       return {
-        id: createWaypointId(
-          this.platformName ?? 'platform',
+        id: createNewWaypointId(
+          this.platformData?.platform.id ?? this.platformName ?? 'platform',
           this.platformData?.platform?.waypoints ?? [],
         ),
         lat: point[0],
@@ -331,10 +331,7 @@ export class PlatformDialogComponent
 
   dragPointOnMap(coord: Coordinate, waypointId: string) {
     if (waypointId && waypointId !== '' && this.platformData) {
-      console.log(this.waypoints);
       const newCoordinates = this.waypoints.map((point) => {
-        console.log(`point.id ${point.id}`);
-        console.log(`waypointId ${waypointId}`);
         if (point.id === waypointId) {
           return {
             ...point,
@@ -373,8 +370,8 @@ export class PlatformDialogComponent
       if (this.waypoints === undefined) {
         this.platformData.platform.waypoints = [
           {
-            id: createWaypointId(
-              this.platformName ?? 'platform',
+            id: createNewWaypointId(
+              this.platformData?.platform.id ?? this.platformName ?? 'platform',
               this.platformData.platform.waypoints,
             ),
             index: 0,
@@ -387,8 +384,8 @@ export class PlatformDialogComponent
         ];
       } else {
         this.waypoints.push({
-          id: createWaypointId(
-            this.platformName ?? 'platform',
+          id: createNewWaypointId(
+            this.platformData?.platform.id ?? this.platformName ?? 'platform',
             this.platformData.platform.waypoints,
           ),
           index: this.waypoints.length,

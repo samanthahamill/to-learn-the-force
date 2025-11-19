@@ -366,6 +366,8 @@ export class BaseMapComponent implements OnInit, OnDestroy {
       });
     });
 
+    console.log(features);
+
     this.platformWaypointSource.addFeatures(features);
   }
 

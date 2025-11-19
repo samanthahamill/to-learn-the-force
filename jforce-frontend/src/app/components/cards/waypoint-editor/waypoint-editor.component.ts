@@ -30,7 +30,7 @@ import View from 'ol/View';
 import * as Styled from 'ol/style';
 import {
   addHours,
-  createWaypointId,
+  createNewWaypointId,
   MAP_PROJECTION,
 } from '../../../shared/utils';
 import CircleStyle from 'ol/style/Circle';
@@ -117,6 +117,10 @@ export class WaypointEditorComponent extends BaseMapComponent {
     super.ngOnInit();
   }
 
+  get platformId() {
+    return this.waypointPlatformData?.platform.id;
+  }
+
   get platformName() {
     return this.waypointPlatformData?.platform.name;
   }
@@ -172,8 +176,8 @@ export class WaypointEditorComponent extends BaseMapComponent {
 
     const newCoordinates: Waypoint[] = points.map((point, i) => {
       return {
-        id: createWaypointId(
-          this.platformName ?? 'platform',
+        id: createNewWaypointId(
+          this.platformId ?? this.platformName ?? 'platform',
           this.waypointPlatformData?.waypoints ?? [],
         ),
         lat: point[0],
@@ -192,10 +196,7 @@ export class WaypointEditorComponent extends BaseMapComponent {
 
   dragPointOnMap(coord: Coordinate, waypointId: string) {
     if (waypointId && waypointId !== '' && this.waypointPlatformData) {
-      console.log(this.waypoints);
       const newCoordinates = this.waypoints.map((point) => {
-        console.log(`point.id ${point.id}`);
-        console.log(`waypointId ${waypointId}`);
         if (point.id === waypointId) {
           return {
             ...point,
@@ -227,8 +228,8 @@ export class WaypointEditorComponent extends BaseMapComponent {
       if (this.waypoints === undefined) {
         this.waypointPlatformData.waypoints = [
           {
-            id: createWaypointId(
-              this.platformName ?? 'platform',
+            id: createNewWaypointId(
+              this.platformId ?? this.platformName ?? 'platform',
               this.waypointPlatformData?.waypoints,
             ),
             index: 0,
@@ -241,8 +242,8 @@ export class WaypointEditorComponent extends BaseMapComponent {
         ];
       } else {
         this.waypoints.push({
-          id: createWaypointId(
-            this.platformName ?? 'platform',
+          id: createNewWaypointId(
+            this.platformId ?? this.platformName ?? 'platform',
             this.waypointPlatformData?.waypoints,
           ),
           index: this.waypoints.length,

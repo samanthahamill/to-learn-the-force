@@ -94,13 +94,6 @@
           <div class="col-4"></div>
           <div class="col-4 waypoint-title"><h1>Waypoints</h1></div>
           <div class="col-4 icons">
-            <!-- <fa-icon
-              [icon]="editIcon"
-              (click)="openWaypointModal()"
-              title="Edit Waypoints"
-              class="icon-button"
-            ></fa-icon> -->
-
             <fa-icon
               *ngIf="!waypointsLocked"
               [icon]="lockOpenIcon"

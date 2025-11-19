@@ -4,7 +4,6 @@ import { ClassificationBannerComponent } from './components/classification-banne
 import { CommonModule } from '@angular/common';
 import { DialogConfirmationComponent } from './components/pop-ups/dialog-confirmation/dialog-confirmation.component';
 import { ToastComponent } from './components/pop-ups/toast/toast.component';
-import { WaypointDialogComponent } from './components/pop-ups/waypoint-dialog/waypoint-dialog.component';
 import { PlatformDialogComponent } from './components/pop-ups/platform-dialog/platform-dialog.component';
 
 @Component({
@@ -15,7 +14,6 @@ import { PlatformDialogComponent } from './components/pop-ups/platform-dialog/pl
     MainContentComponent,
     ToastComponent,
     ClassificationBannerComponent,
-    WaypointDialogComponent,
     PlatformDialogComponent,
   ],
   templateUrl: './app.component.html',

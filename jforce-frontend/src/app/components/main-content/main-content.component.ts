@@ -164,8 +164,13 @@ export class MainContentComponent {
               }),
               platforms: this.fb.array([
                 ...(input.scenario?.scenarioInput.platforms.map(
-                  (platform: Platform) =>
-                    getNewPlatformFormGroup(this.fb, platform.name, platform),
+                  (platform: Platform, i: number) =>
+                    getNewPlatformFormGroup(
+                      this.fb,
+                      platform.name,
+                      platform,
+                      platform.id,
+                    ),
                 ) ?? []),
               ]),
             }),
