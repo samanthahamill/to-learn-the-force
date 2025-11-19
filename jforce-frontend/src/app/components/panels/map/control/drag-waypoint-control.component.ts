@@ -29,9 +29,8 @@ export class DragWaypointsControl extends Toggle {
   handleToggle(activated: boolean) {
     if (activated) {
       this.select = new Select({
-        filter: function (feature, layer) {
-          console.log(feature);
-          return feature.get('draggable') !== false;
+        filter: function (feature) {
+          return feature.get('draggable');
         },
       });
       this.translate = new Translate({

@@ -303,12 +303,15 @@ export class PlatformDialogComponent
     this.reportSource.clear();
 
     const features = this.waypoints.map((waypoint) => {
-      return this.createWaypointFeature(
+      const feature = this.createWaypointFeature(
         waypoint,
         this.platformData!.platform,
         this.name,
         this.color,
       );
+
+      feature.set('draggable', true);
+      return feature;
     });
 
     this.reportSource.addFeatures(features);
