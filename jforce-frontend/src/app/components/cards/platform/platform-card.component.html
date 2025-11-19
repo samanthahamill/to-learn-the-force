@@ -18,59 +18,13 @@
             [readonly]="readonly"
             class="name"
           />
-        </div>
-        <div class="col">
+
           <label tooltip="Type" for="type">Type</label>
           <select formControlName="type" id="type" size="small">
             <option *ngFor="let option of platformTypeOptions" [value]="option">
               {{ option }}
             </option>
           </select>
-        </div>
-        <div class="col">
-          <input
-            id="friendly"
-            type="checkbox"
-            formControlName="friendly"
-            (change)="onUpdate()"
-            class="checkbox"
-          />
-          <label for="friendly">Is Friendly</label>
-        </div>
-      </div>
-      <div class="row-1 mutli-col">
-        <div *ngIf="platformType == 'AIR'" class="col">
-          <label for="maxAlt">Max Alt</label>
-          <input
-            class="input-small"
-            id="maxAlt"
-            type="number"
-            formControlName="maxAlt"
-            (blur)="onUpdate()"
-            [readonly]="readonly"
-          />
-        </div>
-        <div *ngIf="platformType == 'MARITIME'" class="col">
-          <label for="maxDepth">Max Depth</label>
-          <input
-            class="input-small"
-            id="maxDepth"
-            type="number"
-            formControlName="maxDepth"
-            (blur)="onUpdate()"
-            [readonly]="readonly"
-          />
-        </div>
-        <div class="col">
-          <label for="maxSpeed">Max Speed</label>
-          <input
-            class="input-small"
-            id="maxSpeed"
-            type="number"
-            formControlName="maxSpeed"
-            (blur)="onUpdate()"
-            [readonly]="readonly"
-          />
         </div>
         <div class="col">
           <label for="reportingFrequency">Reporting Freq</label>
@@ -82,22 +36,64 @@
             (blur)="onUpdate()"
             [readonly]="readonly"
           />
+          <label for="maxSpeed">Max Speed</label>
+          <input
+            class="input-small"
+            id="maxSpeed"
+            type="number"
+            formControlName="maxSpeed"
+            (blur)="onUpdate()"
+            [readonly]="readonly"
+          />
+          <div class="col-inner" *ngIf="platformType == 'AIR'">
+            <label for="maxAlt">Max Alt</label>
+            <input
+              class="input-small"
+              id="maxAlt"
+              type="number"
+              formControlName="maxAlt"
+              (blur)="onUpdate()"
+              [readonly]="readonly"
+            />
+          </div>
+          <div class="col-inner" *ngIf="platformType == 'MARITIME'">
+            <label for="maxDepth">Max Depth</label>
+            <input
+              class="input-small"
+              id="maxDepth"
+              type="number"
+              formControlName="maxDepth"
+              (blur)="onUpdate()"
+              [readonly]="readonly"
+            />
+          </div>
+        </div>
+        <div class="col">
+          <div>
+            <input
+              id="friendly"
+              type="checkbox"
+              formControlName="friendly"
+              (change)="onUpdate()"
+              class="checkbox"
+            />
+            <label for="friendly">Is Friendly</label>
+          </div>
+
+          <div *ngIf="!shouldShowWaypointTableRows" class="row waypoint-count">
+            <div class="col waypoint-count">
+              <label for="maxDepth"
+                >Waypoint Count: {{ getWaypointCount() }}</label
+              >
+            </div>
+          </div>
         </div>
       </div>
-      <div class="row-1 table-row">
+      <div *ngIf="shouldShowWaypointTableRows" class="row-1 table-row">
         <div class="waypoint-header row-1">
           <div class="col-4"></div>
           <div class="col-4 waypoint-title"><h1>Waypoints</h1></div>
           <div class="col-4 icons">
-            <fa-icon
-              [icon]="editIcon"
-              (click)="openModal()"
-              title="Edit Waypoints"
-              class="icon-button"
-            ></fa-icon>
-
-            <!-- data-toggle="modal"
-              data-target="#exampleModal" -->
             <fa-icon
               *ngIf="!waypointsLocked"
               [icon]="lockOpenIcon"
@@ -114,7 +110,7 @@
             ></fa-icon>
           </div>
         </div>
-        <div *ngIf="shouldShowWaypointTableRows" class="table-responsive">
+        <div class="table-responsive">
           <table
             class="table table-striped table-dark table-hover table-condensed"
           >

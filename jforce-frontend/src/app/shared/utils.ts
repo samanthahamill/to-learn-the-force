@@ -33,20 +33,24 @@ export const RED_COLORS = [
   [173, 56, 7],
 ];
 
-export function createWaypointId(
-  platformName: string,
+export function getPlatformIdFormat(platformId: string, index: number): string {
+  return `${platformId}-waypoint-${index}`;
+}
+
+export function createNewWaypointId(
+  platformId: string,
   waypoints: Waypoint[],
 ): string {
   let newIndex = waypoints.length ?? 0;
   let foundId = false;
-  let newId = `${platformName}-waypoint-${newIndex}`;
+  let newId = getPlatformIdFormat(platformId, newIndex);
 
   if (waypoints === undefined || waypoints.length == 0) {
     return newId;
   }
 
   while (!foundId) {
-    newId = `${platformName}-waypoint-${newIndex}`;
+    newId = getPlatformIdFormat(platformId, newIndex);
     if (!waypoints.map((waypoint) => waypoint.id).includes(newId)) {
       foundId = true;
     } else {

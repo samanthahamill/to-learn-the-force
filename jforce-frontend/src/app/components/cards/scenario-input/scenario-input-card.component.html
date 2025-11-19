@@ -1,5 +1,27 @@
 <app-card header="Scenario Input">
   <form class="formGroup" [formGroup]="scenarioInput">
+    <app-card [innerCard]="true" header="Info">
+      <div class="row-1 mutli-col">
+        <div class="col">
+          <label name="startTime" for="startTime"> Start Time </label>
+          <input
+            type="datetime-local"
+            formControlName="startTime"
+            id="startTime"
+            (blur)="onUpdated()"
+          />
+        </div>
+        <div class="col">
+          <label name="endTime" for="endTime"> End Time </label>
+          <input
+            type="datetime-local"
+            formControlName="endTime"
+            id="endTime"
+            (blur)="onUpdated()"
+          />
+        </div>
+      </div>
+    </app-card>
     <app-aoi-card
       [aoiFormGroup]="getFormGroup('aoi')"
       [formUpdated]="onUpdated.bind(this)"

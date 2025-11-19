@@ -90,9 +90,10 @@ $content-panel-height: calc(
     $classification-banner-height
 );
 $default-margin: 4px;
+$grid-gutter-width: 1rem;
+
 $panel-margin: 4px;
 $panel-padding: 2px;
-
 $panel-width: calc(50vw - ($panel-margin * 4));
 $panel-height: calc(
   100vh - ($panel-margin * 2) - ($classification-banner-height * 2)
@@ -106,6 +107,12 @@ body {
 
 input {
   margin-left: 4px;
+  width: 100%;
+  border-radius: 5px;
+}
+
+label {
+  white-space: nowrap;
 }
 
 .ag-center-cols-viewport {
@@ -119,20 +126,17 @@ input {
   padding: 8px 12px;
 }
 
-input {
-  width: 100%;
-  border-radius: 5px;
-}
-
-label {
-  white-space: nowrap;
-}
-
 .checkbox {
   width: 13px;
 }
 
-$grid-gutter-width: 1rem;
+.modal-content {
+  background-color: $background-dark !important; /* Replace with your color code */
+}
+
+.modal-footer {
+  background-color: $background-dark !important; /* Replace with your color code */
+}
 
 /* Importing Bootstrap SCSS file. */
 @import "bootstrap/scss/bootstrap";

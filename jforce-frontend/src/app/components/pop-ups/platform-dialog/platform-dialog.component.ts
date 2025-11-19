@@ -1,68 +1,96 @@
 import {
+  AfterViewInit,
   Component,
   EventEmitter,
-  Input,
+  inject,
   NO_ERRORS_SCHEMA,
+  OnInit,
   Output,
 } from '@angular/core';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { WaypointEditorInformation } from '../../../services/waypoint-editor.service';
 import {
-  DragDropModule,
+  PlatformEditorInformation,
+  PlatformEditorService,
+} from '../../../services/platform-editor.service';
+import { UserStateService } from '../../../services/user-state.service';
+import {
+  addHours,
+  createNewWaypointId,
+  deepClone,
+  MAP_PROJECTION,
+} from '../../../shared/utils';
+import {
   CdkDragDrop,
+  DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {
+  Platform,
+  PLATFORM_TYPE,
+  PLATFORM_TYPE_OPTIONS,
+  Waypoint,
+} from '../../../shared/types';
+import { CardComponent } from '../../cards/card.component';
+import { BaseMapComponent } from '../../panels/map/base-map.component';
 import {
   faRemove,
   faCopy,
   faAdd,
   faObjectGroup,
 } from '@fortawesome/free-solid-svg-icons';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Waypoint } from '../../../shared/types';
-import VectorSource from 'ol/source/Vector';
-import VectorLayer from 'ol/layer/Vector';
-import Fill from 'ol/style/Fill';
-import Style from 'ol/style/Style';
-import View from 'ol/View';
-import * as Styled from 'ol/style';
-import {
-  addHours,
-  createNewWaypointId,
-  MAP_PROJECTION,
-} from '../../../shared/utils';
-import CircleStyle from 'ol/style/Circle';
-import { DrawWaypointsControl } from '../../panels/map/control/draw-waypoints-control.component';
 import { Coordinate } from 'ol/coordinate';
-import { BaseMapComponent } from '../../panels/map/base-map.component';
-import { DragWaypointsControl } from '../../panels/map/control/drag-waypoint-control.component';
+import VectorLayer from 'ol/layer/Vector';
 import { toFixed } from 'ol/math';
+import VectorSource from 'ol/source/Vector';
+import { Style, Fill } from 'ol/style';
+import CircleStyle from 'ol/style/Circle';
+import { DragWaypointsControl } from '../../panels/map/control/drag-waypoint-control.component';
+import { DrawWaypointsControl } from '../../panels/map/control/draw-waypoints-control.component';
+import * as Styled from 'ol/style';
+import { ColorPickerModule } from 'primeng/colorpicker';
+import {
+  formGroupWaypointToWaypointArray,
+  formGroupWaypointToWaypointType,
+} from '../../../shared/create';
+
+declare var $: any;
 
 @UntilDestroy()
 @Component({
-  selector: 'app-waypoint-editor',
+  selector: 'app-platform-dialog',
   imports: [
     CommonModule,
     DragDropModule,
     FontAwesomeModule,
     FormsModule,
     ReactiveFormsModule,
+    CardComponent,
+    ColorPickerModule,
   ],
-  templateUrl: './waypoint-editor.component.html',
-  styleUrl: './waypoint-editor.component.scss',
+  templateUrl: './platform-dialog.component.html',
+  styleUrl: './platform-dialog.component.scss',
   schemas: [NO_ERRORS_SCHEMA],
 })
-export class WaypointEditorComponent extends BaseMapComponent {
-  @Input() waypointPlatformData: WaypointEditorInformation | undefined;
+export class PlatformDialogComponent
+  extends BaseMapComponent
+  implements AfterViewInit
+{
+  platformData: PlatformEditorInformation | undefined;
+  platformEditorService = inject(PlatformEditorService);
+  userState = inject(UserStateService);
+
   @Output() waypointPlatformDataUpdated =
-    new EventEmitter<WaypointEditorInformation>();
+    new EventEmitter<PlatformEditorInformation>();
 
   removeIcon = faRemove;
   copyIcon = faCopy;
   addIcon = faAdd;
   groupObject = faObjectGroup;
+
+  platformTypeOptions = PLATFORM_TYPE_OPTIONS;
 
   reportSource: VectorSource = new VectorSource();
   reportLayer: VectorLayer;
@@ -70,8 +98,20 @@ export class WaypointEditorComponent extends BaseMapComponent {
   private dragWaypointControl: DragWaypointsControl;
 
   allowDraw: boolean;
-  theresAnError: boolean;
+  theresAnError: boolean = false;
+  errorMessage: string | undefined;
 
+  type: PLATFORM_TYPE | undefined = undefined;
+  maxSpeed: number | undefined = undefined;
+  maxDepth: number | undefined = undefined;
+  maxAlt: number | undefined = undefined;
+  friendly: boolean | undefined = undefined;
+  color: string | undefined = undefined;
+
+  reportingFrequency: number | undefined = undefined;
+  name: string | undefined = undefined;
+
+  // add waypoint information
   latInput: number | undefined = undefined;
   lonInput: number | undefined = undefined;
   altInput: number | undefined = undefined;
@@ -79,7 +119,16 @@ export class WaypointEditorComponent extends BaseMapComponent {
   speedInput: number | undefined = undefined;
 
   constructor() {
-    super('mapContainerWaypoints');
+    super('mapContainerPlatform');
+
+    this.name = this.platformData?.platform.name;
+    this.maxSpeed = this.platformData?.platform.maxSpeed;
+    this.maxDepth = this.platformData?.platform.maxDepth;
+    this.maxAlt = this.platformData?.platform.maxAlt;
+    this.friendly = this.platformData?.platform.friendly;
+    this.color = this.platformData?.platform.color;
+    this.type = this.platformData?.platform.type;
+    this.reportingFrequency = this.platformData?.platform.reportingFrequency;
 
     this.reportSource = new VectorSource();
     this.reportLayer = new VectorLayer({
@@ -94,8 +143,8 @@ export class WaypointEditorComponent extends BaseMapComponent {
       // Ruler Icon
       html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M128 252.6C128 148.4 214 64 320 64C426 64 512 148.4 512 252.6C512 371.9 391.8 514.9 341.6 569.4C329.8 582.2 310.1 582.2 298.3 569.4C248.1 514.9 127.9 371.9 127.9 252.6zM320 320C355.3 320 384 291.3 384 256C384 220.7 355.3 192 320 192C284.7 192 256 220.7 256 256C256 291.3 284.7 320 320 320z"/></svg>`,
       title: 'Draw Waypoint Tool',
-      onDrawEnd: (points) => this.onDrawEnd(points),
-      onDrawNewWaypoint: (points) => this.onDrawEnd(points),
+      onDrawEnd: () => this.onDrawEnd(),
+      onDrawNewWaypoint: (points) => this.onDrawNewWaypoint(points),
     });
     this.dragWaypointControl = new DragWaypointsControl({
       className: 'ol-drag-waypoint-control',
@@ -106,27 +155,44 @@ export class WaypointEditorComponent extends BaseMapComponent {
         this.dragPointOnMap(points, waypointId);
       },
       onUpdateFinished: () => {
-        this.waypointPlatformDataUpdated.emit(this.waypointPlatformData!);
+        this.waypointPlatformDataUpdated.emit(this.platformData!);
       },
     });
+
+    this.platformEditorService.platformInformation$
+      .pipe(untilDestroyed(this))
+      .subscribe((info: PlatformEditorInformation | undefined) => {
+        if (info !== undefined) {
+          this.platformData = {
+            platform: {
+              ...info.platform,
+              waypoints: deepClone(info.platform.waypoints),
+            },
+            platformIndex: info.platformIndex,
+          };
+
+          this.renderWaypoints();
+          this.updateData();
+          this.openModal();
+        }
+      });
 
     this.renderWaypoints();
   }
 
-  override ngOnInit() {
-    super.ngOnInit();
+  updateData() {
+    this.name = this.platformData?.platform.name;
+    this.maxSpeed = this.platformData?.platform.maxSpeed;
+    this.maxDepth = this.platformData?.platform.maxDepth;
+    this.maxAlt = this.platformData?.platform.maxAlt;
+    this.friendly = this.platformData?.platform.friendly;
+    this.color = this.platformData?.platform.color;
+    this.type = this.platformData?.platform.type;
+    this.reportingFrequency = this.platformData?.platform.reportingFrequency;
   }
 
-  get platformId() {
-    return this.waypointPlatformData?.platform.id;
-  }
-
-  get platformName() {
-    return this.waypointPlatformData?.platform.name;
-  }
-
-  get waypoints(): Waypoint[] {
-    return this.waypointPlatformData?.waypoints ?? [];
+  ngAfterViewInit(): void {
+    this.color = this.platformData?.platform.color;
   }
 
   override customLayers() {
@@ -137,15 +203,94 @@ export class WaypointEditorComponent extends BaseMapComponent {
     return [this.drawWaypointControl, this.dragWaypointControl];
   }
 
-  renderWaypoints() {
-    if (!this.reportLayer || this.waypointPlatformData === undefined) return;
+  override updateTracks() {
+    if (!this.platformWaypointLayer) return;
 
+    this.platformWaypointSource.clear();
+
+    const features = this.data
+      .filter(
+        (platform) =>
+          this.platformData?.platform.id == undefined ||
+          platform.id !== this.platformData?.platform.id,
+      )
+      .flatMap((platform) => {
+        return platform.waypoints.flatMap((waypoint, i) => {
+          return this.createWaypointFeature(
+            waypoint,
+            platform,
+            i == platform.waypoints.length - 1 ? platform.name : undefined,
+            'gray',
+          );
+        });
+      });
+
+    this.platformWaypointSource.addFeatures(features);
+  }
+
+  get platform(): Platform | undefined {
+    return this.platformData?.platform;
+  }
+
+  get platformType(): PLATFORM_TYPE {
+    return this.platformData!.platform.type;
+  }
+
+  get platformName(): string {
+    return this.platformData?.platform.name ?? '';
+  }
+
+  get waypoints(): Waypoint[] {
+    return this.platformData?.platform.waypoints ?? [];
+  }
+
+  platformDataUpdated(waypointPlatformData: PlatformEditorInformation) {
+    this.platformData = {
+      ...this.platformData!,
+      platform: {
+        ...this.platformData!.platform,
+        waypoints: waypointPlatformData.platform.waypoints,
+      },
+    };
+  }
+
+  closeAndSaveModal() {
+    if (this.platformData) {
+      // TODO validate everything
+      // if not valid, display error message
+      // if valid, update user service
+      const platform = this.platformData.platform;
+
+      this.userStateService.updatePlatform(this.platformData.platformIndex, {
+        ...platform, // handles 'id' and 'readonly' which should not be changed
+        name: this.name ?? platform.name,
+        type: this.type ?? platform.type,
+        maxSpeed: this.maxSpeed ?? platform.maxSpeed,
+        maxDepth: this.maxDepth ?? platform.maxDepth,
+        maxAlt: this.maxAlt ?? platform.maxAlt,
+        friendly: this.friendly ?? platform.friendly,
+        color: this.color ?? platform.color,
+        waypoints: this.waypoints
+          ? formGroupWaypointToWaypointArray(this.waypoints)
+          : formGroupWaypointToWaypointArray(platform.waypoints),
+        reportingFrequency:
+          this.reportingFrequency ?? platform.reportingFrequency,
+      } as Platform);
+    }
+    this.closeModal();
+  }
+
+  renderWaypoints() {
+    if (!this.reportLayer || this.platformData === undefined) return;
+
+    this.reportSource.clear();
     const features: any[] = [];
     this.waypoints.forEach((waypoint) => {
       const feature = this.createWaypointFeature(
         waypoint,
-        this.waypointPlatformData!.platform,
-        this.waypointPlatformData!.platform.name,
+        this.platformData!.platform,
+        this.platformData!.platform.name,
+        this.color,
       );
       features.push(feature);
     });
@@ -168,17 +313,20 @@ export class WaypointEditorComponent extends BaseMapComponent {
     });
   }
 
-  onDrawEnd(points: Coordinate[]) {
+  onDrawEnd() {
+    this.updateData();
+  }
+
+  onDrawNewWaypoint(points: Coordinate[]) {
     const waypoints = this.waypoints;
     const lastPoint: Waypoint | undefined =
       this.waypoints[waypoints.length - 1];
-    const waypointLastIndex = waypoints.length - 1;
 
     const newCoordinates: Waypoint[] = points.map((point, i) => {
       return {
         id: createNewWaypointId(
-          this.platformId ?? this.platformName ?? 'platform',
-          this.waypointPlatformData?.waypoints ?? [],
+          this.platformData?.platform.id ?? this.platformName ?? 'platform',
+          this.waypoints ?? [],
         ),
         lat: point[0],
         lon: point[1],
@@ -187,7 +335,7 @@ export class WaypointEditorComponent extends BaseMapComponent {
         datetime: !lastPoint?.datetime
           ? new Date()
           : addHours(new Date(lastPoint.datetime), 1),
-        index: waypointLastIndex + i,
+        index: waypoints.length,
       } as Waypoint;
     });
 
@@ -195,7 +343,7 @@ export class WaypointEditorComponent extends BaseMapComponent {
   }
 
   dragPointOnMap(coord: Coordinate, waypointId: string) {
-    if (waypointId && waypointId !== '' && this.waypointPlatformData) {
+    if (waypointId && waypointId !== '' && this.platformData) {
       const newCoordinates = this.waypoints.map((point) => {
         if (point.id === waypointId) {
           return {
@@ -207,18 +355,25 @@ export class WaypointEditorComponent extends BaseMapComponent {
         return point;
       });
 
-      this.waypointPlatformData = {
-        ...this.waypointPlatformData,
-        waypoints: newCoordinates,
+      this.platformData = {
+        ...this.platformData,
+        platform: {
+          ...this.platformData.platform,
+          waypoints: newCoordinates,
+        },
       };
     }
+  }
+
+  ngModelChange(event: any) {
+    this.renderWaypoints();
   }
 
   // non-map functions
 
   addWaypoint() {
     if (
-      this.waypointPlatformData &&
+      this.platformData?.platform &&
       this.latInput &&
       this.lonInput &&
       this.speedInput &&
@@ -226,11 +381,11 @@ export class WaypointEditorComponent extends BaseMapComponent {
       this.datetimeInput
     ) {
       if (this.waypoints === undefined) {
-        this.waypointPlatformData.waypoints = [
+        this.platformData.platform.waypoints = [
           {
             id: createNewWaypointId(
-              this.platformId ?? this.platformName ?? 'platform',
-              this.waypointPlatformData?.waypoints ?? [],
+              this.platformData?.platform.id ?? this.platformName ?? 'platform',
+              this.waypoints,
             ),
             index: 0,
             lat: this.latInput,
@@ -243,8 +398,8 @@ export class WaypointEditorComponent extends BaseMapComponent {
       } else {
         this.waypoints.push({
           id: createNewWaypointId(
-            this.platformId ?? this.platformName ?? 'platform',
-            this.waypointPlatformData?.waypoints ?? [],
+            this.platformData?.platform.id ?? this.platformName ?? 'platform',
+            this.waypoints,
           ),
           index: this.waypoints.length,
           lat: this.latInput,
@@ -284,10 +439,10 @@ export class WaypointEditorComponent extends BaseMapComponent {
   }
 
   validateWaypointValues() {
-    if (this.waypointPlatformData?.waypoints == undefined) return;
+    if (this.platformData?.platform?.waypoints == undefined) return;
     this.theresAnError = false;
 
-    for (const waypoint of this.waypointPlatformData?.waypoints) {
+    for (const waypoint of this.platformData.platform.waypoints) {
       if (
         waypoint === null ||
         waypoint.alt == null ||
@@ -302,12 +457,16 @@ export class WaypointEditorComponent extends BaseMapComponent {
     }
   }
 
-  override get platformDataToDisplay() {
-    return this.data.filter(
-      (platform) =>
-        this.waypointPlatformData?.platform.id &&
-        platform.id !== this.waypointPlatformData?.platform.id,
-    );
+  openModal() {
+    $('#platformModal').modal('show');
+  }
+
+  closeModal() {
+    this.drawWaypointControl.deactivate();
+    this.drawWaypointControl.setActive(false);
+    this.dragWaypointControl.deactivate();
+    this.dragWaypointControl.setActive(false);
+    $('#platformModal').modal('hide');
   }
 
   override destroyMap() {

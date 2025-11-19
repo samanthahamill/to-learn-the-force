@@ -324,10 +324,6 @@ export class BaseMapComponent implements OnInit, OnDestroy {
     }
   }
 
-  get platformDataToDisplay() {
-    return this.data;
-  }
-
   updateVectors() {
     if (!this.platformWaypointLayer) return;
 
@@ -373,11 +369,12 @@ export class BaseMapComponent implements OnInit, OnDestroy {
     waypoint: Waypoint,
     platform: Platform,
     label?: string,
+    presetColor?: string,
   ) {
     const pt = point([waypoint.lon, waypoint.lat], {}, { id: waypoint.id });
     const feature = this.geoJson.readFeature(pt) as Feature;
 
-    const color = platform.color;
+    const color = presetColor ?? platform.color;
 
     feature.setStyle([
       new Styled.Style({
@@ -393,40 +390,30 @@ export class BaseMapComponent implements OnInit, OnDestroy {
         }),
       }),
       new Styled.Style({
-        text: this.showTrackLabels
-          ? new Styled.Text({
-              text: label,
-              font: '12px sans-serif',
-              fill: new Styled.Fill({
-                color: 'black',
-              }),
-              stroke: new Styled.Stroke({
-                color: 'white',
-                width: 3,
-              }),
-              offsetX: 15,
-              offsetY: 15,
-              textAlign: 'center',
-            })
-          : undefined,
+        text:
+          this.showTrackLabels &&
+          waypoint.index === platform.waypoints.length - 1
+            ? new Styled.Text({
+                text: label,
+                font: '12px sans-serif',
+                fill: new Styled.Fill({
+                  color: 'black',
+                }),
+                stroke: new Styled.Stroke({
+                  color: 'white',
+                  width: 3,
+                }),
+                offsetX: 15,
+                offsetY: 15,
+                textAlign: 'center',
+              })
+            : undefined,
       }),
     ]);
 
     feature.set('label', label);
 
     return feature;
-  }
-
-  getColorIndex(platformId: string, friendly: boolean): number[] {
-    const uid = '0000'.substr(String(platformId).length) + platformId;
-    const hash =
-      uid.charCodeAt(0) +
-      uid.charCodeAt(1) * 3 +
-      uid.charCodeAt(2) * 5 +
-      uid.charCodeAt(3) * 7;
-    return friendly
-      ? GREEN_COLORS[hash % GREEN_COLORS.length]
-      : RED_COLORS[hash % RED_COLORS.length];
   }
 
   destroyMap() {

@@ -24,13 +24,17 @@ const tipStyle = new Style({
   }),
 });
 
-export type DrawWaypointsType = { onDrawEnd: (evt: any) => void };
+export type DrawWaypointsType = {
+  onDrawEnd: (evt: any) => void;
+  onDrawNewWaypoint: (evt: any) => void;
+};
 export type DrawWaypointsOptions = Options & DrawWaypointsType;
 
 export class DrawWaypointsControl extends Toggle {
   private drawInteraction: Draw;
   private overlayLayer: VectorLayer;
   private drawEnd: (event: Coordinate[]) => void | undefined;
+  private onDrawNewWaypoint: (event: Coordinate[]) => void | undefined;
   lengthOverlay: Overlay | undefined;
   lengthElement: HTMLElement | undefined;
   centerPoint: Array<number> | undefined;
@@ -47,6 +51,7 @@ export class DrawWaypointsControl extends Toggle {
     super(options);
 
     this.drawEnd = options.onDrawEnd;
+    this.onDrawNewWaypoint = options.onDrawNewWaypoint;
 
     this.source = new VectorSource();
     this.overlayLayer = new VectorLayer({
@@ -68,12 +73,12 @@ export class DrawWaypointsControl extends Toggle {
       const points = geometry.getCoordinates().map((coord) => {
         const coordinate = transform(coord, viewProjection, PROJECTION_TYPE);
         return [
-          new Decimal(coordinate[0]).toDecimalPlaces(2).toNumber(),
           new Decimal(coordinate[1]).toDecimalPlaces(2).toNumber(),
+          new Decimal(coordinate[0]).toDecimalPlaces(2).toNumber(),
         ] as Coordinate;
       });
 
-      this.drawEnd(points);
+      this.onDrawNewWaypoint(points);
     });
 
     options.onToggle = (val: boolean) => this.handleToggle(val);
@@ -116,6 +121,13 @@ export class DrawWaypointsControl extends Toggle {
   override setMap(map: Map) {
     super.setMap(map);
     this.map = map;
+  }
+
+  deactivate() {
+    if (this.drawInteraction) {
+      this.getMap()?.removeInteraction(this.drawInteraction);
+      this.getMap()?.removeLayer(this.overlayLayer);
+    }
   }
 
   onDestroy(): void {

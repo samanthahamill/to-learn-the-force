@@ -1,33 +1,24 @@
-import {
-  AfterViewInit,
-  Component,
-  EventEmitter,
-  inject,
-  Input,
-  NO_ERRORS_SCHEMA,
-  OnInit,
-  Output,
-} from '@angular/core';
+import { Component, inject, Input, NO_ERRORS_SCHEMA } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
-  FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
-  Validators,
 } from '@angular/forms';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { faAdd, faTable, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { ButtonModule } from 'primeng/button';
-import { Platform, Waypoint } from '../../../shared/types';
+import { Platform } from '../../../shared/types';
 import { CardComponent, ICON_FUNCTION } from '../card.component';
 import { PlatformCardComponent } from '../platform/platform-card.component';
 import { DialogConfirmationService } from '../../../services/dialog-confirmation.service';
 import { AoiCardComponent } from '../aoi/aoi-card.component';
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { getNewPlatformFormGroup } from '../../../shared/create';
-import { UserStateService } from '../../../services/user-state.service';
+import { UntilDestroy } from '@ngneat/until-destroy';
+import {
+  formGroupPlatformToPlatformType,
+  getNewPlatformFormGroup,
+} from '../../../shared/create';
 
 @UntilDestroy()
 @Component({
@@ -57,7 +48,6 @@ export class ScenarioInputCardComponent {
   icons: Array<ICON_FUNCTION>;
 
   private confirmationService = inject(DialogConfirmationService);
-  private userStateService = inject(UserStateService);
   shouldShowWaypointTableRows: boolean = true;
 
   constructor(private fb: FormBuilder) {
@@ -135,14 +125,14 @@ export class ScenarioInputCardComponent {
 
   addPlatform(platform?: Platform) {
     const name = this.getNewPlatformName();
-
-    // TODO implement
     this.platforms.push(getNewPlatformFormGroup(this.fb, name, platform));
     this.formUpdated();
   }
 
   duplicatePlatform(index: number) {
-    this.addPlatform({ ...this.platforms.value[index] });
+    this.addPlatform(
+      formGroupPlatformToPlatformType({ ...this.platforms.value[index] }),
+    );
   }
 
   removeAllPlatforms() {

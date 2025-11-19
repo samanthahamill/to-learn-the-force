@@ -32,6 +32,11 @@ export interface Platform {
 }
 
 export type PLATFORM_TYPE = 'GROUND' | 'MARITIME' | 'AIR';
+export const PLATFORM_TYPE_OPTIONS: Array<PLATFORM_TYPE> = [
+  'AIR',
+  'GROUND',
+  'MARITIME',
+];
 
 export interface UserInputFormData {
   scenario: {
@@ -42,6 +47,8 @@ export interface UserInputFormData {
       details: string;
     };
     scenarioInput: {
+      startTime: Date;
+      endTime: Date;
       aoi: AOIType;
       platforms: Array<Platform>;
     };
@@ -85,6 +92,6 @@ export interface Waypoint {
   lon: number;
   alt: number;
   speedKts: number;
-  datetime: string; // should there be a start/end time? Possibly a different type
+  datetime: Date; // should there be a start/end time? Possibly a different type
   index: number; // backend variable only to ensure proper ordering
 }

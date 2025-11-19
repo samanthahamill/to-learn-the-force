@@ -2,13 +2,8 @@
 @use "styles" as style;
 @use "variables" as customVars;
 
-input {
-  margin-left: style.$default-margin;
-}
-
 select {
   border-radius: 5px;
-  margin-left: style.$default-margin;
   height: 23.68px;
 }
 
@@ -51,8 +46,29 @@ th:not(:first-child) {
   border-bottom-width: 0 !important;
 }
 
+.checkbox {
+  margin: 4px;
+  margin-left: 0px;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: style.$panel-padding;
+}
+
+.col-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
 .container {
   margin-top: style.$panel-margin;
+  padding: 0px;
 }
 
 .icon-disabled {
@@ -75,8 +91,14 @@ th:not(:first-child) {
   width: 50px;
 }
 
+.mutli-col {
+  display: flex;
+  justify-content: space-between;
+}
+
 .name {
-  min-width: 150px;
+  min-width: 100px;
+  width: 50%;
 }
 
 .table-disabled {
@@ -101,9 +123,10 @@ th:not(:first-child) {
   width: 100%;
 }
 
-.mutli-col {
+.waypoint-count {
   display: flex;
-  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
 }
 
 .waypoint-header {

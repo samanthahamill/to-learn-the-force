@@ -6,7 +6,7 @@ import {
   UserInputFormData,
   Waypoint,
 } from '../shared/types';
-import { addHours, createWaypointId } from '../shared/utils';
+import { addHours } from '../shared/utils';
 import { FormGroup } from '@angular/forms';
 
 const BASIC_FORM_DATA: UserInputFormData = {
@@ -18,6 +18,8 @@ const BASIC_FORM_DATA: UserInputFormData = {
       details: '',
     },
     scenarioInput: {
+      startTime: addHours(new Date(), -10),
+      endTime: new Date(),
       aoi: {
         lat: 0,
         lon: 0,
@@ -26,7 +28,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
       },
       platforms: [
         {
-          name: 'test',
+          name: 'Test',
           id: 'test',
           readonly: false,
           maxSpeed: 0,
@@ -42,7 +44,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
               lat: 2,
               lon: 2,
               alt: 1,
-              datetime: new Date().toISOString(),
+              datetime: new Date(),
               index: 0,
               speedKts: 13,
             },
@@ -51,7 +53,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
               lat: 1,
               lon: 1,
               alt: 1,
-              datetime: addHours(new Date(), 1).toISOString(),
+              datetime: addHours(new Date(), 1),
               index: 1,
               speedKts: 13,
             },
@@ -60,7 +62,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
               lat: 1,
               lon: 0,
               alt: 1,
-              datetime: addHours(new Date(), 2).toISOString(),
+              datetime: addHours(new Date(), 2),
               index: 2,
               speedKts: 13,
             },
@@ -199,6 +201,35 @@ export class UserStateService {
       const platforms = inputValue?.scenario.scenarioInput.platforms;
       if (platforms !== undefined) {
         platforms[platformIndex].waypoints = waypointInfo;
+
+        store.update((state) => ({
+          ...state,
+          input:
+            state.input == undefined
+              ? undefined
+              : {
+                  // TODO fix me... trying to update waypoints
+                  ...state.input,
+                  scenario: {
+                    ...state.input.scenario,
+                    scenarioInput: {
+                      ...state.input.scenario.scenarioInput,
+                      platforms: platforms,
+                    },
+                  },
+                },
+        }));
+      }
+    }
+  }
+
+  updatePlatform(platformIndex: number, platformInfo: Platform) {
+    if (platformIndex !== undefined && platformInfo !== undefined) {
+      const inputValue = store.value.input;
+
+      const platforms = inputValue?.scenario.scenarioInput.platforms;
+      if (platforms !== undefined) {
+        platforms[platformIndex] = platformInfo;
 
         store.update((state) => ({
           ...state,

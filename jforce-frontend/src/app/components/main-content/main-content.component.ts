@@ -15,8 +15,12 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ToastService } from '../../services/toast.service';
 import { UserStateService } from '../../services/user-state.service';
 import { ExternalComponent } from '../panels/external/external.component';
-import { AOIType, Platform, UserInputFormData } from '../../shared/types';
-import { getNewPlatformFormGroup } from '../../shared/create';
+import { Platform, UserInputFormData } from '../../shared/types';
+import {
+  createFormDateString,
+  formGroupPlatformsToPlatformArray,
+  getNewPlatformFormGroup,
+} from '../../shared/create';
 
 @UntilDestroy()
 @Component({
@@ -62,12 +66,41 @@ export class MainContentComponent {
         .get('input')
         ?.get('scenario') as FormGroup;
 
+      const scenarioInput = inputGroup?.get('scenarioInput')?.value;
+      const baseInfo = inputGroup?.get('baseInfo')?.value;
+      const platforms = scenarioInput?.platforms;
+      const external = this.formGroup.get('input')?.get('external')?.value;
+
       this.userStateService.updateInput({
         scenario: {
-          baseInfo: inputGroup?.get('baseInfo')?.value ?? {},
-          scenarioInput: inputGroup?.get('scenarioInput')?.value ?? {},
+          baseInfo: baseInfo
+            ? {
+                ...baseInfo,
+                dateOfCreation: new Date(baseInfo.dateOfCreation),
+              }
+            : {},
+          scenarioInput: scenarioInput
+            ? {
+                ...scenarioInput,
+                startTime: new Date(scenarioInput.startTime),
+                endTime: new Date(scenarioInput.endTime),
+                platforms: formGroupPlatformsToPlatformArray(platforms),
+              }
+            : {},
         },
-        external: this.formGroup.get('input')?.get('external') ?? {},
+        external: external
+          ? {
+              ...external,
+              newStartTime: new Date(external.newStartTime),
+              import: external.import
+                ? {
+                    ...external.import,
+                    ogStartTime: new Date(external.import.ogStartTime),
+                    ogEndTime: new Date(external.import.ogEndTime),
+                  }
+                : {},
+            }
+          : {},
       } as UserInputFormData);
     }
   }
@@ -88,8 +121,9 @@ export class MainContentComponent {
                 { validators: Validators.required },
               ), // TODO eventually pull this from user profile and don't allow to be edited
               dateOfCreation: new FormControl(
-                input.scenario?.baseInfo?.dateOfCreation ??
-                  new Date().toISOString(),
+                createFormDateString(
+                  input.scenario?.baseInfo?.dateOfCreation ?? new Date(),
+                ),
                 { validators: Validators.required }, // TODO eventually don't hardcode this
               ),
               details: new FormControl(
@@ -98,6 +132,18 @@ export class MainContentComponent {
               ),
             }),
             scenarioInput: this.fb.group({
+              startTime: new FormControl(
+                createFormDateString(
+                  input.scenario?.scenarioInput?.startTime ?? new Date(),
+                ),
+                { validators: Validators.required },
+              ),
+              endTime: new FormControl(
+                createFormDateString(
+                  input.scenario?.scenarioInput?.endTime ?? new Date(),
+                ),
+                { validators: Validators.required },
+              ),
               aoi: this.fb.group({
                 lat: new FormControl(
                   input.scenario?.scenarioInput?.aoi.lat ?? 0,
@@ -119,7 +165,12 @@ export class MainContentComponent {
               platforms: this.fb.array([
                 ...(input.scenario?.scenarioInput.platforms.map(
                   (platform: Platform, i: number) =>
-                    getNewPlatformFormGroup(this.fb, platform.name, platform),
+                    getNewPlatformFormGroup(
+                      this.fb,
+                      platform.name,
+                      platform,
+                      platform.id,
+                    ),
                 ) ?? []),
               ]),
             }),
@@ -133,16 +184,20 @@ export class MainContentComponent {
         external: this.fb.group({
           dataType: new FormControl(input.external?.dataType ?? 'IMPORT'),
           newStartTime: new FormControl(
-            input.external?.newStartTime ?? new Date(),
+            createFormDateString(input.external?.newStartTime ?? new Date()),
             { validators: Validators.required },
           ),
           import: this.fb.group({
             ogStartTime: new FormControl(
-              input.external?.import?.ogStartTime ?? new Date(),
+              createFormDateString(
+                input.external?.import?.ogStartTime ?? new Date(),
+              ),
               { validators: Validators.required },
             ),
             ogEndTime: new FormControl(
-              input.external?.import?.ogEndTime ?? new Date(),
+              createFormDateString(
+                input.external?.import?.ogEndTime ?? new Date(),
+              ),
               { validators: Validators.required },
             ),
             type1: new FormControl(input.external?.import?.type1 ?? false, {

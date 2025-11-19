@@ -5,19 +5,30 @@ import {
   Validators,
 } from '@angular/forms';
 import { Platform, Waypoint } from './types';
-import { createWaypointId } from './utils';
+import { getPlatformIdFormat } from './utils';
+
+export function createFormDateString(date: Date): string {
+  return (date as Date).toISOString().substring(0, 16);
+}
 
 export function getNewPlatformFormGroup(
   fb: FormBuilder,
   platformName: string,
   platform?: Platform,
+  platformId?: string,
 ): FormGroup {
+  const compliantPlatformId = (platformId ?? platformName)
+    .replace(' ', '-')
+    .toLowerCase();
+
   // TODO implement
   return fb.group({
     name: new FormControl(platform?.name ?? platformName, {
       validators: Validators.required,
     }),
-    id: new FormControl(platformName, { validators: Validators.required }), // TODO make better id,
+    id: new FormControl(compliantPlatformId, {
+      validators: Validators.required,
+    }), // TODO make better id,
     maxSpeed: new FormControl(platform?.maxSpeed ?? '', {
       validators: Validators.required,
     }),
@@ -36,33 +47,30 @@ export function getNewPlatformFormGroup(
     friendly: new FormControl(platform?.friendly ?? true, {
       validators: Validators.required,
     }),
-    waypoints: fb.array(
-      platform?.waypoints.map((waypoint: Waypoint) =>
-        createNewWaypoint(fb, platform.name, waypoint.index, waypoint),
-      ) ?? [],
-    ),
     reportingFrequency: new FormControl(platform?.reportingFrequency ?? 0, {
       validators: Validators.required,
     }),
     readonly: new FormControl(platform?.readonly ?? false, {
       validators: Validators.required,
     }), // TODO change to be dynamic once they can add platforms from a predesigned list
+    waypoints: fb.array(
+      platform?.waypoints.map((waypoint: Waypoint, i: number) =>
+        createNewWaypointFormGroup(fb, compliantPlatformId, i, waypoint),
+      ) ?? [],
+    ),
   });
 }
 
-export function createNewWaypoint(
+export function createNewWaypointFormGroup(
   fb: FormBuilder,
-  platformName: string,
+  platformId: string,
   waypointIndex?: number,
   waypoint?: Waypoint,
-) {
+): FormGroup {
   return fb.group({
-    id: new FormControl(
-      waypoint?.id ?? `${platformName}-waypoint-${waypointIndex}`,
-      {
-        validators: Validators.required,
-      },
-    ),
+    id: new FormControl(getPlatformIdFormat(platformId, waypointIndex ?? 0), {
+      validators: Validators.required,
+    }),
     lat: new FormControl(waypoint?.lat ?? 0, {
       validators: Validators.required,
     }),
@@ -72,9 +80,12 @@ export function createNewWaypoint(
     alt: new FormControl(waypoint?.alt ?? 0, {
       validators: Validators.required,
     }),
-    datetime: new FormControl(waypoint?.datetime ?? new Date().toISOString(), {
-      validators: Validators.required,
-    }),
+    datetime: new FormControl(
+      createFormDateString(waypoint?.datetime ?? new Date()),
+      {
+        validators: Validators.required,
+      },
+    ),
     index: new FormControl(waypointIndex ?? waypoint?.index ?? 0, {
       validators: Validators.required,
     }),
@@ -82,4 +93,34 @@ export function createNewWaypoint(
       validators: Validators.required,
     }),
   });
+}
+
+export function formGroupPlatformsToPlatformArray(platforms: any): Platform[] {
+  return platforms
+    ? platforms.map((platform: any) => {
+        return formGroupPlatformToPlatformType(platform);
+      })
+    : [];
+}
+
+export function formGroupPlatformToPlatformType(platform: any): Platform {
+  return {
+    ...platform,
+    waypoints: formGroupWaypointToWaypointArray(platform.waypoints),
+  };
+}
+
+export function formGroupWaypointToWaypointArray(waypoints: any): Waypoint[] {
+  return waypoints
+    ? waypoints.map((waypoint: any) => {
+        return formGroupWaypointToWaypointType(waypoint);
+      })
+    : [];
+}
+
+export function formGroupWaypointToWaypointType(waypoint: any): Waypoint {
+  return {
+    ...waypoint,
+    datetime: new Date(waypoint.datetime),
+  };
 }
