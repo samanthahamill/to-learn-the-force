@@ -15,6 +15,10 @@ import { deepClone } from '../../../shared/utils';
 
 declare var $: any;
 
+/**
+ * @deprecated - deprecated for now because of PlatformDialog utilizing all the functionality
+ *                actions should either be to delete, or to reimplement if specific 'waypoint editing' is desired
+ */
 @UntilDestroy()
 @Component({
   selector: 'app-waypoint-dialog',
