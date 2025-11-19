@@ -77,10 +77,6 @@ export class ScenarioInputCardComponent {
     ];
   }
 
-  onUpdated(): void {
-    this.formUpdated();
-  }
-
   get platforms(): FormArray {
     return this.scenarioInput.get('platforms') as FormArray;
   }
@@ -92,6 +88,10 @@ export class ScenarioInputCardComponent {
   // In your component class
   get formGroups(): FormGroup[] {
     return (this.platforms?.controls as FormGroup[]) ?? [];
+  }
+
+  onUpdated(): void {
+    this.formUpdated();
   }
 
   getFormGroup(formGroup: string): FormGroup {

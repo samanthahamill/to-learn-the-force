@@ -79,7 +79,8 @@ export class PlatformDialogComponent
   private platformEditorService = inject(PlatformEditorService);
   private systemStateService = inject(SystemStateService);
 
-  maxDateTime: Date;
+  maxDateTime: string;
+  minDateTime: string;
 
   @Output() waypointPlatformDataUpdated =
     new EventEmitter<PlatformEditorInformation>();
@@ -120,7 +121,16 @@ export class PlatformDialogComponent
   constructor() {
     super('mapContainerPlatform');
 
-    this.maxDateTime = this.systemStateService.maxDate;
+    this.maxDateTime = this.userStateService.maxDate;
+    this.minDateTime = this.userStateService.minDate;
+
+    this.userStateService.minDate$
+      .pipe(untilDestroyed(this))
+      .subscribe((val) => (this.minDateTime = val));
+
+    this.userStateService.maxDate$
+      .pipe(untilDestroyed(this))
+      .subscribe((val) => (this.maxDateTime = val));
 
     this.name = this.platformData?.platform.name;
     this.maxSpeed = this.platformData?.platform.maxSpeed;
@@ -332,7 +342,7 @@ export class PlatformDialogComponent
         speedKts: lastPoint?.speedKts ?? 0,
         datetime: !lastPoint?.datetime
           ? new Date()
-          : lastPoint.datetime < minusHours(this.maxDateTime, 1)
+          : lastPoint.datetime < minusHours(new Date(this.maxDateTime), 1)
             ? addHours(new Date(lastPoint.datetime), 1)
             : lastPoint.datetime,
         index: waypoints.length,
@@ -495,14 +505,18 @@ export class PlatformDialogComponent
       return false;
     }
 
-    // validate waypoints
-    const invalidWapointDate = this.waypoints.find(
-      (waypoint) => waypoint.datetime > this.maxDateTime,
-    );
+    const earliestTime = new Date(this.minDateTime);
+    const latestTime = new Date(this.maxDateTime);
 
-    if (invalidWapointDate) {
-      this.errorMessage = `Waypoint with index ${invalidWapointDate.index} has a date that is greater than today's date. Future scenarios are not yet available for processing. Please change this date to be earlier than today's date.`;
-      return false;
+    for (let waypoint of this.waypoints) {
+      if (waypoint.datetime < earliestTime) {
+        this.errorMessage = `Waypoint with index ${waypoint.index} has a date that is earlier than the scenario start time.`;
+        return false;
+      }
+      if (waypoint.datetime > latestTime) {
+        this.errorMessage = `Waypoint with index ${waypoint.index} has a date that is later than the scenario end time.`;
+        return false;
+      }
     }
 
     this.errorMessage = undefined;

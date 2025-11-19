@@ -128,6 +128,11 @@ export class PlatformCardComponent implements AfterViewInit {
     return this.platformForm?.get('readonly')?.value;
   }
 
+  getDateTimeString(date: Date) {
+    console.log(date);
+    return date?.toISOString() ?? '';
+  }
+
   ngAfterViewInit(): void {
     this.platformForm?.valueChanges.pipe(untilDestroyed(this)).subscribe(() => {
       const type = this.platformForm?.controls['type'].value as PLATFORM_TYPE;

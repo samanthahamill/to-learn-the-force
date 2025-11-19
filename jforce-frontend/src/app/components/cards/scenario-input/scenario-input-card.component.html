@@ -1,4 +1,4 @@
-<app-card header="Scenario Input">
+<app-card header="Scenario Input" class="main-content">
   <form class="formGroup" [formGroup]="scenarioInput">
     <app-card [innerCard]="true" header="Info">
       <div class="row-1 mutli-col">
@@ -9,6 +9,7 @@
             formControlName="startTime"
             id="startTime"
             (blur)="onUpdated()"
+            [format]="24"
           />
         </div>
         <div class="col">

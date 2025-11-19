@@ -33,6 +33,15 @@ export const RED_COLORS = [
   [173, 56, 7],
 ];
 
+/**
+ * Form strings are typically in the format of YYYY-MM-DDTHH:mm
+ * when we need YYYY-MM-DDTHH:mm:ss.000Z
+ * @param date
+ */
+export function createISODateFromFormString(date: string): Date {
+  return new Date(`${date}:00.000Z`);
+}
+
 export function getPlatformIdFormat(platformId: string, index: number): string {
   return `${platformId}-waypoint-${index}`;
 }

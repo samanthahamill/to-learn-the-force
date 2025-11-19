@@ -8,6 +8,7 @@ import {
 } from '../shared/types';
 import { addHours, minusHours } from '../shared/utils';
 import { FormGroup } from '@angular/forms';
+import { createFormDateString } from '../shared/create';
 
 const BASIC_FORM_DATA: UserInputFormData = {
   scenario: {
@@ -18,7 +19,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
       details: '',
     },
     scenarioInput: {
-      startTime: addHours(new Date(), -10),
+      startTime: minusHours(new Date(), 48),
       endTime: new Date(),
       aoi: {
         lat: 0,
@@ -43,7 +44,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
               lat: 2,
               lon: 2,
               z: 1,
-              datetime: minusHours(new Date(), 12),
+              datetime: minusHours(new Date(), 22),
               index: 0,
               speedKts: 13,
             },
@@ -52,7 +53,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
               lat: 1,
               lon: 1,
               z: 1,
-              datetime: minusHours(new Date(), 11),
+              datetime: minusHours(new Date(), 17),
               index: 1,
               speedKts: 13,
             },
@@ -92,7 +93,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
               lat: 2,
               lon: 3,
               z: 1,
-              datetime: addHours(new Date(), 1),
+              datetime: addHours(new Date(), 10),
               index: 1,
               speedKts: 13,
             },
@@ -101,7 +102,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
               lat: 2,
               lon: 4,
               z: 1,
-              datetime: addHours(new Date(), 2),
+              datetime: addHours(new Date(), 4),
               index: 2,
               speedKts: 13,
             },
@@ -115,6 +116,8 @@ const BASIC_FORM_DATA: UserInputFormData = {
 interface UserStoreState {
   input: UserInputFormData | undefined;
   aoi: AOIType | undefined;
+  maxDate: string;
+  minDate: string;
 }
 
 export interface ChangeAOIRequest {
@@ -128,6 +131,8 @@ const store = createStore(
   withProps<UserStoreState>({
     input: BASIC_FORM_DATA,
     aoi: undefined,
+    maxDate: createFormDateString(new Date()),
+    minDate: createFormDateString(minusHours(new Date(), 48)),
   }),
 );
 
@@ -137,6 +142,8 @@ const store = createStore(
 export class UserStateService {
   input$ = store.pipe(select((state) => state.input));
   aoi$ = store.pipe(select((state) => state.aoi));
+  maxDate$ = store.pipe(select((state) => state.maxDate));
+  minDate$ = store.pipe(select((state) => state.minDate));
 
   constructor() {
     store.update((state) => ({
@@ -154,9 +161,19 @@ export class UserStateService {
     return store.value.input?.scenario?.scenarioInput?.platforms?.length ?? 0;
   }
 
+  get minDate() {
+    return store.value.minDate;
+  }
+
+  get maxDate() {
+    return store.value.maxDate;
+  }
+
   updateInput(input: UserInputFormData) {
     store.update((state) => ({
       ...state,
+      minDate: createFormDateString(input.scenario.scenarioInput.startTime),
+      maxDate: createFormDateString(input.scenario.scenarioInput.endTime),
       input: input,
       aoi:
         input?.scenario?.scenarioInput?.aoi ??

@@ -3,7 +3,6 @@ import { InputPanelComponent } from '../panels/input-panel/input-panel.component
 import { MapComponent } from '../panels/map/map.component';
 import { CommonModule, NgIf } from '@angular/common';
 import {
-  FormArray,
   FormBuilder,
   FormControl,
   FormGroup,
@@ -21,6 +20,7 @@ import {
   formGroupPlatformsToPlatformArray,
   getNewPlatformFormGroup,
 } from '../../shared/create';
+import { createISODateFromFormString } from '../../shared/utils';
 
 @UntilDestroy()
 @Component({
@@ -76,14 +76,16 @@ export class MainContentComponent {
           baseInfo: baseInfo
             ? {
                 ...baseInfo,
-                dateOfCreation: new Date(baseInfo.dateOfCreation),
+                dateOfCreation: createISODateFromFormString(
+                  baseInfo.dateOfCreation,
+                ),
               }
             : {},
           scenarioInput: scenarioInput
             ? {
                 ...scenarioInput,
-                startTime: new Date(scenarioInput.startTime),
-                endTime: new Date(scenarioInput.endTime),
+                startTime: createISODateFromFormString(scenarioInput.startTime),
+                endTime: createISODateFromFormString(scenarioInput.endTime),
                 platforms: formGroupPlatformsToPlatformArray(platforms),
               }
             : {},
@@ -91,12 +93,16 @@ export class MainContentComponent {
         external: external
           ? {
               ...external,
-              newStartTime: new Date(external.newStartTime),
+              newStartTime: createISODateFromFormString(external.newStartTime),
               import: external.import
                 ? {
                     ...external.import,
-                    ogStartTime: new Date(external.import.ogStartTime),
-                    ogEndTime: new Date(external.import.ogEndTime),
+                    ogStartTime: createISODateFromFormString(
+                      external.import.ogStartTime,
+                    ),
+                    ogEndTime: createISODateFromFormString(
+                      external.import.ogEndTime,
+                    ),
                   }
                 : {},
             }
