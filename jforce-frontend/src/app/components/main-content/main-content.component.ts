@@ -91,7 +91,7 @@ export class MainContentComponent {
         external: external
           ? {
               ...external,
-              newStartTime: external,
+              newStartTime: new Date(external.newStartTime),
               import: external.import
                 ? {
                     ...external.import,
