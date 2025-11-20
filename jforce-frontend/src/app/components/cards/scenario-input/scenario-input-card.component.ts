@@ -66,7 +66,7 @@ export class ScenarioInputCardComponent {
         tooltip: 'Delete All Platforms',
         onClick: () =>
           this.confirmationService.confirmAction(
-            this.removeAllPlatforms,
+            () => this.removeAllPlatforms(),
             () => {},
             'Are you sure you want to delete all platforms from this scenario?',
             'Delete All Platforms Confirmation',
@@ -140,6 +140,13 @@ export class ScenarioInputCardComponent {
   }
 
   removePlatform(index: number) {
-    this.platforms.removeAt(index);
+    this.confirmationService.confirmAction(
+      () => this.platforms.removeAt(index),
+      () => {},
+      `Are you sure you want to delete platform ${this.platforms.at(index)?.value.name} from this scenario?`,
+      `Delete ${this.platforms.at(index)?.value.name} Confirmation`,
+      `Delete ${this.platforms.at(index)?.value.name}`,
+      `Platform ${this.platforms.at(index)?.value.name} successfully removed from scenario`,
+    );
   }
 }
