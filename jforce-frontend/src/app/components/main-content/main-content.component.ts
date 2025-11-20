@@ -20,7 +20,7 @@ import {
   getNewPlatformFormGroup,
 } from '../../shared/create';
 import { createISODateFromFormString } from '../../shared/utils';
-import { InfoPanelComponent } from '../panels/info/info-panel.component';
+import { InfoDialogComponent } from '../pop-ups/info-dialog/info-dialog.component';
 import { ScenarioInputPanelComponent } from '../panels/scenario-input/scenario-input-panel.component';
 
 @UntilDestroy()
@@ -110,19 +110,6 @@ export class MainContentComponent {
     if (input !== null) {
       console.log('Form Updated');
       this.formGroup = this.fb.group({
-        metadata: this.fb.group({
-          scenarioAuthor: new FormControl(
-            input.metadata?.scenarioAuthor ?? 'TBD',
-            { validators: Validators.required },
-          ), // TODO eventually pull this from user profile and don't allow to be edited
-          dateOfCreation: new FormControl(
-            createFormDateString(input.metadata?.dateOfCreation ?? new Date()),
-            { validators: Validators.required }, // TODO eventually don't hardcode this
-          ),
-          details: new FormControl(input.metadata?.details ?? '', {
-            validators: Validators.required,
-          }),
-        }),
         scenarioInput: this.fb.group({
           scenarioName: new FormControl(
             input.scenarioInput?.scenarioName ?? 'Default Scenario',

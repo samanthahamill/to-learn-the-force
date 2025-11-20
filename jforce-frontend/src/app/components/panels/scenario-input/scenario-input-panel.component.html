@@ -19,7 +19,7 @@
       [formGroup]="scenarioInput"
       (ngSubmit)="onSubmit()"
     >
-      <app-card header="Info">
+      <app-card header="Info" [icons]="infoIcons">
         <div class="row-1">
           <div class="col">
             <label name="scenarioName" for="scenarioName">
@@ -92,7 +92,10 @@
           </div>
         </div>
       </app-card>
-      <app-card header="Platforms ({{ platformCount }})" [icons]="icons">
+      <app-card
+        header="Platforms ({{ platformCount }})"
+        [icons]="platformIcons"
+      >
         <div class="platform-inner">
           <div *ngFor="let platformForm of formGroups; let i = index">
             <div *ngIf="platformForm != undefined">

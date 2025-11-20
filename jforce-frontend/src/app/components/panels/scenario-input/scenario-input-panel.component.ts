@@ -26,6 +26,7 @@ import {
   getNewPlatformFormGroup,
 } from '../../../shared/create';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { DialogEditorService } from '../../../services/dialog-editor.service';
 
 @UntilDestroy()
 @Component({
@@ -56,10 +57,11 @@ export class ScenarioInputPanelComponent {
   importIcon = faDownload;
   infoIcon = faInfoCircle;
 
-  icons: Array<ICON_FUNCTION>;
+  platformIcons: Array<ICON_FUNCTION>;
   infoIcons: Array<ICON_FUNCTION>;
 
   private confirmationService = inject(DialogConfirmationService);
+  private dialogService = inject(DialogEditorService);
   shouldShowWaypointTableRows: boolean = true;
 
   constructor(private fb: FormBuilder) {
@@ -69,12 +71,12 @@ export class ScenarioInputPanelComponent {
         type: 'NONE',
         tooltip: 'Edit scenario metadata',
         onClick: () => {
-          // todo pop up dialog to add metadata information
+          this.dialogService.showMetadataDialog();
         },
       },
     ];
 
-    this.icons = [
+    this.platformIcons = [
       {
         icon: this.tableIcon,
         type: 'NONE',

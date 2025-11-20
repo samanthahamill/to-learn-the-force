@@ -11,19 +11,12 @@
       </div>
 
       <div class="col">
-        <!-- <app-info-panel
-          class="thirty-three-percent"
-          [formGroup]="getFormGroup('metadata')"
-          [formUpdated]="onUpdated.bind(this)"
-        /> -->
         <!-- TODO add form group -->
         <app-external-card
-          class="thirty-three-percent"
           [formGroup]="getFormGroup('external')"
           [formUpdated]="onUpdated.bind(this)"
         />
-        <!-- Not part of the form. If possible, would be ideal to move -->
-        <app-map class="thirty-three-percent" />
+        <app-map />
       </div>
     </div>
   </form>

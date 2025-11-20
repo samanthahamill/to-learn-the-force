@@ -35,9 +35,8 @@ import {
 } from '@angular/cdk/drag-drop';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { WaypointEditorService } from '../../../services/waypoint-editor.service';
 import { createNewWaypointId } from '../../../shared/utils';
-import { PlatformEditorService } from '../../../services/platform-editor.service';
+import { DialogEditorService } from '../../../services/dialog-editor.service';
 
 @UntilDestroy()
 @Component({
@@ -79,8 +78,7 @@ export class PlatformCardComponent implements AfterViewInit {
   icons: Array<ICON_FUNCTION>;
   defaultColor: string | undefined = undefined; // default color at the time the platform was made
 
-  private waypointEditorService = inject(WaypointEditorService);
-  private platformEditorService = inject(PlatformEditorService);
+  private dialogEditorService = inject(DialogEditorService);
 
   constructor() {
     this.icons = [
@@ -203,16 +201,8 @@ export class PlatformCardComponent implements AfterViewInit {
     this.waypointsLocked = !this.waypointsLocked;
   }
 
-  openWaypointModal() {
-    this.waypointEditorService.updateWaypointAndOpenDialog(
-      this.waypoints,
-      this.platformForm.value,
-      this.index,
-    );
-  }
-
   editPlatformClicked() {
-    this.platformEditorService.updatePlatformAndOpenDialog(
+    this.dialogEditorService.updatePlatformAndOpenDialog(
       this.platformForm.value,
       this.index,
     );

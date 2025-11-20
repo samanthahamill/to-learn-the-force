@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { createStore, select, withProps } from '@ngneat/elf';
 import {
   AOIType,
+  METADATA,
   Platform,
   UserInputFormData,
   Waypoint,
@@ -167,6 +168,10 @@ export class UserStateService {
     return store.value.maxDate;
   }
 
+  get metadata() {
+    return store.value.input?.metadata;
+  }
+
   updateInput(input: UserInputFormData) {
     store.update((state) => ({
       ...state,
@@ -177,6 +182,19 @@ export class UserStateService {
         input?.scenarioInput?.aoi ??
         state.aoi ??
         BASIC_FORM_DATA.scenarioInput.aoi,
+    }));
+  }
+
+  updateMetadata(metadata: METADATA) {
+    store.update((state) => ({
+      ...state,
+      input: {
+        ...state.input!,
+        metadata: {
+          ...metadata,
+          dateOfCreation: metadata.dateOfCreation,
+        },
+      },
     }));
   }
 
