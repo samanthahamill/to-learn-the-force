@@ -1,5 +1,4 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
-import { InputPanelComponent } from '../panels/input-panel/input-panel.component';
 import { MapComponent } from '../panels/map/map.component';
 import { CommonModule, NgIf } from '@angular/common';
 import {

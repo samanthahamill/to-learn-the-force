@@ -52,8 +52,8 @@ export class ScenarioInputPanelComponent {
   addIcon = faAdd;
   trashIcon = faTrash;
   tableIcon = faTable;
-  importIcon = faUpload;
-  exportIcon = faDownload;
+  exportIcon = faUpload;
+  importIcon = faDownload;
   infoIcon = faInfoCircle;
 
   icons: Array<ICON_FUNCTION>;
