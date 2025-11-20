@@ -1,10 +1,17 @@
-@use "../card.component.scss" as card;
-@use "../../panels/panel.scss";
+@use "../../cards/card.component.scss" as card;
+@use "../panel.scss";
 @use "styles" as style;
 @use "variables" as customVars;
 
 input {
-  width: 170px;
+  max-width: 170px;
+}
+
+.bottom-button {
+  position: absolute;
+  bottom: 4px;
+  display: flex;
+  justify-content: center;
 }
 
 .button {
@@ -55,7 +62,7 @@ input {
   border: 1px solid style.$light;
 }
 
-.formGroup {
+.form-group {
   display: flex;
   flex-direction: column;
 }
@@ -64,13 +71,24 @@ input {
   overflow: hidden;
 }
 
+.panel-dimensions {
+  height: calc(100% - 4px);
+}
+
 .platforms {
   margin-top: 4px;
 }
 
 .platform-inner {
   overflow-y: auto;
-  max-height: 415px;
+  // 20*2 for card header heights
+  // 28.5 for panel header height
+  // 166 for info card height
+  // 40px for submit button
+  max-height: calc(
+    100vh - 166px - (style.$classification-banner-height * 2) - (20px * 3) -
+      28.5px - (style.$panel-padding * 8) - (40px)
+  );
 }
 
 .title {

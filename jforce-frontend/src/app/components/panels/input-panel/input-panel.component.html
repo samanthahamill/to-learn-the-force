@@ -18,11 +18,11 @@
     <form *ngIf="formGroup" [formGroup]="formGroup" (ngSubmit)="onSubmit()">
       <div class="inputs">
         <app-info-card
-          [info]="getScenarioFormGroup('baseInfo')"
+          [info]="getScenarioFormGroup('metadata')"
           [formUpdated]="onUpdated.bind(this)"
         />
         <!-- TODO add form group -->
-        <app-scenario-input-card
+        <app-scenario-input-panel
           [scenarioInput]="getScenarioFormGroup('scenarioInput')"
           [formUpdated]="onUpdated.bind(this)"
         />

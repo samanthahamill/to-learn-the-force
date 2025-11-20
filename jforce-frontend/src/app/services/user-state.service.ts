@@ -11,105 +11,103 @@ import { FormGroup } from '@angular/forms';
 import { createFormDateString } from '../shared/create';
 
 const BASIC_FORM_DATA: UserInputFormData = {
-  scenario: {
-    baseInfo: {
-      scenarioName: 'Test',
-      scenarioAuthor: 'TBD',
-      dateOfCreation: new Date(),
-      details: '',
+  metadata: {
+    scenarioAuthor: 'TBD',
+    dateOfCreation: new Date(),
+    details: '',
+  },
+  scenarioInput: {
+    scenarioName: 'Test Scenario',
+    startTime: minusHours(new Date(), 48),
+    endTime: new Date(),
+    aoi: {
+      lat: 0,
+      lon: 0,
+      alt: 0,
+      radius: 450,
     },
-    scenarioInput: {
-      startTime: minusHours(new Date(), 48),
-      endTime: new Date(),
-      aoi: {
-        lat: 0,
-        lon: 0,
-        alt: 0,
-        radius: 450,
+    platforms: [
+      {
+        name: 'Test',
+        id: 'test',
+        readonly: false,
+        maxSpeed: 0,
+        maxZ: 0,
+        type: 'AIR',
+        reportingFrequency: 0,
+        friendly: true,
+        color: '#6466f1',
+        waypoints: [
+          {
+            id: 'test-waypoint-0',
+            lat: 2,
+            lon: 2,
+            z: 1,
+            datetime: minusHours(new Date(), 22),
+            index: 0,
+            speedKts: 13,
+          },
+          {
+            id: 'test-waypoint-1',
+            lat: 1,
+            lon: 1,
+            z: 1,
+            datetime: minusHours(new Date(), 17),
+            index: 1,
+            speedKts: 13,
+          },
+          {
+            id: 'test-waypoint-2',
+            lat: 1,
+            lon: 0,
+            z: 1,
+            datetime: minusHours(new Date(), 10),
+            index: 2,
+            speedKts: 13,
+          },
+        ],
       },
-      platforms: [
-        {
-          name: 'Test',
-          id: 'test',
-          readonly: false,
-          maxSpeed: 0,
-          maxZ: 0,
-          type: 'AIR',
-          reportingFrequency: 0,
-          friendly: true,
-          color: '#6466f1',
-          waypoints: [
-            {
-              id: 'test-waypoint-0',
-              lat: 2,
-              lon: 2,
-              z: 1,
-              datetime: minusHours(new Date(), 22),
-              index: 0,
-              speedKts: 13,
-            },
-            {
-              id: 'test-waypoint-1',
-              lat: 1,
-              lon: 1,
-              z: 1,
-              datetime: minusHours(new Date(), 17),
-              index: 1,
-              speedKts: 13,
-            },
-            {
-              id: 'test-waypoint-2',
-              lat: 1,
-              lon: 0,
-              z: 1,
-              datetime: minusHours(new Date(), 10),
-              index: 2,
-              speedKts: 13,
-            },
-          ],
-        },
-        {
-          name: 'Second Test',
-          id: 'second-test',
-          readonly: false,
-          maxSpeed: 0,
-          maxZ: 0,
-          type: 'GROUND',
-          reportingFrequency: 0,
-          friendly: true,
-          color: '#51e68fff',
-          waypoints: [
-            {
-              id: 'second-test-waypoint-0',
-              lat: 3,
-              lon: 1,
-              z: 1,
-              datetime: new Date(),
-              index: 0,
-              speedKts: 13,
-            },
-            {
-              id: 'second-test-waypoint-1',
-              lat: 2,
-              lon: 3,
-              z: 1,
-              datetime: addHours(new Date(), 10),
-              index: 1,
-              speedKts: 13,
-            },
-            {
-              id: 'second-test-waypoint-2',
-              lat: 2,
-              lon: 4,
-              z: 1,
-              datetime: addHours(new Date(), 4),
-              index: 2,
-              speedKts: 13,
-            },
-          ],
-        },
-      ],
-    },
+      {
+        name: 'Second Test',
+        id: 'second-test',
+        readonly: false,
+        maxSpeed: 0,
+        maxZ: 0,
+        type: 'GROUND',
+        reportingFrequency: 0,
+        friendly: true,
+        color: '#51e68fff',
+        waypoints: [
+          {
+            id: 'second-test-waypoint-0',
+            lat: 3,
+            lon: 1,
+            z: 1,
+            datetime: new Date(),
+            index: 0,
+            speedKts: 13,
+          },
+          {
+            id: 'second-test-waypoint-1',
+            lat: 2,
+            lon: 3,
+            z: 1,
+            datetime: addHours(new Date(), 10),
+            index: 1,
+            speedKts: 13,
+          },
+          {
+            id: 'second-test-waypoint-2',
+            lat: 2,
+            lon: 4,
+            z: 1,
+            datetime: addHours(new Date(), 4),
+            index: 2,
+            speedKts: 13,
+          },
+        ],
+      },
+    ],
   },
 };
 
@@ -149,7 +147,7 @@ export class UserStateService {
     store.update((state) => ({
       ...state,
       input: BASIC_FORM_DATA,
-      aoi: BASIC_FORM_DATA.scenario.scenarioInput.aoi,
+      aoi: BASIC_FORM_DATA.scenarioInput.aoi,
     }));
   }
 
@@ -158,7 +156,7 @@ export class UserStateService {
   }
 
   get platformLength() {
-    return store.value.input?.scenario?.scenarioInput?.platforms?.length ?? 0;
+    return store.value.input?.scenarioInput?.platforms?.length ?? 0;
   }
 
   get minDate() {
@@ -172,39 +170,30 @@ export class UserStateService {
   updateInput(input: UserInputFormData) {
     store.update((state) => ({
       ...state,
-      minDate: createFormDateString(input.scenario.scenarioInput.startTime),
-      maxDate: createFormDateString(input.scenario.scenarioInput.endTime),
+      minDate: createFormDateString(input.scenarioInput.startTime),
+      maxDate: createFormDateString(input.scenarioInput.endTime),
       input: input,
       aoi:
-        input?.scenario?.scenarioInput?.aoi ??
+        input?.scenarioInput?.aoi ??
         state.aoi ??
-        BASIC_FORM_DATA.scenario.scenarioInput.aoi,
+        BASIC_FORM_DATA.scenarioInput.aoi,
     }));
   }
 
   addPlatform(platform: FormGroup) {
     store.update((state) => ({
       ...state,
-      input: {
-        ...state.input,
-        scenario: {
-          ...state.input!.scenario,
-          scenarioInput: {
-            ...state.input!.scenario!.scenarioInput,
+      scenarioInput: {
+        ...state.input!.scenarioInput,
 
-            platforms: state.input!.scenario!.scenarioInput!.platforms
-              ? [
-                  ...state.input!.scenario.scenarioInput.platforms,
-                  platform.value,
-                ]
-              : [platform.value],
-          },
-        },
+        platforms: state.input!.scenarioInput!.platforms
+          ? [...state.input!.scenarioInput.platforms, platform.value]
+          : [platform.value],
       },
       aoi:
-        state.input?.scenario?.scenarioInput?.aoi ??
+        state.input?.scenarioInput?.aoi ??
         state.aoi ??
-        BASIC_FORM_DATA.scenario.scenarioInput.aoi,
+        BASIC_FORM_DATA.scenarioInput.aoi,
     }));
   }
 
@@ -237,12 +226,9 @@ export class UserStateService {
         input: state.input
           ? {
               ...state.input,
-              scenario: {
-                ...state.input?.scenario,
-                scenarioInput: {
-                  ...state.input?.scenario?.scenarioInput,
-                  aoi: newAoi,
-                },
+              scenarioInput: {
+                ...state.input?.scenarioInput,
+                aoi: newAoi,
               },
             }
           : undefined,
@@ -254,7 +240,7 @@ export class UserStateService {
     if (platformIndex !== undefined && waypointInfo !== undefined) {
       const inputValue = store.value.input;
 
-      const platforms = inputValue?.scenario.scenarioInput.platforms;
+      const platforms = inputValue?.scenarioInput.platforms;
       if (platforms !== undefined) {
         platforms[platformIndex].waypoints = waypointInfo;
 
@@ -266,12 +252,9 @@ export class UserStateService {
               : {
                   // TODO fix me... trying to update waypoints
                   ...state.input,
-                  scenario: {
-                    ...state.input.scenario,
-                    scenarioInput: {
-                      ...state.input.scenario.scenarioInput,
-                      platforms: platforms,
-                    },
+                  scenarioInput: {
+                    ...state.input.scenarioInput,
+                    platforms: platforms,
                   },
                 },
         }));
@@ -283,7 +266,7 @@ export class UserStateService {
     if (platformIndex !== undefined && platformInfo !== undefined) {
       const inputValue = store.value.input;
 
-      const platforms = inputValue?.scenario.scenarioInput.platforms;
+      const platforms = inputValue?.scenarioInput.platforms;
       if (platforms !== undefined) {
         platforms[platformIndex] = platformInfo;
 
@@ -295,12 +278,9 @@ export class UserStateService {
               : {
                   // TODO fix me... trying to update waypoints
                   ...state.input,
-                  scenario: {
-                    ...state.input.scenario,
-                    scenarioInput: {
-                      ...state.input.scenario.scenarioInput,
-                      platforms: platforms,
-                    },
+                  scenarioInput: {
+                    ...state.input.scenarioInput,
+                    platforms: platforms,
                   },
                 },
         }));

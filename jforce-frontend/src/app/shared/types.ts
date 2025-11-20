@@ -38,19 +38,17 @@ export const PLATFORM_TYPE_OPTIONS: Array<PLATFORM_TYPE> = [
 ];
 
 export interface UserInputFormData {
-  scenario: {
-    baseInfo: {
-      scenarioName: string;
-      scenarioAuthor: string;
-      dateOfCreation: Date;
-      details: string;
-    };
-    scenarioInput: {
-      startTime: Date;
-      endTime: Date;
-      aoi: AOIType;
-      platforms: Array<Platform>;
-    };
+  metadata: {
+    scenarioAuthor: string;
+    dateOfCreation: Date;
+    details: string;
+  };
+  scenarioInput: {
+    scenarioName: string;
+    startTime: Date;
+    endTime: Date;
+    aoi: AOIType;
+    platforms: Array<Platform>;
   };
   tool?: {
     isTool: boolean;

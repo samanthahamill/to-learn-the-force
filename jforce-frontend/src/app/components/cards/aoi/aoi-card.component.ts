@@ -1,16 +1,9 @@
 import { CommonModule } from '@angular/common';
-import {
-  AfterViewInit,
-  Component,
-  inject,
-  Input,
-  OnInit,
-  Output,
-} from '@angular/core';
+import { AfterViewInit, Component, inject, Input } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CardComponent } from '../card.component';
 import { UserStateService } from '../../../services/user-state.service';
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { UntilDestroy } from '@ngneat/until-destroy';
 
 @UntilDestroy()
 @Component({
@@ -21,8 +14,8 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 })
 export class AoiCardComponent implements AfterViewInit {
   @Input() aoiFormGroup!: FormGroup;
-  @Input() onInputUpdated!: (details: string) => void;
   @Input() formUpdated!: () => void;
+
   private userState = inject(UserStateService);
 
   constructor() {}

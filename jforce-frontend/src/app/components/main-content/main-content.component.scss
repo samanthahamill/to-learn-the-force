@@ -47,3 +47,7 @@ form {
   margin: 0px !important;
   padding: 0px !important;
 }
+
+.thirty-three-percent {
+  height: calc(33vh - (style.$classification-banner-height * 2 / 3) - 4px);
+}

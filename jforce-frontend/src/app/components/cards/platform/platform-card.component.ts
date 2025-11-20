@@ -5,7 +5,6 @@ import {
   inject,
   Input,
   NO_ERRORS_SCHEMA,
-  OnInit,
   Output,
 } from '@angular/core';
 import { CardComponent, ICON_FUNCTION } from '../card.component';

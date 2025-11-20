@@ -1,4 +1,5 @@
-@use "../card.component.scss" as card;
+@use "../../cards/card.component.scss" as card;
+@use "../panel.scss";
 @use "styles" as style;
 @use "variables" as customVars;
 

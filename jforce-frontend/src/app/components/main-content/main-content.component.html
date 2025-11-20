@@ -2,22 +2,28 @@
   <form *ngIf="formGroup" [formGroup]="formGroup">
     <div class="container">
       <div class="col">
-        <app-input-panel
+        <app-scenario-input-panel
           class="input-panel"
-          [formGroup]="getFormGroup('input')"
-          (onSubmit)="onSubmit()"
+          [scenarioInput]="getFormGroup('scenarioInput')"
           [formUpdated]="onUpdated.bind(this)"
+          (onSubmit)="onSubmit()"
         />
       </div>
 
       <div class="col">
+        <!-- <app-info-panel
+          class="thirty-three-percent"
+          [formGroup]="getFormGroup('metadata')"
+          [formUpdated]="onUpdated.bind(this)"
+        /> -->
         <!-- TODO add form group -->
         <app-external-card
+          class="thirty-three-percent"
           [formGroup]="getFormGroup('external')"
           [formUpdated]="onUpdated.bind(this)"
         />
         <!-- Not part of the form. If possible, would be ideal to move -->
-        <app-map />
+        <app-map class="thirty-three-percent" />
       </div>
     </div>
   </form>

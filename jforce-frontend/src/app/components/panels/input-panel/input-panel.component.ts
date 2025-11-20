@@ -6,10 +6,9 @@ import {
   Output,
 } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ScenarioInputCardComponent } from '../../cards/scenario-input/scenario-input-card.component';
+import { ScenarioInputPanelComponent } from '../scenario-input/scenario-input-panel.component';
 import { CommonModule, NgIf } from '@angular/common';
 import { faDownload, faUpload } from '@fortawesome/free-solid-svg-icons';
-import { InfoCardComponent } from '../../cards/info/info-card.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { UntilDestroy } from '@ngneat/until-destroy';
 
@@ -17,9 +16,8 @@ import { UntilDestroy } from '@ngneat/until-destroy';
 @Component({
   selector: 'app-input-panel',
   imports: [
-    ScenarioInputCardComponent,
+    ScenarioInputPanelComponent,
     FontAwesomeModule,
-    InfoCardComponent,
     CommonModule,
     NgIf,
     FormsModule,

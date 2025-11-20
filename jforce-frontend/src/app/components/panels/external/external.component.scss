@@ -8,7 +8,8 @@ h1 {
   width: 100%;
 }
 
-::ng-deep .p-buttongroup .p-button:first-of-type:not(:only-of-type) {
+::ng-deep .p-buttongroup .p-button:first-of-type:not(:only-of-type),
+::ng-deep .p-buttongroup .p-button:first-of-type:not(:only-of-type):hover {
   border-right: 2px solid;
   border-color: style.$secondary-dark;
 }
@@ -26,10 +27,6 @@ h1 {
   align-items: flex-start;
 }
 
-.form-control {
-  background-color: style.$secondary-dark;
-}
-
 .checkbox {
   margin-right: style.$default-margin;
   margin-left: style.$default-margin;
@@ -43,6 +40,10 @@ h1 {
 .downwards {
   flex-direction: column;
   display: flex;
+}
+
+.form-control {
+  background-color: style.$secondary-dark;
 }
 
 .icon {
@@ -67,6 +68,9 @@ h1 {
   border-width: 2px;
   border-radius: 5px;
   color: white;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   width: 78px;
 }
 
@@ -75,6 +79,9 @@ h1 {
   color: white;
   border-width: 2px;
   border-color: style.$light;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .primary {

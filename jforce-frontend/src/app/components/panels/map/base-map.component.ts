@@ -129,7 +129,7 @@ export class BaseMapComponent implements OnInit, OnDestroy {
     this.userStateService.input$
       .pipe(untilDestroyed(this))
       .subscribe((input) => {
-        this.data = input?.scenario?.scenarioInput?.platforms ?? [];
+        this.data = input?.scenarioInput?.platforms ?? [];
         this.updateMap();
       });
   }
