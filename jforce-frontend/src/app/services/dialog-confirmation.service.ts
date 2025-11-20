@@ -13,8 +13,6 @@ export interface ConfirmationServiceOptions {
   providedIn: 'root',
 })
 export class DialogConfirmationService {
-  // private confirmationService = inject(ConfirmationService);
-
   private dialogSubject = new Subject<ConfirmationServiceOptions | null>();
   dialogState = this.dialogSubject.asObservable();
   private toastService = inject(ToastService);

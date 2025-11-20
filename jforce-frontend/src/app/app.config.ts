@@ -11,13 +11,28 @@ import {
 } from '@angular/platform-browser';
 import { ConfirmationService } from 'primeng/api';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {
+  provideHttpClient,
+  withFetch,
+  withInterceptors,
+} from '@angular/common/http';
+import { providePrimeNG } from 'primeng/config';
+import { ProxyHeaderInterceptor } from './shared/proxy-header.interceptor';
+import Aura from '@primeng/themes/aura';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
+    importProvidersFrom([BrowserAnimationsModule]),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
     ConfirmationService,
+    provideHttpClient(withFetch(), withInterceptors([ProxyHeaderInterceptor])),
     importProvidersFrom([BrowserAnimationsModule]),
+    providePrimeNG({
+      theme: {
+        preset: Aura,
+      },
+    }),
   ],
 };

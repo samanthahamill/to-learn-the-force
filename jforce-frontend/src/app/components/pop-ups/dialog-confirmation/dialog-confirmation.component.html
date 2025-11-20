@@ -1,14 +1,15 @@
 <div
-  class="modal modal-custom"
+  class="modal fade modal-custom"
   tabindex="-1"
   role="dialog"
   #confirmationDialog
   id="confirmationDialog"
   aria-labelledby="confirmationDialogLabel"
   aria-hidden="true"
+  data-bs-backdrop="static"
 >
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="model-content">
+  <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+    <div class="modal-content modal-dimensions">
       <div class="modal-header">
         <h1 class="modal-title">{{ title }}</h1>
       </div>
@@ -16,10 +17,22 @@
         <p>{{ message }}</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn confirm" (click)="onConfirm()">
+        <button
+          type="button"
+          class="btn confirm"
+          data-dismiss="modal"
+          (click)="onConfirm()"
+        >
           Accept
         </button>
-        <button type="button" class="btn deny" (click)="onDeny()">Deny</button>
+        <button
+          type="button"
+          class="btn deny"
+          data-dismiss="modal"
+          (click)="onDeny()"
+        >
+          Deny
+        </button>
       </div>
     </div>
   </div>

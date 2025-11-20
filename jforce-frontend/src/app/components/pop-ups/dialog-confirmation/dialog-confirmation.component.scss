@@ -18,15 +18,23 @@
   background-color: style.$success-hover;
 }
 
-.custom-dialog {
-  background-color: style.$primary;
+.modal-dimensions {
+  border: 1px solid style.$light;
   border-radius: 5px;
-  border-width: 1px;
-  border-color: style.$light;
-  width: 300px;
-  height: 300px;
-  z-index: 11;
+  z-index: 2005;
+}
+
+.modal-custom {
   position: absolute;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2000;
+}
+
+.modal-content,
+.modal-body,
+.modal-header {
+  background-color: style.$background-dark;
 }
 
 .deny {

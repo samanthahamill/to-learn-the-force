@@ -1,19 +1,26 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import {
+  Component,
+  ElementRef,
+  inject,
+  NO_ERRORS_SCHEMA,
+  ViewChild,
+} from '@angular/core';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import {
   ConfirmationServiceOptions,
   DialogConfirmationService,
 } from '../../../services/dialog-confirmation.service';
+
 declare var $: any;
 
 @UntilDestroy()
 @Component({
   selector: 'app-dialog-confirmation',
-  imports: [CommonModule, ConfirmDialogModule],
+  imports: [CommonModule],
   templateUrl: './dialog-confirmation.component.html',
   styleUrl: './dialog-confirmation.component.scss',
+  schemas: [NO_ERRORS_SCHEMA],
 })
 export class DialogConfirmationComponent {
   dialog: ConfirmationServiceOptions | null = null;
@@ -21,8 +28,6 @@ export class DialogConfirmationComponent {
 
   title: string = 'Confirmation Dialog';
   message!: string;
-
-  @ViewChild('confirmationDialog') modal!: ElementRef;
 
   constructor() {
     this.dialogConfirmationService.dialogState
@@ -32,16 +37,17 @@ export class DialogConfirmationComponent {
           this.dialog = message;
           this.title = message.header;
           this.message = message.message;
+          this.openModal();
         }
       });
   }
 
   openModal() {
-    $(this.modal.nativeElement).modal('show');
+    $('#confirmationDialog').modal('show');
   }
 
   closeModal() {
-    $(this.modal.nativeElement).modal('hide');
+    $('#confirmationDialog').modal('hide');
   }
 
   onConfirm() {
