@@ -1,5 +1,4 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
-import { InputPanelComponent } from '../panels/input-panel/input-panel.component';
 import { MapComponent } from '../panels/map/map.component';
 import { CommonModule, NgIf } from '@angular/common';
 import {
@@ -21,12 +20,14 @@ import {
   getNewPlatformFormGroup,
 } from '../../shared/create';
 import { createISODateFromFormString } from '../../shared/utils';
+import { InfoDialogComponent } from '../pop-ups/info-dialog/info-dialog.component';
+import { ScenarioInputPanelComponent } from '../panels/scenario-input/scenario-input-panel.component';
 
 @UntilDestroy()
 @Component({
   selector: 'app-main-content',
   imports: [
-    InputPanelComponent,
+    ScenarioInputPanelComponent,
     ExternalComponent,
     MapComponent,
     CommonModule,
@@ -62,34 +63,28 @@ export class MainContentComponent {
 
   onUpdated() {
     if (this.formGroup) {
-      const inputGroup = this.formGroup
-        .get('input')
-        ?.get('scenario') as FormGroup;
-
-      const scenarioInput = inputGroup?.get('scenarioInput')?.value;
-      const baseInfo = inputGroup?.get('baseInfo')?.value;
+      const scenarioInput = this.formGroup?.get('scenarioInput')?.value;
+      const metadata = this.formGroup?.get('metadata')?.value;
       const platforms = scenarioInput?.platforms;
-      const external = this.formGroup.get('input')?.get('external')?.value;
+      const external = this.formGroup.get('external')?.value;
 
       this.userStateService.updateInput({
-        scenario: {
-          baseInfo: baseInfo
-            ? {
-                ...baseInfo,
-                dateOfCreation: createISODateFromFormString(
-                  baseInfo.dateOfCreation,
-                ),
-              }
-            : {},
-          scenarioInput: scenarioInput
-            ? {
-                ...scenarioInput,
-                startTime: createISODateFromFormString(scenarioInput.startTime),
-                endTime: createISODateFromFormString(scenarioInput.endTime),
-                platforms: formGroupPlatformsToPlatformArray(platforms),
-              }
-            : {},
-        },
+        metadata: metadata
+          ? {
+              ...metadata,
+              dateOfCreation: createISODateFromFormString(
+                metadata.dateOfCreation,
+              ),
+            }
+          : {},
+        scenarioInput: scenarioInput
+          ? {
+              ...scenarioInput,
+              startTime: createISODateFromFormString(scenarioInput.startTime),
+              endTime: createISODateFromFormString(scenarioInput.endTime),
+              platforms: formGroupPlatformsToPlatformArray(platforms),
+            }
+          : {},
         external: external
           ? {
               ...external,
@@ -115,78 +110,48 @@ export class MainContentComponent {
     if (input !== null) {
       console.log('Form Updated');
       this.formGroup = this.fb.group({
-        input: this.fb.group({
-          scenario: this.fb.group({
-            baseInfo: this.fb.group({
-              scenarioName: new FormControl(
-                input.scenario?.baseInfo?.scenarioName ?? 'Default Scenario',
-                { validators: Validators.required },
-              ),
-              scenarioAuthor: new FormControl(
-                input.scenario?.baseInfo?.scenarioAuthor ?? 'TBD',
-                { validators: Validators.required },
-              ), // TODO eventually pull this from user profile and don't allow to be edited
-              dateOfCreation: new FormControl(
-                createFormDateString(
-                  input.scenario?.baseInfo?.dateOfCreation ?? new Date(),
-                ),
-                { validators: Validators.required }, // TODO eventually don't hardcode this
-              ),
-              details: new FormControl(
-                input.scenario?.baseInfo?.details ?? '',
-                { validators: Validators.required },
-              ),
-            }),
-            scenarioInput: this.fb.group({
-              startTime: new FormControl(
-                createFormDateString(
-                  input.scenario?.scenarioInput?.startTime ?? new Date(),
-                ),
-                { validators: Validators.required },
-              ),
-              endTime: new FormControl(
-                createFormDateString(
-                  input.scenario?.scenarioInput?.endTime ?? new Date(),
-                ),
-                { validators: Validators.required },
-              ),
-              aoi: this.fb.group({
-                lat: new FormControl(
-                  input.scenario?.scenarioInput?.aoi.lat ?? 0,
-                  { validators: Validators.required },
-                ),
-                lon: new FormControl(
-                  input.scenario?.scenarioInput?.aoi.lon ?? 0,
-                  { validators: Validators.required },
-                ),
-                alt: new FormControl(
-                  input.scenario?.scenarioInput?.aoi.alt ?? 0,
-                  {
-                    validators: Validators.required,
-                  },
-                ),
-                radius: new FormControl(
-                  input.scenario?.scenarioInput?.aoi.radius ?? 0,
-                  { validators: Validators.required },
-                ),
-              }),
-              platforms: this.fb.array([
-                ...(input.scenario?.scenarioInput.platforms.map(
-                  (platform: Platform, i: number) =>
-                    getNewPlatformFormGroup(
-                      this.fb,
-                      platform.name,
-                      platform,
-                      platform.id,
-                    ),
-                ) ?? []),
-              ]),
-            }),
-          }),
-          tools: this.fb.group({
-            isTool: new FormControl(input.tool ?? 'true', {
+        scenarioInput: this.fb.group({
+          scenarioName: new FormControl(
+            input.scenarioInput?.scenarioName ?? 'Default Scenario',
+            { validators: Validators.required },
+          ),
+          startTime: new FormControl(
+            createFormDateString(input.scenarioInput?.startTime ?? new Date()),
+            { validators: Validators.required },
+          ),
+          endTime: new FormControl(
+            createFormDateString(input.scenarioInput?.endTime ?? new Date()),
+            { validators: Validators.required },
+          ),
+          aoi: this.fb.group({
+            lat: new FormControl(input.scenarioInput?.aoi.lat ?? 0, {
               validators: Validators.required,
             }),
+            lon: new FormControl(input.scenarioInput?.aoi.lon ?? 0, {
+              validators: Validators.required,
+            }),
+            alt: new FormControl(input.scenarioInput?.aoi.alt ?? 0, {
+              validators: Validators.required,
+            }),
+            radius: new FormControl(input.scenarioInput?.aoi.radius ?? 0, {
+              validators: Validators.required,
+            }),
+          }),
+          platforms: this.fb.array([
+            ...(input.scenarioInput.platforms.map(
+              (platform: Platform, i: number) =>
+                getNewPlatformFormGroup(
+                  this.fb,
+                  platform.name,
+                  platform,
+                  platform.id,
+                ),
+            ) ?? []),
+          ]),
+        }),
+        tools: this.fb.group({
+          isTool: new FormControl(input.tool ?? 'true', {
+            validators: Validators.required,
           }),
         }),
         external: this.fb.group({

@@ -37,20 +37,20 @@ export const PLATFORM_TYPE_OPTIONS: Array<PLATFORM_TYPE> = [
   'MARITIME',
 ];
 
+export type METADATA = {
+  scenarioAuthor: string;
+  dateOfCreation: Date;
+  details: string;
+};
+
 export interface UserInputFormData {
-  scenario: {
-    baseInfo: {
-      scenarioName: string;
-      scenarioAuthor: string;
-      dateOfCreation: Date;
-      details: string;
-    };
-    scenarioInput: {
-      startTime: Date;
-      endTime: Date;
-      aoi: AOIType;
-      platforms: Array<Platform>;
-    };
+  metadata: METADATA;
+  scenarioInput: {
+    scenarioName: string;
+    startTime: Date;
+    endTime: Date;
+    aoi: AOIType;
+    platforms: Array<Platform>;
   };
   tool?: {
     isTool: boolean;

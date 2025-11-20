@@ -7,6 +7,11 @@ select {
   height: 23.68px;
 }
 
+input,
+select {
+  background-color: style.$dark;
+}
+
 table {
   max-width: 100%;
   min-width: 100%;
@@ -135,7 +140,7 @@ th:not(:first-child) {
   justify-content: space-between;
   align-content: center;
   align-items: center;
-  background-color: #3e4347;
+  background-color: style.$medium-grey;
   width: 100%;
   border: 1px solid style.$light;
   border-bottom-width: 0px;

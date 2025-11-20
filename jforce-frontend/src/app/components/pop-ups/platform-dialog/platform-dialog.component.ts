@@ -9,8 +9,8 @@ import {
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import {
   PlatformEditorInformation,
-  PlatformEditorService,
-} from '../../../services/platform-editor.service';
+  DialogEditorService,
+} from '../../../services/dialog-editor.service';
 import { UserStateService } from '../../../services/user-state.service';
 import {
   addHours,
@@ -48,7 +48,6 @@ import VectorSource from 'ol/source/Vector';
 import { DragWaypointsControl } from '../../panels/map/control/drag-waypoint-control.component';
 import { DrawWaypointsControl } from '../../panels/map/control/draw-waypoints-control.component';
 import { ColorPickerModule } from 'primeng/colorpicker';
-import { SystemStateService } from '../../../services/system-state.service';
 import { formGroupWaypointToWaypointArray } from '../../../shared/create';
 import { lineString } from '@turf/turf';
 import { Feature } from 'ol';
@@ -76,8 +75,7 @@ export class PlatformDialogComponent
   implements AfterViewInit
 {
   private platformData: PlatformEditorInformation | undefined;
-  private platformEditorService = inject(PlatformEditorService);
-  private systemStateService = inject(SystemStateService);
+  private dialogEditorService = inject(DialogEditorService);
 
   maxDateTime: string;
   minDateTime: string;
@@ -179,7 +177,7 @@ export class PlatformDialogComponent
       },
     });
 
-    this.platformEditorService.platformInformation$
+    this.dialogEditorService.platformInformation$
       .pipe(untilDestroyed(this))
       .subscribe((info: PlatformEditorInformation | undefined) => {
         if (info !== undefined) {

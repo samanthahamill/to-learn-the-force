@@ -7,51 +7,76 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
-import { faAdd, faTable, faTrash } from '@fortawesome/free-solid-svg-icons';
+import {
+  faAdd,
+  faDownload,
+  faInfoCircle,
+  faTable,
+  faTrash,
+  faUpload,
+} from '@fortawesome/free-solid-svg-icons';
 import { ButtonModule } from 'primeng/button';
 import { Platform } from '../../../shared/types';
-import { CardComponent, ICON_FUNCTION } from '../card.component';
-import { PlatformCardComponent } from '../platform/platform-card.component';
+import { CardComponent, ICON_FUNCTION } from '../../cards/card.component';
+import { PlatformCardComponent } from '../../cards/platform/platform-card.component';
 import { DialogConfirmationService } from '../../../services/dialog-confirmation.service';
-import { AoiCardComponent } from '../aoi/aoi-card.component';
 import { UntilDestroy } from '@ngneat/until-destroy';
 import {
   formGroupPlatformToPlatformType,
   getNewPlatformFormGroup,
 } from '../../../shared/create';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { DialogEditorService } from '../../../services/dialog-editor.service';
 
 @UntilDestroy()
 @Component({
-  selector: 'app-scenario-input-card',
+  selector: 'app-scenario-input-panel',
   imports: [
     ButtonModule,
     CardComponent,
     PlatformCardComponent,
-    AoiCardComponent,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    FontAwesomeModule,
     NgIf,
     NgFor,
   ],
-  templateUrl: './scenario-input-card.component.html',
-  styleUrl: './scenario-input-card.component.scss',
+  templateUrl: './scenario-input-panel.component.html',
+  styleUrl: './scenario-input-panel.component.scss',
   schemas: [NO_ERRORS_SCHEMA],
 })
-export class ScenarioInputCardComponent {
+export class ScenarioInputPanelComponent {
   @Input() scenarioInput!: FormGroup;
+  @Input() onSubmit!: () => void;
   @Input() formUpdated!: () => void;
   addIcon = faAdd;
   trashIcon = faTrash;
   tableIcon = faTable;
+  exportIcon = faUpload;
+  importIcon = faDownload;
+  infoIcon = faInfoCircle;
 
-  icons: Array<ICON_FUNCTION>;
+  platformIcons: Array<ICON_FUNCTION>;
+  infoIcons: Array<ICON_FUNCTION>;
 
   private confirmationService = inject(DialogConfirmationService);
+  private dialogService = inject(DialogEditorService);
   shouldShowWaypointTableRows: boolean = true;
 
   constructor(private fb: FormBuilder) {
-    this.icons = [
+    this.infoIcons = [
+      {
+        icon: this.infoIcon,
+        type: 'NONE',
+        tooltip: 'Edit scenario metadata',
+        onClick: () => {
+          this.dialogService.showMetadataDialog();
+        },
+      },
+    ];
+
+    this.platformIcons = [
       {
         icon: this.tableIcon,
         type: 'NONE',

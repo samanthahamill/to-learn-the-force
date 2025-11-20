@@ -1,0 +1,137 @@
+<div class="panel-style panel-dimensions">
+  <div class="content">
+    <div class="title">
+      <h1>Scenario Input</h1>
+
+      <div class="right-buttons">
+        <button class="btn" disabled>
+          <fa-icon [icon]="importIcon"></fa-icon>
+          Import Config
+        </button>
+        <button class="btn" disabled>
+          <fa-icon [icon]="exportIcon"></fa-icon>
+          Export Config
+        </button>
+      </div>
+    </div>
+    <form
+      class="form-group"
+      [formGroup]="scenarioInput"
+      (ngSubmit)="onSubmit()"
+    >
+      <app-card header="Info" [icons]="infoIcons">
+        <div class="row-1">
+          <div class="col">
+            <label name="scenarioName" for="scenarioName">
+              Scenario Name
+            </label>
+            <input
+              type="text"
+              formControlName="scenarioName"
+              id="scenarioName"
+              (blur)="onUpdated()"
+            />
+          </div>
+        </div>
+        <div class="row-1 multi-col">
+          <div class="col">
+            <label name="startTime" for="startTime"> Start Time </label>
+            <input
+              type="datetime-local"
+              formControlName="startTime"
+              id="startTime"
+              (blur)="onUpdated()"
+            />
+            <label name="endTime" for="endTime"> End Time </label>
+            <input
+              type="datetime-local"
+              formControlName="endTime"
+              id="endTime"
+              (blur)="onUpdated()"
+            />
+          </div>
+          <div class="col" formGroupName="aoi">
+            <label for="lat">Latitude:</label>
+            <input
+              id="lat"
+              type="number"
+              class="input"
+              formControlName="lat"
+              placeholder="Latitude"
+              (blur)="onUpdated()"
+            />
+            <label for="lon">Longitude:</label>
+            <input
+              id="lon"
+              type="number"
+              class="input"
+              formControlName="lon"
+              placeholder="Longitude"
+              (blur)="onUpdated()"
+            />
+          </div>
+          <div class="col" formGroupName="aoi">
+            <label for="alt">Altitude:</label>
+            <input
+              id="alt"
+              type="number"
+              formControlName="alt"
+              class="readonly input"
+              placeholder="Altitude"
+              (blur)="onUpdated()"
+            />
+            <label for="radius">Radius:</label>
+            <input
+              id="radius"
+              type="text"
+              formControlName="radius"
+              class="input"
+              placeholder="Radius"
+              (blur)="onUpdated()"
+            />
+          </div>
+        </div>
+      </app-card>
+      <app-card
+        header="Platforms ({{ platformCount }})"
+        [icons]="platformIcons"
+      >
+        <div class="platform-inner">
+          <div *ngFor="let platformForm of formGroups; let i = index">
+            <div *ngIf="platformForm != undefined">
+              <app-platform-card
+                id="i"
+                [index]="i"
+                [platformForm]="platformForm"
+                [shouldShowWaypointTableRows]="shouldShowWaypointTableRows"
+                [redIcon]="true"
+                (onDeleteClicked)="removePlatform(i)"
+                (onCopyClicked)="duplicatePlatform(i)"
+                [formUpdated]="onUpdated.bind(this)"
+              />
+            </div>
+          </div>
+
+          <div class="buttons">
+            <button class="btn button" (click)="addPlatform()">
+              <fa-icon [icon]="addIcon"></fa-icon>
+              Add Custom Platform
+            </button>
+            <button
+              class="btn button disabled"
+              (click)="addPlatform()"
+              disabled
+            >
+              <fa-icon [icon]="addIcon"></fa-icon>
+              Import Platform
+            </button>
+          </div>
+        </div>
+      </app-card>
+
+      <div class="bottom-button">
+        <button class="submit" type="submit">Generate Scenario</button>
+      </div>
+    </form>
+  </div>
+</div>

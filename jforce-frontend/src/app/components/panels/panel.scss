@@ -80,6 +80,12 @@ input {
   justify-content: flex-end;
 }
 
+.right-panel {
+  height: inherit;
+  margin-left: style.$panel-margin;
+  width: calc(100% - 4px);
+}
+
 .stop-button {
   background-color: style.$warning;
 }

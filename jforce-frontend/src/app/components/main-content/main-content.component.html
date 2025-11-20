@@ -2,11 +2,11 @@
   <form *ngIf="formGroup" [formGroup]="formGroup">
     <div class="container">
       <div class="col">
-        <app-input-panel
+        <app-scenario-input-panel
           class="input-panel"
-          [formGroup]="getFormGroup('input')"
-          (onSubmit)="onSubmit()"
+          [scenarioInput]="getFormGroup('scenarioInput')"
           [formUpdated]="onUpdated.bind(this)"
+          (onSubmit)="onSubmit()"
         />
       </div>
 
@@ -16,7 +16,6 @@
           [formGroup]="getFormGroup('external')"
           [formUpdated]="onUpdated.bind(this)"
         />
-        <!-- Not part of the form. If possible, would be ideal to move -->
         <app-map />
       </div>
     </div>
