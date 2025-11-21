@@ -16,12 +16,12 @@ import {
 } from 'ol/control.js';
 import TileLayer from 'ol/layer/Tile';
 import { OSM, StadiaMaps } from 'ol/source';
-import { UserStateService } from '../../../services/user-state.service';
+import { UserStateService } from '../../services/user-state.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { AOIType, Platform, Waypoint } from '../../../shared/types';
+import { AOIType, Platform, Waypoint } from '../../shared/types';
 import { fromLonLat, getUserProjection, Projection, toLonLat } from 'ol/proj';
 import GeoJSON from 'ol/format/GeoJSON';
-import { createStringYX, MAP_PROJECTION } from '../../../shared/utils';
+import { createStringYX, MAP_PROJECTION } from '../../shared/utils';
 import Feature from 'ol/Feature';
 import { TerraDraw, TerraDrawPointMode } from 'terra-draw';
 import { TerraDrawOpenLayersAdapter } from 'terra-draw-openlayers-adapter';
@@ -29,7 +29,7 @@ import { point, circle, polygon, lineString } from '@turf/turf';
 import { Extent } from 'ol/extent';
 import BaseLayer from 'ol/layer/Base';
 import { Coordinate } from 'ol/coordinate';
-import { MapContextMenu } from './menu/map-context-menu.component';
+import { MapContextMenu } from '../panels/map/menu/map-context-menu.component';
 import Toggle from 'ol-ext/control/Toggle';
 import { LineString } from 'ol/geom';
 

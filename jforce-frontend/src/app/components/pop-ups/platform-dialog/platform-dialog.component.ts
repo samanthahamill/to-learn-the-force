@@ -34,7 +34,7 @@ import {
   Waypoint,
 } from '../../../shared/types';
 import { CardComponent } from '../../cards/card.component';
-import { BaseMapComponent } from '../../panels/map/base-map.component';
+import { BaseMapComponent } from '../../general/base-map.component';
 import {
   faRemove,
   faCopy,

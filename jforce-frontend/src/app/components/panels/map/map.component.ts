@@ -7,7 +7,7 @@ import { UntilDestroy } from '@ngneat/until-destroy';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DrawCircleAoiControl } from './control/draw-circle-aoi-control.component';
-import { BaseMapComponent } from './base-map.component';
+import { BaseMapComponent } from '../../general/base-map.component';
 import { MeasurementToolControl } from './control/measurement-tool.component';
 import { FeatureContextMenu } from './menu/feature-context-menu.component';
 

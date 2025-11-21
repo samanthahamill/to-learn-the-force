@@ -36,7 +36,7 @@ import {
 import CircleStyle from 'ol/style/Circle';
 import { DrawWaypointsControl } from '../../panels/map/control/draw-waypoints-control.component';
 import { Coordinate } from 'ol/coordinate';
-import { BaseMapComponent } from '../../panels/map/base-map.component';
+import { BaseMapComponent } from '../../general/base-map.component';
 import { DragWaypointsControl } from '../../panels/map/control/drag-waypoint-control.component';
 import { toFixed } from 'ol/math';
 
