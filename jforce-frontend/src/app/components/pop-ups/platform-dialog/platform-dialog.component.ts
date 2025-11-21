@@ -80,9 +80,6 @@ export class PlatformDialogComponent
   private platformData: PlatformEditorInformation | undefined;
   private dialogEditorService = inject(DialogEditorService);
 
-  maxDateTime: string;
-  minDateTime: string;
-
   @Output() waypointPlatformDataUpdated =
     new EventEmitter<PlatformEditorInformation>();
 
@@ -93,16 +90,19 @@ export class PlatformDialogComponent
 
   platformTypeOptions = PLATFORM_TYPE_OPTIONS;
 
-  reportSource: VectorSource = new VectorSource();
-  reportLayer: VectorLayer;
-  vectorSource: VectorSource = new VectorSource();
-  vectorLayer: VectorLayer;
-  private drawWaypointControl: DrawWaypointsControl;
-  private dragWaypointControl: DragWaypointsControl;
-  private featureContextMenu: FeatureContextMenu;
+  maxDateTime: string;
+  minDateTime: string;
 
   allowDraw: boolean;
   errorMessage: string | undefined;
+
+  private reportSource: VectorSource = new VectorSource();
+  private reportLayer: VectorLayer;
+  private vectorSource: VectorSource = new VectorSource();
+  private vectorLayer: VectorLayer;
+  private drawWaypointControl: DrawWaypointsControl;
+  private dragWaypointControl: DragWaypointsControl;
+  private featureContextMenu: FeatureContextMenu;
 
   type: PLATFORM_TYPE | undefined = undefined;
   maxSpeed: number | undefined = undefined;
@@ -121,7 +121,7 @@ export class PlatformDialogComponent
   speedInput: number | undefined = undefined;
 
   constructor() {
-    super('mapContainerPlatform');
+    super('mapContainerPlatform', 'platformMousePositionDisplay');
 
     this.maxDateTime = this.userStateService.maxDate;
     this.minDateTime = this.userStateService.minDate;

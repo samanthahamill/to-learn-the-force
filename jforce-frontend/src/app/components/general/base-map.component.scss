@@ -1,0 +1,32 @@
+@use "styles" as style;
+
+fa-icon {
+  width: 20px;
+  height: 20px;
+  pointer-events: all;
+}
+
+.mouse-container {
+  position: relative;
+  left: 0px;
+  padding: 0px;
+  margin: 0px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 100%;
+}
+
+.mouse-position {
+  text-align: right;
+  position: absolute;
+  padding: 8px;
+  z-index: 10;
+  pointer-events: none;
+  color: grey;
+  width: 100%;
+  max-width: 100%;
+  min-width: 100%;
+  background-color: none;
+}
+
+// 833x1064

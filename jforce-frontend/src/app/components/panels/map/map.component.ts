@@ -27,7 +27,7 @@ export class MapComponent extends BaseMapComponent {
   vectorLayer: VectorLayer;
 
   constructor() {
-    super('mapContainer');
+    super('mapContainer', 'mapMousePositionDisplay');
     this.drawCircleAoiControl = new DrawCircleAoiControl({
       onDrawEnd: (evt: any) => this.onDrawCircleAoiComplete(evt),
     });

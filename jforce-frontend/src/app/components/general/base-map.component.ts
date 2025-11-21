@@ -73,12 +73,14 @@ export class BaseMapComponent implements OnInit, OnDestroy {
   contextMenuElement: HTMLElement | null = null;
 
   target: string;
+  mouseTarget: string;
 
   showTrackLabels: boolean;
   platformVectorVisible: boolean;
 
-  constructor(target: string) {
+  constructor(target: string, mouseTarget: string) {
     this.target = target;
+    this.mouseTarget = mouseTarget;
     this.showTrackLabels = true;
     this.platformVectorVisible = true;
 
@@ -140,10 +142,6 @@ export class BaseMapComponent implements OnInit, OnDestroy {
       });
   }
 
-  customLayers(): BaseLayer[] {
-    return [];
-  }
-
   ngOnInit() {
     this.map = new Map({
       target: this.target,
@@ -152,8 +150,8 @@ export class BaseMapComponent implements OnInit, OnDestroy {
         new MousePosition({
           coordinateFormat: createStringYX(4),
           projection: MAP_PROJECTION,
-          className: 'custom-mouse-position',
-          target: 'mousePositionDisplay',
+          className: `${this.target}-custom-mouse-position`,
+          target: this.mouseTarget,
         }),
       ]),
       layers: [
@@ -174,6 +172,10 @@ export class BaseMapComponent implements OnInit, OnDestroy {
 
     this.initButtonBar();
     this.initTerraDraw();
+  }
+
+  customLayers(): BaseLayer[] {
+    return [];
   }
 
   getContextMenu(): ContextMenu {
