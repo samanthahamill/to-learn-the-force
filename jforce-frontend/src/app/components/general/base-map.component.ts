@@ -85,7 +85,7 @@ export class BaseMapComponent implements OnInit, OnDestroy {
     this.measureToolControl = new MeasurementToolControl({
       className: 'ol-measure-tool',
       html: RULER_ICON,
-      title: 'Measure tool',
+      title: 'Measure Tool',
       onToggle: () => {
         // internally handled
       },
@@ -170,17 +170,6 @@ export class BaseMapComponent implements OnInit, OnDestroy {
         ...this.customLayers(),
       ],
       view: this.olMapView,
-    });
-
-    // right click menu changes if user clicks on map vs a feature
-    this.map?.getTargetElement().addEventListener('contextmenu', (event) => {
-      event.preventDefault();
-
-      this.getContextMenu().createContextMenu(
-        document,
-        event.clientX,
-        event.clientY,
-      );
     });
 
     this.initButtonBar();
@@ -444,47 +433,6 @@ export class BaseMapComponent implements OnInit, OnDestroy {
     feature.set('label', label);
 
     return feature;
-  }
-
-  createContextMenu(clientX: number, clientY: number) {
-    this.contextMenuElement = document.createElement('div');
-    this.contextMenuElement.classList.add('dropdown');
-    this.contextMenuElement.style.position = 'fixed';
-    this.contextMenuElement.style.left = `${clientX}px`;
-    this.contextMenuElement.style.top = `${clientY}px`;
-
-    document.addEventListener('click', (event) => {
-      this.handleDocumentClick(event);
-    });
-    document.body.appendChild(this.contextMenuElement);
-  }
-
-  handleDocumentClick(event: MouseEvent) {
-    if (
-      this.contextMenuElement &&
-      !this.contextMenuElement.contains(event.target as Node)
-    ) {
-      this.removeContextMenu();
-    }
-  }
-
-  removeContextMenu() {
-    if (this.contextMenuElement && this.contextMenuElement.parentNode) {
-      this.contextMenuElement.parentNode.removeChild(this.contextMenuElement);
-      this.contextMenuElement = null;
-    }
-  }
-
-  createContextMenuElement(label: string): HTMLElement {
-    const element = document.createElement('button');
-    element.classList.add('context-menu');
-    element.textContent = label;
-    element.style.display = 'block';
-    element.style.width = '100%';
-    element.style.textAlign = 'left';
-    element.style.cursor = 'pointer';
-    element.setAttribute('role', 'menuitem');
-    return element;
   }
 
   destroyMap() {

@@ -45,6 +45,20 @@ export class MapComponent extends BaseMapComponent {
 
   ////////////// OVERRIDEN METHODS \\\\\\\\\\\\\\\\
 
+  override ngOnInit() {
+    super.ngOnInit();
+    // right click menu changes if user clicks on map vs a feature
+    this.map?.getTargetElement().addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+
+      this.mapContextMenu.createContextMenu(
+        document,
+        event.clientX,
+        event.clientY,
+      );
+    });
+  }
+
   override getContextMenu(): ContextMenu {
     return this.mapContextMenu;
   }

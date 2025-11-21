@@ -1,14 +1,18 @@
 import { ContextMenu, ContextMenuBaseProps } from './context-menu.component';
 
+export type FeatureContextMenuProps = {
+  deleteWaypoint: () => void;
+} & ContextMenuBaseProps;
+
 export class FeatureContextMenu extends ContextMenu {
-  constructor(props: ContextMenuBaseProps) {
+  constructor(props: FeatureContextMenuProps) {
     super({
       ...props,
       elements: [
         {
-          label: 'Delete Platform',
+          label: 'Delete Waypoint',
           action: () => {
-            // props.deletePlatform(); TODO implement
+            props.deleteWaypoint();
           },
         },
       ],

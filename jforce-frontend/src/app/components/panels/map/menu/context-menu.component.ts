@@ -48,7 +48,7 @@ export class ContextMenu {
   removeContextMenu() {
     if (this.contextMenuElement && this.contextMenuElement.parentNode) {
       this.contextMenuElement.parentNode.removeChild(this.contextMenuElement);
-      this.contextMenuElement = null; // TODO do we need this?
+      this.contextMenuElement = null;
     }
   }
 

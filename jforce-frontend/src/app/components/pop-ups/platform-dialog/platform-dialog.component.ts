@@ -136,6 +136,9 @@ export class PlatformDialogComponent
 
     this.featureContextMenu = new FeatureContextMenu({
       document: document,
+      deleteWaypoint: () => {
+        // TODO implement me
+      },
     });
 
     this.name = this.platformData?.platform.name;
@@ -234,6 +237,20 @@ export class PlatformDialogComponent
   }
 
   ////////////// OVERRIDEN METHODS \\\\\\\\\\\\\\\\
+
+  override ngOnInit() {
+    super.ngOnInit();
+    // right click menu changes if user clicks on map vs a feature
+    this.map?.getTargetElement().addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+
+      this.featureContextMenu.createContextMenu(
+        document,
+        event.clientX,
+        event.clientY,
+      );
+    });
+  }
 
   override updateMap() {
     super.updateMap();
