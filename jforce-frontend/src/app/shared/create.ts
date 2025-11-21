@@ -4,12 +4,12 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { Platform, Waypoint } from './types';
-import { getPlatformIdFormat } from './utils';
-
-export function createFormDateString(date: Date): string {
-  return (date as Date).toISOString().substring(0, 16);
-}
+import { Platform, Waypoint, FormWaypoint, FormPlatform } from './types';
+import {
+  createFormDateString,
+  createISODateFromFormString,
+  getPlatformIdFormat,
+} from './utils';
 
 export function getNewPlatformFormGroup(
   fb: FormBuilder,
@@ -118,6 +118,35 @@ export function formGroupWaypointToWaypointArray(waypoints: any): Waypoint[] {
 export function formGroupWaypointToWaypointType(waypoint: any): Waypoint {
   return {
     ...waypoint,
-    datetime: new Date(waypoint.datetime),
+    datetime: new Date(createISODateFromFormString(waypoint.datetime)),
+  };
+}
+
+export function formWaypointToWaypoint(formWaypoint: FormWaypoint): Waypoint {
+  return {
+    ...formWaypoint,
+    datetime: createISODateFromFormString(formWaypoint.datetime),
+  };
+}
+export function waypointToFormWaypoint(waypoint: Waypoint): FormWaypoint {
+  return {
+    ...waypoint,
+    datetime: createFormDateString(waypoint.datetime),
+  };
+}
+export function formPlatformToPlatform(formPlatform: FormPlatform): Platform {
+  return {
+    ...formPlatform,
+    waypoints: formPlatform.waypoints.map((waypoint) => {
+      return formWaypointToWaypoint(waypoint);
+    }),
+  };
+}
+export function platformToFormPlatform(platform: Platform): FormPlatform {
+  return {
+    ...platform,
+    waypoints: platform.waypoints.map((waypoint) => {
+      return waypointToFormWaypoint(waypoint);
+    }),
   };
 }

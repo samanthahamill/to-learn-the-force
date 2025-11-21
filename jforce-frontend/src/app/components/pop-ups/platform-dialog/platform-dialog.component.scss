@@ -64,6 +64,10 @@ $table-height: 235px;
   min-width: 1100px;
 }
 
+.red-outline {
+  border: 1px solid style.$danger;
+}
+
 .row {
   padding-left: style.$panel-padding;
   padding-right: style.$panel-padding;
