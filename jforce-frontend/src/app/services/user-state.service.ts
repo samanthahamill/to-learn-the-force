@@ -29,7 +29,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
     },
     platforms: [
       {
-        name: 'Test',
+        name: 'Test Platform',
         id: 'test',
         readonly: false,
         maxSpeed: 0,
@@ -69,7 +69,7 @@ const BASIC_FORM_DATA: UserInputFormData = {
         ],
       },
       {
-        name: 'Second Test',
+        name: 'Second Test Platform',
         id: 'second-test',
         readonly: false,
         maxSpeed: 0,

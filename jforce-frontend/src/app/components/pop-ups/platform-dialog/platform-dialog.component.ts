@@ -11,12 +11,10 @@ import {
   PlatformEditorInformation,
   DialogEditorService,
 } from '../../../services/dialog-editor.service';
-import { UserStateService } from '../../../services/user-state.service';
 import {
   addHours,
   createNewWaypointId,
   deepClone,
-  MAP_PROJECTION,
   minusHours,
 } from '../../../shared/utils';
 import {
@@ -51,6 +49,11 @@ import { ColorPickerModule } from 'primeng/colorpicker';
 import { formGroupWaypointToWaypointArray } from '../../../shared/create';
 import { lineString } from '@turf/turf';
 import { Feature } from 'ol';
+import { FeatureLike } from 'ol/Feature';
+import { MapContextMenu } from '../../panels/map/menu/map-context-menu.component';
+import { ContextMenu } from '../../panels/map/menu/context-menu.component';
+import { FeatureContextMenu } from '../../panels/map/menu/feature-context-menu.component';
+import { DRAW_WAYPOINT_ICON, HEXAGON_NODE_ICON } from '../../../shared/icons';
 
 declare var $: any;
 
@@ -96,6 +99,7 @@ export class PlatformDialogComponent
   vectorLayer: VectorLayer;
   private drawWaypointControl: DrawWaypointsControl;
   private dragWaypointControl: DragWaypointsControl;
+  private featureContextMenu: FeatureContextMenu;
 
   allowDraw: boolean;
   errorMessage: string | undefined;
@@ -130,6 +134,10 @@ export class PlatformDialogComponent
       .pipe(untilDestroyed(this))
       .subscribe((val) => (this.maxDateTime = val));
 
+    this.featureContextMenu = new FeatureContextMenu({
+      document: document,
+    });
+
     this.name = this.platformData?.platform.name;
     this.maxSpeed = this.platformData?.platform.maxSpeed;
     this.maxZ = this.platformData?.platform.maxZ;
@@ -152,7 +160,7 @@ export class PlatformDialogComponent
     this.drawWaypointControl = new DrawWaypointsControl({
       className: 'ol-draw-waypoint-tool',
       // Ruler Icon
-      html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M128 252.6C128 148.4 214 64 320 64C426 64 512 148.4 512 252.6C512 371.9 391.8 514.9 341.6 569.4C329.8 582.2 310.1 582.2 298.3 569.4C248.1 514.9 127.9 371.9 127.9 252.6zM320 320C355.3 320 384 291.3 384 256C384 220.7 355.3 192 320 192C284.7 192 256 220.7 256 256C256 291.3 284.7 320 320 320z"/></svg>`,
+      html: DRAW_WAYPOINT_ICON,
       title: 'Draw Waypoint Tool',
       onDrawEnd: () => this.onDrawEnd(),
       onDrawNewWaypoint: (points) => this.onDrawNewWaypoint(points),
@@ -163,7 +171,7 @@ export class PlatformDialogComponent
     this.dragWaypointControl = new DragWaypointsControl({
       className: 'ol-drag-waypoint-control',
       // TODO possibly find a better svg - this is hexagon nodes icon
-      html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M344 170.6C362.9 161.6 376 142.3 376 120C376 89.1 350.9 64 320 64C289.1 64 264 89.1 264 120C264 142.3 277.1 161.6 296 170.6L296 269.4C293.2 270.7 290.5 272.3 288 274.1L207.9 228.3C209.5 207.5 199.3 186.7 180 175.5C153.2 160 119 169.2 103.5 196C88 222.8 97.2 257 124 272.5C125.3 273.3 126.6 274 128 274.6L128 365.4C126.7 366 125.3 366.7 124 367.5C97.2 383 88 417.2 103.5 444C119 470.8 153.2 480 180 464.5C199.3 453.4 209.4 432.5 207.8 411.7L258.3 382.8C246.8 371.6 238.4 357.2 234.5 341.1L184 370.1C181.4 368.3 178.8 366.8 176 365.4L176 274.6C178.8 273.3 181.5 271.7 184 269.9L264.1 315.7C264 317.1 263.9 318.5 263.9 320C263.9 342.3 277 361.6 295.9 370.6L295.9 469.4C277 478.4 263.9 497.7 263.9 520C263.9 550.9 289 576 319.9 576C350.8 576 375.9 550.9 375.9 520C375.9 497.7 362.8 478.4 343.9 469.4L343.9 370.6C346.7 369.3 349.4 367.7 351.9 365.9L432 411.7C430.4 432.5 440.6 453.3 459.8 464.5C486.6 480 520.8 470.8 536.3 444C551.8 417.2 542.6 383 515.8 367.5C514.5 366.7 513.1 366 511.8 365.4L511.8 274.6C513.2 274 514.5 273.3 515.8 272.5C542.6 257 551.8 222.8 536.3 196C520.8 169.2 486.8 160 460 175.5C440.7 186.6 430.6 207.5 432.2 228.3L381.6 257.2C393.1 268.4 401.5 282.8 405.4 298.9L456 269.9C458.6 271.7 461.2 273.2 464 274.6L464 365.4C461.2 366.7 458.5 368.3 456 370L375.9 324.2C376 322.8 376.1 321.4 376.1 319.9C376.1 297.6 363 278.3 344.1 269.3L344.1 170.5z"/></svg>`,
+      html: HEXAGON_NODE_ICON,
       title: 'Drag Waypoints',
       updateCoordinate: (points, waypointId) => {
         this.dragPointOnMap(points, waypointId);
@@ -225,6 +233,8 @@ export class PlatformDialogComponent
     this.color = this.platformData?.platform.color;
   }
 
+  ////////////// OVERRIDEN METHODS \\\\\\\\\\\\\\\\
+
   override updateMap() {
     super.updateMap();
     this.renderWaypoints();
@@ -255,6 +265,12 @@ export class PlatformDialogComponent
       : this.platform?.color;
   }
 
+  override getContextMenu(): ContextMenu {
+    return this.featureContextMenu;
+  }
+
+  ////////////// GET METHODS \\\\\\\\\\\\\\\\
+
   get platform(): Platform | undefined {
     return this.platformData?.platform;
   }
@@ -270,6 +286,8 @@ export class PlatformDialogComponent
   get waypoints(): Waypoint[] {
     return this.platformData?.platform.waypoints ?? [];
   }
+
+  ////////////// CUSTOM METHODS \\\\\\\\\\\\\\\\
 
   platformDataUpdated(waypointPlatformData: PlatformEditorInformation) {
     this.platformData = {
@@ -380,7 +398,7 @@ export class PlatformDialogComponent
     this.renderWaypoints();
   }
 
-  // non-map functions
+  ////////////// NON-MAP METHODS \\\\\\\\\\\\\\\\
 
   addWaypoint() {
     if (
@@ -449,7 +467,7 @@ export class PlatformDialogComponent
     }
   }
 
-  ///
+  ////////////// VALIDATION AND MODAL METHODS \\\\\\\\\\\\\\\\
 
   private validate(): boolean {
     if (this.platformData === undefined) {

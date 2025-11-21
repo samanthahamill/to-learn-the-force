@@ -8,8 +8,8 @@ import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DrawCircleAoiControl } from './control/draw-circle-aoi-control.component';
 import { BaseMapComponent } from '../../general/base-map.component';
-import { MeasurementToolControl } from './control/measurement-tool.component';
-import { FeatureContextMenu } from './menu/feature-context-menu.component';
+import { MapContextMenu } from './menu/map-context-menu.component';
+import { ContextMenu } from './menu/context-menu.component';
 
 export type FeatureId = string | number;
 
@@ -22,11 +22,9 @@ export type FeatureId = string | number;
 })
 export class MapComponent extends BaseMapComponent {
   private drawCircleAoiControl: DrawCircleAoiControl;
-  private measureToolControl: MeasurementToolControl;
+  private mapContextMenu: MapContextMenu;
   vectorSource: VectorSource;
   vectorLayer: VectorLayer;
-
-  private featureContextMenu: FeatureContextMenu;
 
   constructor() {
     super('mapContainer');
@@ -34,24 +32,21 @@ export class MapComponent extends BaseMapComponent {
       onDrawEnd: (evt: any) => this.onDrawCircleAoiComplete(evt),
     });
 
-    this.measureToolControl = new MeasurementToolControl({
-      className: 'ol-measure-tool',
-      // Ruler Icon
-      html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M241.1 580.2C222.4 598.9 192 598.9 173.2 580.2L60.1 467.1C41.4 448.4 41.4 418 60.1 399.2L77.1 382.2L150.6 455.7C160 465.1 175.2 465.1 184.5 455.7C193.8 446.3 193.9 431.1 184.5 421.8L111 348.3L144.9 314.4L195.8 365.3C205.2 374.7 220.4 374.7 229.7 365.3C239 355.9 239.1 340.7 229.7 331.4L178.8 280.5L212.7 246.6L286.2 320.1C295.6 329.5 310.8 329.5 320.1 320.1C329.4 310.7 329.5 295.5 320.1 286.2L246.6 212.7L280.5 178.8L331.4 229.7C340.8 239.1 356 239.1 365.3 229.7C374.6 220.3 374.7 205.1 365.3 195.8L314.4 144.9L348.3 111L421.8 184.5C431.2 193.9 446.4 193.9 455.7 184.5C465 175.1 465.1 159.9 455.7 150.6L382.2 77.1L399.2 60.1C417.9 41.4 448.3 41.4 467.1 60.1L580.5 172.9C599.2 191.6 599.2 222 580.5 240.8L241.1 580.2z"/></svg>`,
-      title: 'Measure tool',
-      onToggle: () => {
-        // internally handled
-      },
-    });
-
     this.vectorSource = new VectorSource();
     this.vectorLayer = new VectorLayer({
       source: this.vectorSource,
     });
 
-    this.featureContextMenu = new FeatureContextMenu({
+    this.mapContextMenu = new MapContextMenu({
+      toggleTrackLabels: () => this.toggleTrackLabels(),
       document: document,
     });
+  }
+
+  ////////////// OVERRIDEN METHODS \\\\\\\\\\\\\\\\
+
+  override getContextMenu(): ContextMenu {
+    return this.mapContextMenu;
   }
 
   override customLayers() {
@@ -59,8 +54,10 @@ export class MapComponent extends BaseMapComponent {
   }
 
   override addButtonsToBar(): Control[] {
-    return [this.drawCircleAoiControl, this.measureToolControl];
+    return [this.drawCircleAoiControl];
   }
+
+  ////////////// CUSTOM METHODS \\\\\\\\\\\\\\\\
 
   private onDrawCircleAoiComplete(evt: ChangeAOIRequest) {
     this.userStateService.updateAOIRequest(evt);

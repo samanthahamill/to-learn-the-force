@@ -36,12 +36,6 @@ export class InfoDialogComponent {
   errorMessage: string | undefined = undefined;
 
   constructor(private fb: FormBuilder) {
-    this.userStateService.input$
-      .pipe(untilDestroyed(this))
-      .subscribe((info) => {
-        if (info) this.info.setValue(info);
-      });
-
     const metadata = this.userStateService.metadata;
 
     this.info = this.fb.group({
@@ -57,9 +51,19 @@ export class InfoDialogComponent {
       }),
     });
 
+    this.userStateService.input$
+      .pipe(untilDestroyed(this))
+      .subscribe((info) => {
+        if (info) this.info.setValue(info.metadata);
+      });
+
     this.dialogSerivce.metadataPing$
       .pipe(untilDestroyed(this))
-      .subscribe(() => this.openModal());
+      .subscribe((val) => {
+        if (val !== 0) {
+          this.openModal();
+        }
+      });
   }
 
   openModal() {
