@@ -30,6 +30,9 @@ $table-height: 235px;
 
 .error {
   color: style.$danger;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .flex-modal {

@@ -443,77 +443,20 @@ export class PlatformDialogComponent
     this.validatedWaypointCreation = {};
 
     if (this.platformData?.platform) {
-      const errorFields: string[] = [];
+      const validatedResults = this.validateWaypoint({
+        lat: this.latInput,
+        lon: this.lonInput,
+        datetime: this.datetimeInput,
+        speedKts: this.speedInput,
+        z: this.zInput,
+      } as FormWaypoint);
 
-      if (this.latInput == undefined || isNaN(this.latInput)) {
-        errorFields.push('Lat');
-        this.validatedWaypointCreation = {
-          ...this.validatedWaypointCreation,
-          lat: 'Invalid',
-        };
-      }
+      this.validatedWaypointCreation = validatedResults.validated ?? {};
 
-      if (this.lonInput == undefined || isNaN(this.lonInput)) {
-        errorFields.push('Lon');
-        this.validatedWaypointCreation = {
-          ...this.validatedWaypointCreation,
-          lon: 'Invalid',
-        };
-      }
-
-      if (this.speedInput == undefined || isNaN(this.speedInput)) {
-        errorFields.push('Speed');
-        this.validatedWaypointCreation = {
-          ...this.validatedWaypointCreation,
-          speedKts: 'Invalid',
-        };
-      }
-
-      if (this.datetimeInput == undefined) {
-        errorFields.push('Date/Time');
-        this.validatedWaypointCreation = {
-          ...this.validatedWaypointCreation,
-          datetime: 'Invalid',
-        };
-      } else if (
-        new Date(createISODateFromFormString(this.datetimeInput)) <
-          new Date(createISODateFromFormString(this.minDateTime)) ||
-        new Date(createISODateFromFormString(this.datetimeInput)) >
-          new Date(createISODateFromFormString(this.maxDateTime))
-      ) {
+      if (validatedResults.errorFields.length > 0) {
         this.toastSerivce.popErrorToast(
           'Add Waypoint Error',
-          `Date/Time cannot be before min date time of ${this.minDateTime} or after ${this.maxDateTime}.` +
-            `Please ensure it is within the required bounds, or change the overall min/max datetimes for the scenario first.`,
-        );
-      }
-
-      if (
-        (this.zInput == undefined || isNaN(this.zInput)) &&
-        this.platformData.platform.type === 'MARITIME'
-      ) {
-        errorFields.push('Depth');
-        this.validatedWaypointCreation = {
-          ...this.validatedWaypointCreation,
-          z: 'Invalid',
-        };
-      }
-
-      if (
-        (this.zInput == undefined || isNaN(this.zInput)) &&
-        this.platformData.platform.type === 'AIR'
-      ) {
-        errorFields.push('Alt');
-        this.validatedWaypointCreation = {
-          ...this.validatedWaypointCreation,
-          z: 'Invalid',
-        };
-      }
-
-      if (errorFields.length > 0) {
-        this.toastSerivce.popErrorToast(
-          'Add Waypoint Error',
-          `Form field${errorFields.length > 0 ? 's' : ''} ${errorFields.concat(', ')} was not filled out. Only a valid waypoint can be added to the existing table.`,
+          `Form field${validatedResults.errorFields.length > 0 ? 's' : ''} ${validatedResults.errorFields.join(', ')} was not filled out. Only a valid waypoint can be added to the existing table.`,
         );
       } else {
         const newWaypoint = {
@@ -577,77 +520,124 @@ export class PlatformDialogComponent
 
   ////////////// VALIDATION AND MODAL METHODS \\\\\\\\\\\\\\\\
 
-  private validate(): boolean {
+  getWaypointInvalid(index: number, thing: string): boolean {
+    const waypoint = this.validatedInput.waypoints?.[index];
+
+    if (waypoint == undefined) return false;
+
+    if (thing == 'lat') {
+      return waypoint.lat !== undefined;
+    }
+    if (thing == 'lon') {
+      return waypoint.lon !== undefined;
+    }
+    if (thing == 'datetime') {
+      return waypoint.datetime !== undefined;
+    }
+    if (thing == 'speedKts') {
+      return waypoint.speedKts !== undefined;
+    }
+    if (thing == 'z') {
+      return waypoint.z !== undefined;
+    }
+
+    return false;
+  }
+
+  validate(): boolean {
     if (this.platformData === undefined) {
       return false;
     }
 
+    const errorMessageAdditions: string[] = [];
+    this.validatedInput = {};
+
     // ensure all fields are filled
-    if (this.color === undefined) {
-      this.errorMessage = `Platform color cannot be undefined. Please set to a valid value before proceeding.`;
-      return false;
+    if (this.color == null) {
+      errorMessageAdditions.push(
+        `Platform color cannot be undefined. Please set to a valid value before proceeding.`,
+      );
+      this.validatedInput = {
+        ...this.validatedInput,
+        color: 'Invalid',
+      };
     }
-    if (this.name === undefined || this.name === '') {
-      this.errorMessage = `Platform name cannot be undefined. Please set to a valid value before proceeding.`;
-      return false;
+    if (this.name == null || this.name === '') {
+      errorMessageAdditions.push(
+        `Platform name cannot be undefined. Please set to a valid value before proceeding.`,
+      );
+      this.validatedInput = {
+        ...this.validatedInput,
+        name: 'Invalid',
+      };
     }
-    if (
-      this.type === 'AIR' &&
-      (this.maxZ === undefined || Number.isNaN(this.maxZ))
-    ) {
-      this.errorMessage = `Platform color cannot be undefined for an air platform. Please set to a valid value before proceeding.`;
-      return false;
+    if (this.maxSpeed == null || Number.isNaN(this.maxSpeed)) {
+      errorMessageAdditions.push(
+        `Platform speed cannot be undefined. Please set to a valid value before proceeding.`,
+      );
+      this.validatedInput = {
+        ...this.validatedInput,
+        maxSpeed: 'Invalid',
+      };
+    }
+    if (this.type === 'AIR' && (this.maxZ == null || Number.isNaN(this.maxZ))) {
+      errorMessageAdditions.push(
+        `Platform color cannot be undefined for an air platform. Please set to a valid value before proceeding.`,
+      );
+      this.validatedInput = {
+        ...this.validatedInput,
+        maxZ: 'Invalid',
+      };
     }
     if (
       this.type !== 'GROUND' &&
-      (this.maxZ === undefined || Number.isNaN(this.maxZ))
+      (this.maxZ == null || Number.isNaN(this.maxZ))
     ) {
-      this.errorMessage = `Platform ${this.type == 'AIR' ? 'Alt' : 'Depth'} cannot be undefined for a ${this.type} platform. Please set to a valid value before proceeding.`;
-      return false;
+      errorMessageAdditions.push(
+        `Platform ${this.type == 'AIR' ? 'Alt' : 'Depth'} cannot be undefined for a ${this.type} platform. Please set to a valid value before proceeding.`,
+      );
+      this.validatedInput = {
+        ...this.validatedInput,
+        maxZ: 'Invalid',
+      };
     }
     if (
-      this.reportingFrequency === undefined ||
+      this.reportingFrequency == null ||
       Number.isNaN(this.reportingFrequency)
     ) {
-      this.errorMessage = `Platform reporting frequency cannot be undefined. Please set to a valid value before proceeding.`;
-      return false;
+      errorMessageAdditions.push(
+        `Platform reporting frequency cannot be undefined. Please set to a valid value before proceeding.`,
+      );
+      this.validatedInput = {
+        ...this.validatedInput,
+        reportingFrequency: 'Invalid',
+      };
     }
 
-    const invalidWapoint = this.waypoints.find(
-      (waypoint) =>
-        waypoint.lat == undefined ||
-        Number.isNaN(waypoint.lat) ||
-        waypoint.lon == undefined ||
-        Number.isNaN(waypoint.lon) ||
-        waypoint.speedKts == undefined ||
-        Number.isNaN(waypoint.speedKts) ||
-        waypoint.datetime == undefined,
-    );
-
-    if (invalidWapoint) {
-      this.errorMessage = `Waypoint ${invalidWapoint.index} has invalid entries. Please fix these before saving.`;
-      return false;
-    }
+    const invalidWapoint = [];
 
     const earliestTime = new Date(this.minDateTime);
     const latestTime = new Date(this.maxDateTime);
 
     for (let i = 0; i < this.waypoints.length; i++) {
       const waypoint = this.waypoints[i];
+      invalidWapoint.push(this.validateWaypoint(waypoint).validated);
 
       if (
         createISODateFromFormString(waypoint.datetime).getTime() <
         earliestTime.getTime()
       ) {
-        this.errorMessage = `Waypoint ${waypoint.index} has a date that is earlier than the scenario start time.`;
-        return false;
+        errorMessageAdditions.push(
+          `Waypoint ${waypoint.index} has a date that is earlier than the scenario start time.`,
+        );
       }
       if (
         createISODateFromFormString(waypoint.datetime).getTime() >
         latestTime.getTime()
       ) {
-        this.errorMessage = `Waypoint ${waypoint.index} has a date that is later than the scenario end time.`;
-        return false;
+        errorMessageAdditions.push(
+          `Waypoint ${waypoint.index} has a date that is later than the scenario end time.`,
+        );
       }
 
       if (i !== 0) {
@@ -657,14 +647,104 @@ export class PlatformDialogComponent
           createISODateFromFormString(waypoint.datetime).getTime() <
           createISODateFromFormString(previousWaypoint.datetime).getTime()
         ) {
-          this.errorMessage = `Waypoint ${waypoint.index} is scheduled before Waypoint ${previousWaypoint.index} but comes after in order.`;
-          return false;
+          errorMessageAdditions.push(
+            `Waypoint ${waypoint.index} is scheduled before Waypoint ${previousWaypoint.index} but comes after in order.`,
+          );
         }
       }
     }
 
+    if (invalidWapoint.find((message) => message !== undefined)) {
+      this.validatedInput = {
+        ...this.validatedInput,
+        waypoints: invalidWapoint,
+      };
+    }
+
+    console.log(this.validatedInput.waypoints);
+
+    if (errorMessageAdditions.length > 0) {
+      this.errorMessage = errorMessageAdditions.join(', ');
+      return false;
+    }
+
     this.errorMessage = undefined;
     return true;
+  }
+
+  validateWaypoint(waypoint: FormWaypoint): {
+    validated: ValidatedWaypoint | undefined;
+    errorFields: string[];
+  } {
+    const errorFields: string[] = [];
+    let validatedWaypoint: ValidatedWaypoint = {};
+
+    if (waypoint.lat == null || isNaN(waypoint.lat)) {
+      errorFields.push('Lat');
+      validatedWaypoint = {
+        ...validatedWaypoint,
+        lat: 'Invalid',
+      };
+    }
+
+    if (waypoint.lon == null || isNaN(waypoint.lon)) {
+      errorFields.push('Lon');
+      validatedWaypoint = {
+        ...validatedWaypoint,
+        lon: 'Invalid',
+      };
+    }
+
+    if (waypoint.speedKts == null || isNaN(waypoint.speedKts)) {
+      errorFields.push('Speed');
+      validatedWaypoint = {
+        ...validatedWaypoint,
+        speedKts: 'Invalid',
+      };
+    }
+
+    if (waypoint.datetime == null) {
+      errorFields.push('Date/Time');
+      validatedWaypoint = {
+        ...validatedWaypoint,
+        datetime: 'Invalid',
+      };
+    } else if (
+      new Date(createISODateFromFormString(waypoint.datetime)) <
+        new Date(createISODateFromFormString(this.minDateTime)) ||
+      new Date(createISODateFromFormString(waypoint.datetime)) >
+        new Date(createISODateFromFormString(this.maxDateTime))
+    ) {
+      validatedWaypoint = {
+        ...validatedWaypoint,
+        datetime: 'Invalid',
+      };
+      this.toastSerivce.popErrorToast(
+        'Add Waypoint Error',
+        `Date/Time cannot be before min date time of ${this.minDateTime} or after ${this.maxDateTime}.` +
+          `Please ensure it is within the required bounds, or change the overall min/max datetimes for the scenario first.`,
+      );
+    }
+
+    if (waypoint.z == null || isNaN(waypoint.z)) {
+      if (this.type === 'MARITIME') errorFields.push('Depth');
+      validatedWaypoint = {
+        ...validatedWaypoint,
+        z: 'Invalid',
+      };
+      if (this.type === 'AIR') {
+        errorFields.push('Alt');
+        validatedWaypoint = {
+          ...validatedWaypoint,
+          z: 'Invalid',
+        };
+      }
+    }
+
+    return {
+      validated: errorFields.length > 0 ? validatedWaypoint : undefined,
+      errorFields: errorFields,
+    };
   }
 
   closeAndSaveModal() {
@@ -697,6 +777,10 @@ export class PlatformDialogComponent
   }
 
   closeModal() {
+    this.platformData = undefined;
+
+    this.validatedInput = {};
+    this.validatedWaypointCreation = {};
     this.drawWaypointControl.deactivate();
     this.drawWaypointControl.setActive(false);
     this.dragWaypointControl.deactivate();

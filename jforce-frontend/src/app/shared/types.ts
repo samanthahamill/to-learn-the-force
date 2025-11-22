@@ -114,7 +114,7 @@ export interface ValidatedPlatform {
   maxZ?: string;
   friendly?: string;
   color?: string;
-  waypoints?: Array<ValidatedWaypoint>;
+  waypoints?: Array<ValidatedWaypoint | undefined>;
   reportingFrequency?: string;
 }
 
