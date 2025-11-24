@@ -161,8 +161,22 @@ export class PlatformDialogComponent
 
     this.featureContextMenu = new FeatureContextMenu({
       document: document,
-      deleteWaypoint: () => {
+      deleteWaypoint: (feature: FeatureLike) => {
         // TODO implement me
+        const index = feature.getId()?.toString().split('-').at(-1);
+
+        if (index && Number(index)) {
+          // confirmation message ?
+          this.deleteWaypoint(Number(index));
+        } else {
+          this.toastSerivce.showErrorMessage(
+            'Invalid feature',
+            'The selected feature could not be deleted',
+          );
+          console.log(
+            `The selected feature with id ${feature.getId()} could not be deleted. Index was found to be ${index}`,
+          );
+        }
       },
     });
 
@@ -262,12 +276,22 @@ export class PlatformDialogComponent
     // right click menu changes if user clicks on map vs a feature
     this.map?.getTargetElement().addEventListener('contextmenu', (event) => {
       event.preventDefault();
+      const pixel = this.map!.getEventPixel(event);
+      const feature =
+        this.map!.forEachFeatureAtPixel(pixel, (feature) => feature) || '';
 
-      this.featureContextMenu.createContextMenu(
-        document,
-        event.clientX,
-        event.clientY,
-      );
+      if (
+        feature &&
+        (feature as FeatureLike).getId()?.toString().split('-waypoint')[0] ==
+          this.platform?.id
+      ) {
+        this.featureContextMenu.createContextMenuForFeature(
+          document,
+          event.clientX,
+          event.clientY,
+          feature,
+        );
+      }
     });
   }
 
@@ -299,10 +323,6 @@ export class PlatformDialogComponent
       platform.id !== this.platformData?.platform.id
       ? 'gray'
       : this.platform?.color;
-  }
-
-  override getContextMenu(): ContextMenu {
-    return this.featureContextMenu;
   }
 
   ////////////// GET METHODS \\\\\\\\\\\\\\\\
@@ -495,6 +515,7 @@ export class PlatformDialogComponent
   deleteWaypoint(index: number) {
     this.waypoints?.splice(index, 1);
     this.shiftWaypoints();
+    this.updateMap();
   }
 
   drop(event: CdkDragDrop<string[]>) {

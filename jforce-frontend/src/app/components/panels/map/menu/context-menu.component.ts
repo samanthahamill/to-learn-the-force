@@ -16,6 +16,7 @@ export interface ContextMenuProps extends ContextMenuBaseProps {
 export class ContextMenu {
   contextMenuElement: HTMLElement | undefined | null;
   elements: ContextMenuElement[];
+  feature: FeatureLike | undefined;
 
   constructor(props: ContextMenuProps) {
     document.addEventListener('click', (event) => {
@@ -32,8 +33,19 @@ export class ContextMenu {
     this.contextMenuElement.style.position = 'fixed';
     this.contextMenuElement.style.left = `${clientX}px`;
     this.contextMenuElement.style.top = `${clientY}px`;
+    this.contextMenuElement.style.zIndex = '3000';
     doc.body.appendChild(this.contextMenuElement);
     this.showContextMenu();
+  }
+
+  createContextMenuForFeature(
+    doc: Document,
+    clientX: number,
+    clientY: number,
+    feature: FeatureLike,
+  ) {
+    this.feature = feature;
+    this.createContextMenu(doc, clientX, clientY);
   }
 
   handleDocumentClick(event: MouseEvent) {

@@ -15,7 +15,7 @@ import {
   ScaleLine,
 } from 'ol/control.js';
 import TileLayer from 'ol/layer/Tile';
-import { OSM, StadiaMaps } from 'ol/source';
+import { StadiaMaps } from 'ol/source';
 import { UserStateService } from '../../services/user-state.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { AOIType, Platform, Waypoint } from '../../shared/types';
@@ -29,11 +29,9 @@ import { point, circle, polygon, lineString } from '@turf/turf';
 import { Extent } from 'ol/extent';
 import BaseLayer from 'ol/layer/Base';
 import { Coordinate } from 'ol/coordinate';
-import { MapContextMenu } from '../panels/map/menu/map-context-menu.component';
 import Toggle from 'ol-ext/control/Toggle';
 import { RULER_ICON, TRACK_ICON } from '../../shared/icons';
 import { MeasurementToolControl } from '../panels/map/control/measurement-tool.component';
-import { ContextMenu } from '../panels/map/menu/context-menu.component';
 
 // import { FeatureId } from 'terra-draw/dist/store/store';
 export type FeatureId = string | number;
@@ -70,7 +68,6 @@ export class BaseMapComponent implements OnInit, OnDestroy {
   terraDraw: TerraDraw | undefined;
   terraDrawOpenLayerAdapter: TerraDrawOpenLayersAdapter | undefined;
   fitExtent: Extent | undefined;
-  contextMenuElement: HTMLElement | null = null;
 
   target: string;
   mouseTarget: string;
@@ -176,10 +173,6 @@ export class BaseMapComponent implements OnInit, OnDestroy {
 
   customLayers(): BaseLayer[] {
     return [];
-  }
-
-  getContextMenu(): ContextMenu {
-    return new ContextMenu({ elements: [], document: document });
   }
 
   addButtonsToBar(): Control[] {

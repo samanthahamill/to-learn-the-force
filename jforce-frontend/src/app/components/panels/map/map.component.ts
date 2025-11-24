@@ -59,10 +59,6 @@ export class MapComponent extends BaseMapComponent {
     });
   }
 
-  override getContextMenu(): ContextMenu {
-    return this.mapContextMenu;
-  }
-
   override customLayers() {
     return [this.vectorLayer];
   }

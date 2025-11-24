@@ -1,7 +1,8 @@
+import { FeatureLike } from 'ol/Feature';
 import { ContextMenu, ContextMenuBaseProps } from './context-menu.component';
 
 export type FeatureContextMenuProps = {
-  deleteWaypoint: () => void;
+  deleteWaypoint: (feature: FeatureLike) => void;
 } & ContextMenuBaseProps;
 
 export class FeatureContextMenu extends ContextMenu {
@@ -12,7 +13,9 @@ export class FeatureContextMenu extends ContextMenu {
         {
           label: 'Delete Waypoint',
           action: () => {
-            props.deleteWaypoint();
+            if (this.feature) {
+              props.deleteWaypoint(this.feature);
+            }
           },
         },
       ],
