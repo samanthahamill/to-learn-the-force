@@ -30,15 +30,24 @@
                     }"
                     (blur)="validate()"
                   />
-                  <label tooltip="Type" for="type">Type</label>
-                  <select [(ngModel)]="type" id="type" size="small">
-                    <option
-                      *ngFor="let option of platformTypeOptions"
-                      [value]="option"
-                    >
-                      {{ option }}
-                    </option>
-                  </select>
+                  <label for="friendly">Is Friendly</label>
+                  <input
+                    id="friendly"
+                    type="checkbox"
+                    [(ngModel)]="friendly"
+                    [ngClass]="{
+                      checkbox: true,
+                      'red-outline': validatedInput.friendly !== undefined,
+                    }"
+                    (blur)="validate()"
+                  />
+                  <label for="color">Platform Waypoint Color</label>
+                  <p-colorpicker
+                    [(ngModel)]="color"
+                    (ngModelChange)="ngModelChange($event)"
+                    inputId="cp-hex"
+                    class="mb-4"
+                  />
                 </div>
                 <div class="col">
                   <label for="reportingFrequency">Reporting Freq</label>
@@ -81,25 +90,15 @@
                   </div>
                 </div>
                 <div class="col">
-                  <label for="friendly">Is Friendly</label>
-                  <input
-                    id="friendly"
-                    type="checkbox"
-                    [(ngModel)]="friendly"
-                    [ngClass]="{
-                      checkbox: true,
-                      'red-outline': validatedInput.friendly !== undefined,
-                    }"
-                    (blur)="validate()"
-                  />
-
-                  <label for="color">Platform Waypoint Color</label>
-                  <p-colorpicker
-                    [(ngModel)]="color"
-                    (ngModelChange)="ngModelChange($event)"
-                    inputId="cp-hex"
-                    class="mb-4"
-                  />
+                  <label tooltip="Type" for="type">Type</label>
+                  <select [(ngModel)]="type" id="type" size="small">
+                    <option
+                      *ngFor="let option of platformTypeOptions"
+                      [value]="option"
+                    >
+                      {{ option }}
+                    </option>
+                  </select>
                 </div>
               </div>
             </app-card>
@@ -133,6 +132,9 @@
                             {{ type == "AIR" ? "Altitude" : "Depth" }}
                           </th>
                           <th scope="col">Speed</th>
+                          <th scope="col">Smaj</th>
+                          <th scope="col">Smin</th>
+                          <th scope="col">Orientation</th>
                           <th scope="col">Date/Time</th>
                           <th scope="col" class="actions">Actions</th>
                         </tr>
@@ -193,6 +195,48 @@
                               }"
                             />
                           </td>
+
+                          <td>
+                            <input
+                              id="smajInput"
+                              type="number"
+                              [(ngModel)]="smajInput"
+                              required
+                              [ngClass]="{
+                                'input-small': true,
+                                'red-outline':
+                                  validatedWaypointCreation.smaj !== undefined,
+                              }"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              id="sminInput"
+                              type="number"
+                              [(ngModel)]="sminInput"
+                              required
+                              [ngClass]="{
+                                'input-small': true,
+                                'red-outline':
+                                  validatedWaypointCreation.smin !== undefined,
+                              }"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              id="orientationInput"
+                              type="number"
+                              [(ngModel)]="orientationInput"
+                              required
+                              [ngClass]="{
+                                'input-small': true,
+                                'red-outline':
+                                  validatedWaypointCreation.orientation !==
+                                  undefined,
+                              }"
+                            />
+                          </td>
+
                           <td>
                             <input
                               id="datetimeInput"
@@ -282,6 +326,48 @@
                                 'red-outline': getWaypointInvalid(
                                   i,
                                   'speedKts'
+                                ),
+                              }"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              id="waypointSmajInput-{{ i }}"
+                              type="number"
+                              [(ngModel)]="waypoint.smaj"
+                              (blur)="validate()"
+                              required
+                              [ngClass]="{
+                                'input-small': true,
+                                'red-outline': getWaypointInvalid(i, 'smaj'),
+                              }"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              id="waypointSminInput-{{ i }}"
+                              type="number"
+                              [(ngModel)]="waypoint.smin"
+                              (blur)="validate()"
+                              required
+                              [ngClass]="{
+                                'input-small': true,
+                                'red-outline': getWaypointInvalid(i, 'smin'),
+                              }"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              id="waypointOrientationInput-{{ i }}"
+                              type="number"
+                              [(ngModel)]="waypoint.orientation"
+                              (blur)="validate()"
+                              required
+                              [ngClass]="{
+                                'input-small': true,
+                                'red-outline': getWaypointInvalid(
+                                  i,
+                                  'orientation'
                                 ),
                               }"
                             />

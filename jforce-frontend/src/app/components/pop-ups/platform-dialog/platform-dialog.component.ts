@@ -132,6 +132,9 @@ export class PlatformDialogComponent
   zInput: number | undefined = undefined;
   datetimeInput: string | undefined = undefined;
   speedInput: number | undefined = undefined;
+  smajInput: number | undefined = undefined;
+  sminInput: number | undefined = undefined;
+  orientationInput: number | undefined = undefined;
 
   // will hold error messages for invalid values
   validatedInput: ValidatedPlatform = {};
@@ -173,7 +176,7 @@ export class PlatformDialogComponent
             'Invalid feature',
             'The selected feature could not be deleted',
           );
-          console.log(
+          console.warn(
             `The selected feature with id ${feature.getId()} could not be deleted. Index was found to be ${index}`,
           );
         }
@@ -489,6 +492,9 @@ export class PlatformDialogComponent
           z: this.zInput!,
           speedKts: this.speedInput!,
           datetime: this.datetimeInput!,
+          smaj: this.smajInput!,
+          smin: this.sminInput!,
+          orientation: this.orientationInput!,
         };
 
         this.platformData.platform.waypoints = this.platformData.platform
@@ -541,25 +547,34 @@ export class PlatformDialogComponent
 
   ////////////// VALIDATION AND MODAL METHODS \\\\\\\\\\\\\\\\
 
-  getWaypointInvalid(index: number, thing: string): boolean {
+  getWaypointInvalid(index: number, fieldName: string): boolean {
     const waypoint = this.validatedInput.waypoints?.[index];
 
     if (waypoint == undefined) return false;
 
-    if (thing == 'lat') {
+    if (fieldName == 'lat') {
       return waypoint.lat !== undefined;
     }
-    if (thing == 'lon') {
+    if (fieldName == 'lon') {
       return waypoint.lon !== undefined;
     }
-    if (thing == 'datetime') {
+    if (fieldName == 'datetime') {
       return waypoint.datetime !== undefined;
     }
-    if (thing == 'speedKts') {
+    if (fieldName == 'speedKts') {
       return waypoint.speedKts !== undefined;
     }
-    if (thing == 'z') {
+    if (fieldName == 'z') {
       return waypoint.z !== undefined;
+    }
+    if (fieldName == 'smaj') {
+      return waypoint.smaj !== undefined;
+    }
+    if (fieldName == 'smin') {
+      return waypoint.smin !== undefined;
+    }
+    if (fieldName == 'orientation') {
+      return waypoint.orientation !== undefined;
     }
 
     return false;
@@ -682,8 +697,6 @@ export class PlatformDialogComponent
       };
     }
 
-    console.log(this.validatedInput.waypoints);
-
     if (errorMessageAdditions.length > 0) {
       this.errorMessage = errorMessageAdditions.join(', ');
       return false;
@@ -721,6 +734,30 @@ export class PlatformDialogComponent
       validatedWaypoint = {
         ...validatedWaypoint,
         speedKts: 'Invalid',
+      };
+    }
+
+    if (waypoint.smaj == null || isNaN(waypoint.smaj)) {
+      errorFields.push('smaj');
+      validatedWaypoint = {
+        ...validatedWaypoint,
+        smaj: 'Invalid',
+      };
+    }
+
+    if (waypoint.smin == null || isNaN(waypoint.smin)) {
+      errorFields.push('smin');
+      validatedWaypoint = {
+        ...validatedWaypoint,
+        smin: 'Invalid',
+      };
+    }
+
+    if (waypoint.orientation == null || isNaN(waypoint.orientation)) {
+      errorFields.push('Orientation');
+      validatedWaypoint = {
+        ...validatedWaypoint,
+        orientation: 'Invalid',
       };
     }
 

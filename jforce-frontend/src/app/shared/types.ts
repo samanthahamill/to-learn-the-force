@@ -93,11 +93,15 @@ export interface VesselInfo {
 
 interface WaypointBase {
   id: string; // for frontend us only - utilized to allow dragging on map feature
+  index: number; // backend variable only to ensure proper ordering
+
   lat: number;
   lon: number;
   z: number; // altitude or depth
   speedKts: number;
-  index: number; // backend variable only to ensure proper ordering
+  smaj: number;
+  smin: number;
+  orientation: number;
 }
 export interface Waypoint extends WaypointBase {
   datetime: Date;
@@ -124,4 +128,7 @@ export interface ValidatedWaypoint {
   z?: string;
   speedKts?: string;
   datetime?: string;
+  smaj?: string;
+  smin?: string;
+  orientation?: string;
 }
