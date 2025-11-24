@@ -1,5 +1,5 @@
 import { Coordinate, format } from 'ol/coordinate';
-import { Waypoint } from './types';
+import { UserInputFormData, Waypoint } from './types';
 
 export const MAP_PROJECTION = 'EPSG:4326';
 
@@ -33,6 +33,107 @@ export const RED_COLORS = [
   [173, 56, 7],
 ];
 
+export const BASIC_FORM_DATA: UserInputFormData = {
+  metadata: {
+    scenarioAuthor: 'TBD',
+    dateOfCreation: new Date(),
+    details: '',
+  },
+  scenarioInput: {
+    scenarioName: 'Test Scenario',
+    startTime: minusHours(new Date(), 48),
+    endTime: new Date(),
+    aoi: {
+      lat: 0,
+      lon: 0,
+      alt: 0,
+      radius: 450,
+    },
+    platforms: [
+      {
+        name: 'Test Platform',
+        id: 'test',
+        readonly: false,
+        maxSpeed: 0,
+        maxZ: 0,
+        type: 'AIR',
+        reportingFrequency: 0,
+        friendly: true,
+        color: '#6466f1',
+        waypoints: [
+          {
+            id: 'test-waypoint-0',
+            lat: 2,
+            lon: 2,
+            z: 1,
+            datetime: minusHours(new Date(), 22),
+            index: 0,
+            speedKts: 13,
+          },
+          {
+            id: 'test-waypoint-1',
+            lat: 1,
+            lon: 1,
+            z: 1,
+            datetime: minusHours(new Date(), 17),
+            index: 1,
+            speedKts: 13,
+          },
+          {
+            id: 'test-waypoint-2',
+            lat: 1,
+            lon: 0,
+            z: 1,
+            datetime: minusHours(new Date(), 10),
+            index: 2,
+            speedKts: 13,
+          },
+        ],
+      },
+      {
+        name: 'Second Test Platform',
+        id: 'second-test',
+        readonly: false,
+        maxSpeed: 0,
+        maxZ: 0,
+        type: 'GROUND',
+        reportingFrequency: 0,
+        friendly: true,
+        color: '#51e68fff',
+        waypoints: [
+          {
+            id: 'second-test-waypoint-0',
+            lat: 3,
+            lon: 1,
+            z: 1,
+            datetime: minusHours(new Date(), 12),
+            index: 0,
+            speedKts: 13,
+          },
+          {
+            id: 'second-test-waypoint-1',
+            lat: 2,
+            lon: 3,
+            z: 1,
+            datetime: minusHours(new Date(), 10),
+            index: 1,
+            speedKts: 13,
+          },
+          {
+            id: 'second-test-waypoint-2',
+            lat: 2,
+            lon: 4,
+            z: 1,
+            datetime: minusHours(new Date(), 4),
+            index: 2,
+            speedKts: 13,
+          },
+        ],
+      },
+    ],
+  },
+};
+
 /**
  * Form strings are typically in the format of YYYY-MM-DDTHH:mm
  * when we need YYYY-MM-DDTHH:mm:ss.000Z
@@ -40,6 +141,9 @@ export const RED_COLORS = [
  */
 export function createISODateFromFormString(date: string): Date {
   return new Date(`${date}:00.000Z`);
+}
+export function createFormDateString(date: Date): string {
+  return (date as Date).toISOString().substring(0, 16);
 }
 
 export function getPlatformIdFormat(platformId: string, index: number): string {

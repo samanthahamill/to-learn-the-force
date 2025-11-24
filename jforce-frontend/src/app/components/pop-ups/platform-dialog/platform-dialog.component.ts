@@ -11,12 +11,12 @@ import {
   PlatformEditorInformation,
   DialogEditorService,
 } from '../../../services/dialog-editor.service';
-import { UserStateService } from '../../../services/user-state.service';
 import {
   addHours,
+  createFormDateString,
+  createISODateFromFormString,
   createNewWaypointId,
   deepClone,
-  MAP_PROJECTION,
   minusHours,
 } from '../../../shared/utils';
 import {
@@ -24,17 +24,21 @@ import {
   DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   Platform,
   PLATFORM_TYPE,
   PLATFORM_TYPE_OPTIONS,
+  FormPlatform,
+  ValidatedPlatform,
+  ValidatedWaypoint,
   Waypoint,
+  FormWaypoint,
 } from '../../../shared/types';
 import { CardComponent } from '../../cards/card.component';
-import { BaseMapComponent } from '../../panels/map/base-map.component';
+import { BaseMapComponent } from '../../general/base-map.component';
 import {
   faRemove,
   faCopy,
@@ -48,9 +52,19 @@ import VectorSource from 'ol/source/Vector';
 import { DragWaypointsControl } from '../../panels/map/control/drag-waypoint-control.component';
 import { DrawWaypointsControl } from '../../panels/map/control/draw-waypoints-control.component';
 import { ColorPickerModule } from 'primeng/colorpicker';
-import { formGroupWaypointToWaypointArray } from '../../../shared/create';
+import {
+  formGroupWaypointToWaypointArray,
+  formPlatformToPlatform,
+  formWaypointToWaypoint,
+} from '../../../shared/create';
 import { lineString } from '@turf/turf';
 import { Feature } from 'ol';
+import { FeatureLike } from 'ol/Feature';
+import { MapContextMenu } from '../../panels/map/menu/map-context-menu.component';
+import { ContextMenu } from '../../panels/map/menu/context-menu.component';
+import { FeatureContextMenu } from '../../panels/map/menu/feature-context-menu.component';
+import { DRAW_WAYPOINT_ICON, HEXAGON_NODE_ICON } from '../../../shared/icons';
+import { ToastService } from '../../../services/toast.service';
 
 declare var $: any;
 
@@ -65,6 +79,7 @@ declare var $: any;
     ReactiveFormsModule,
     CardComponent,
     ColorPickerModule,
+    NgClass,
   ],
   templateUrl: './platform-dialog.component.html',
   styleUrl: './platform-dialog.component.scss',
@@ -76,9 +91,7 @@ export class PlatformDialogComponent
 {
   private platformData: PlatformEditorInformation | undefined;
   private dialogEditorService = inject(DialogEditorService);
-
-  maxDateTime: string;
-  minDateTime: string;
+  private toastSerivce = inject(ToastService);
 
   @Output() waypointPlatformDataUpdated =
     new EventEmitter<PlatformEditorInformation>();
@@ -90,15 +103,19 @@ export class PlatformDialogComponent
 
   platformTypeOptions = PLATFORM_TYPE_OPTIONS;
 
-  reportSource: VectorSource = new VectorSource();
-  reportLayer: VectorLayer;
-  vectorSource: VectorSource = new VectorSource();
-  vectorLayer: VectorLayer;
-  private drawWaypointControl: DrawWaypointsControl;
-  private dragWaypointControl: DragWaypointsControl;
+  maxDateTime: string;
+  minDateTime: string;
 
   allowDraw: boolean;
   errorMessage: string | undefined;
+
+  private reportSource: VectorSource = new VectorSource();
+  private reportLayer: VectorLayer;
+  private vectorSource: VectorSource = new VectorSource();
+  private vectorLayer: VectorLayer;
+  private drawWaypointControl: DrawWaypointsControl;
+  private dragWaypointControl: DragWaypointsControl;
+  private featureContextMenu: FeatureContextMenu;
 
   type: PLATFORM_TYPE | undefined = undefined;
   maxSpeed: number | undefined = undefined;
@@ -112,12 +129,16 @@ export class PlatformDialogComponent
   // add waypoint information
   latInput: number | undefined = undefined;
   lonInput: number | undefined = undefined;
-  altInput: number | undefined = undefined;
+  zInput: number | undefined = undefined;
   datetimeInput: string | undefined = undefined;
   speedInput: number | undefined = undefined;
 
+  // will hold error messages for invalid values
+  validatedInput: ValidatedPlatform = {};
+  validatedWaypointCreation: ValidatedWaypoint = {};
+
   constructor() {
-    super('mapContainerPlatform');
+    super('mapContainerPlatform', 'platformMousePositionDisplay');
 
     this.maxDateTime = this.userStateService.maxDate;
     this.minDateTime = this.userStateService.minDate;
@@ -138,6 +159,27 @@ export class PlatformDialogComponent
     this.type = this.platformData?.platform.type;
     this.reportingFrequency = this.platformData?.platform.reportingFrequency;
 
+    this.featureContextMenu = new FeatureContextMenu({
+      document: document,
+      deleteWaypoint: (feature: FeatureLike) => {
+        // TODO implement me
+        const index = feature.getId()?.toString().split('-').at(-1);
+
+        if (index && Number(index)) {
+          // confirmation message ?
+          this.deleteWaypoint(Number(index));
+        } else {
+          this.toastSerivce.showErrorMessage(
+            'Invalid feature',
+            'The selected feature could not be deleted',
+          );
+          console.log(
+            `The selected feature with id ${feature.getId()} could not be deleted. Index was found to be ${index}`,
+          );
+        }
+      },
+    });
+
     this.reportSource = new VectorSource();
     this.reportLayer = new VectorLayer({
       source: this.reportSource,
@@ -152,7 +194,7 @@ export class PlatformDialogComponent
     this.drawWaypointControl = new DrawWaypointsControl({
       className: 'ol-draw-waypoint-tool',
       // Ruler Icon
-      html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M128 252.6C128 148.4 214 64 320 64C426 64 512 148.4 512 252.6C512 371.9 391.8 514.9 341.6 569.4C329.8 582.2 310.1 582.2 298.3 569.4C248.1 514.9 127.9 371.9 127.9 252.6zM320 320C355.3 320 384 291.3 384 256C384 220.7 355.3 192 320 192C284.7 192 256 220.7 256 256C256 291.3 284.7 320 320 320z"/></svg>`,
+      html: DRAW_WAYPOINT_ICON,
       title: 'Draw Waypoint Tool',
       onDrawEnd: () => this.onDrawEnd(),
       onDrawNewWaypoint: (points) => this.onDrawNewWaypoint(points),
@@ -163,7 +205,7 @@ export class PlatformDialogComponent
     this.dragWaypointControl = new DragWaypointsControl({
       className: 'ol-drag-waypoint-control',
       // TODO possibly find a better svg - this is hexagon nodes icon
-      html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M344 170.6C362.9 161.6 376 142.3 376 120C376 89.1 350.9 64 320 64C289.1 64 264 89.1 264 120C264 142.3 277.1 161.6 296 170.6L296 269.4C293.2 270.7 290.5 272.3 288 274.1L207.9 228.3C209.5 207.5 199.3 186.7 180 175.5C153.2 160 119 169.2 103.5 196C88 222.8 97.2 257 124 272.5C125.3 273.3 126.6 274 128 274.6L128 365.4C126.7 366 125.3 366.7 124 367.5C97.2 383 88 417.2 103.5 444C119 470.8 153.2 480 180 464.5C199.3 453.4 209.4 432.5 207.8 411.7L258.3 382.8C246.8 371.6 238.4 357.2 234.5 341.1L184 370.1C181.4 368.3 178.8 366.8 176 365.4L176 274.6C178.8 273.3 181.5 271.7 184 269.9L264.1 315.7C264 317.1 263.9 318.5 263.9 320C263.9 342.3 277 361.6 295.9 370.6L295.9 469.4C277 478.4 263.9 497.7 263.9 520C263.9 550.9 289 576 319.9 576C350.8 576 375.9 550.9 375.9 520C375.9 497.7 362.8 478.4 343.9 469.4L343.9 370.6C346.7 369.3 349.4 367.7 351.9 365.9L432 411.7C430.4 432.5 440.6 453.3 459.8 464.5C486.6 480 520.8 470.8 536.3 444C551.8 417.2 542.6 383 515.8 367.5C514.5 366.7 513.1 366 511.8 365.4L511.8 274.6C513.2 274 514.5 273.3 515.8 272.5C542.6 257 551.8 222.8 536.3 196C520.8 169.2 486.8 160 460 175.5C440.7 186.6 430.6 207.5 432.2 228.3L381.6 257.2C393.1 268.4 401.5 282.8 405.4 298.9L456 269.9C458.6 271.7 461.2 273.2 464 274.6L464 365.4C461.2 366.7 458.5 368.3 456 370L375.9 324.2C376 322.8 376.1 321.4 376.1 319.9C376.1 297.6 363 278.3 344.1 269.3L344.1 170.5z"/></svg>`,
+      html: HEXAGON_NODE_ICON,
       title: 'Drag Waypoints',
       updateCoordinate: (points, waypointId) => {
         this.dragPointOnMap(points, waypointId);
@@ -184,7 +226,9 @@ export class PlatformDialogComponent
           this.platformData = {
             platform: {
               ...info.platform,
-              waypoints: deepClone(info.platform.waypoints),
+              waypoints: info.platform.waypoints.map((waypoint) => {
+                return { ...waypoint };
+              }),
             },
             platformIndex: info.platformIndex,
           };
@@ -225,6 +269,32 @@ export class PlatformDialogComponent
     this.color = this.platformData?.platform.color;
   }
 
+  ////////////// OVERRIDEN METHODS \\\\\\\\\\\\\\\\
+
+  override ngOnInit() {
+    super.ngOnInit();
+    // right click menu changes if user clicks on map vs a feature
+    this.map?.getTargetElement().addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+      const pixel = this.map!.getEventPixel(event);
+      const feature =
+        this.map!.forEachFeatureAtPixel(pixel, (feature) => feature) || '';
+
+      if (
+        feature &&
+        (feature as FeatureLike).getId()?.toString().split('-waypoint')[0] ==
+          this.platform?.id
+      ) {
+        this.featureContextMenu.createContextMenuForFeature(
+          document,
+          event.clientX,
+          event.clientY,
+          feature,
+        );
+      }
+    });
+  }
+
   override updateMap() {
     super.updateMap();
     this.renderWaypoints();
@@ -255,7 +325,9 @@ export class PlatformDialogComponent
       : this.platform?.color;
   }
 
-  get platform(): Platform | undefined {
+  ////////////// GET METHODS \\\\\\\\\\\\\\\\
+
+  get platform(): FormPlatform | undefined {
     return this.platformData?.platform;
   }
 
@@ -267,9 +339,11 @@ export class PlatformDialogComponent
     return this.platformData?.platform.name ?? '';
   }
 
-  get waypoints(): Waypoint[] {
+  get waypoints(): FormWaypoint[] {
     return this.platformData?.platform.waypoints ?? [];
   }
+
+  ////////////// CUSTOM METHODS \\\\\\\\\\\\\\\\
 
   platformDataUpdated(waypointPlatformData: PlatformEditorInformation) {
     this.platformData = {
@@ -288,8 +362,8 @@ export class PlatformDialogComponent
 
     const features = this.waypoints.map((waypoint) => {
       const feature = this.createWaypointFeature(
-        waypoint,
-        this.platformData!.platform,
+        formWaypointToWaypoint(waypoint),
+        formPlatformToPlatform(this.platformData!.platform),
         this.name,
         this.color,
       );
@@ -325,26 +399,29 @@ export class PlatformDialogComponent
 
   onDrawNewWaypoint(points: Coordinate[]) {
     const waypoints = this.waypoints;
-    const lastPoint: Waypoint | undefined =
+    const lastPoint: FormWaypoint | undefined =
       this.waypoints[waypoints.length - 1];
 
-    const newCoordinates: Waypoint[] = points.map((point) => {
+    const newCoordinates: FormWaypoint[] = points.map((point) => {
       return {
         id: createNewWaypointId(
           this.platformData?.platform.id ?? this.platformName ?? 'platform',
-          this.waypoints ?? [],
+          this.waypoints?.map((waypoint) => {
+            return formWaypointToWaypoint(waypoint);
+          }) ?? [],
         ),
         lat: point[0],
         lon: point[1],
         z: 0,
         speedKts: lastPoint?.speedKts ?? 0,
         datetime: !lastPoint?.datetime
-          ? new Date()
-          : lastPoint.datetime < minusHours(new Date(this.maxDateTime), 1)
-            ? addHours(new Date(lastPoint.datetime), 1)
+          ? createFormDateString(new Date())
+          : new Date(lastPoint.datetime).getTime() <
+              minusHours(new Date(this.maxDateTime), 1).getTime()
+            ? createFormDateString(addHours(new Date(lastPoint.datetime), 1))
             : lastPoint.datetime,
         index: waypoints.length,
-      } as Waypoint;
+      } as FormWaypoint;
     });
 
     this.waypoints.push(...newCoordinates);
@@ -359,7 +436,7 @@ export class PlatformDialogComponent
             ...point,
             lat: toFixed(coord[1], 3),
             lon: toFixed(coord[0], 3),
-          } as Waypoint;
+          } as FormWaypoint;
         }
         return point;
       });
@@ -380,45 +457,57 @@ export class PlatformDialogComponent
     this.renderWaypoints();
   }
 
-  // non-map functions
+  ////////////// NON-MAP METHODS \\\\\\\\\\\\\\\\
 
   addWaypoint() {
-    if (
-      this.platformData?.platform &&
-      this.latInput &&
-      this.lonInput &&
-      this.speedInput &&
-      this.altInput &&
-      this.datetimeInput
-    ) {
-      if (this.waypoints === undefined) {
-        this.platformData.platform.waypoints = [
-          {
-            id: createNewWaypointId(
-              this.platformData?.platform.id ?? this.platformName ?? 'platform',
-              this.waypoints,
-            ),
-            index: 0,
-            lat: this.latInput,
-            lon: this.lonInput,
-            z: this.altInput,
-            speedKts: this.speedInput,
-            datetime: new Date(this.datetimeInput),
-          },
-        ];
+    this.validatedWaypointCreation = {};
+
+    if (this.platformData?.platform) {
+      const validatedResults = this.validateWaypoint({
+        lat: this.latInput,
+        lon: this.lonInput,
+        datetime: this.datetimeInput,
+        speedKts: this.speedInput,
+        z: this.zInput,
+      } as FormWaypoint);
+
+      this.validatedWaypointCreation = validatedResults.validated ?? {};
+
+      if (validatedResults.errorFields.length > 0) {
+        this.toastSerivce.popErrorToast(
+          'Add Waypoint Error',
+          `Form field${validatedResults.errorFields.length > 0 ? 's' : ''} ${validatedResults.errorFields.join(', ')} was not filled out. Only a valid waypoint can be added to the existing table.`,
+        );
       } else {
-        this.waypoints.push({
+        const newWaypoint = {
           id: createNewWaypointId(
             this.platformData?.platform.id ?? this.platformName ?? 'platform',
-            this.waypoints,
+            this.waypoints.map((waypoint) => formWaypointToWaypoint(waypoint)),
           ),
-          index: this.waypoints.length,
-          lat: this.latInput,
-          lon: this.lonInput,
-          z: this.altInput,
-          speedKts: this.speedInput,
-          datetime: new Date(this.datetimeInput),
-        });
+          lat: this.latInput!,
+          lon: this.lonInput!,
+          z: this.zInput!,
+          speedKts: this.speedInput!,
+          datetime: this.datetimeInput!,
+        };
+
+        this.platformData.platform.waypoints = this.platformData.platform
+          .waypoints
+          ? [
+              ...this.platformData.platform.waypoints,
+              {
+                ...newWaypoint,
+                index: this.platformData.platform.waypoints.length,
+              },
+            ]
+          : [
+              {
+                ...newWaypoint,
+                index: 0,
+              },
+            ];
+
+        this.updateMap();
       }
     }
   }
@@ -426,6 +515,7 @@ export class PlatformDialogComponent
   deleteWaypoint(index: number) {
     this.waypoints?.splice(index, 1);
     this.shiftWaypoints();
+    this.updateMap();
   }
 
   drop(event: CdkDragDrop<string[]>) {
@@ -449,76 +539,233 @@ export class PlatformDialogComponent
     }
   }
 
-  ///
+  ////////////// VALIDATION AND MODAL METHODS \\\\\\\\\\\\\\\\
 
-  private validate(): boolean {
+  getWaypointInvalid(index: number, thing: string): boolean {
+    const waypoint = this.validatedInput.waypoints?.[index];
+
+    if (waypoint == undefined) return false;
+
+    if (thing == 'lat') {
+      return waypoint.lat !== undefined;
+    }
+    if (thing == 'lon') {
+      return waypoint.lon !== undefined;
+    }
+    if (thing == 'datetime') {
+      return waypoint.datetime !== undefined;
+    }
+    if (thing == 'speedKts') {
+      return waypoint.speedKts !== undefined;
+    }
+    if (thing == 'z') {
+      return waypoint.z !== undefined;
+    }
+
+    return false;
+  }
+
+  validate(): boolean {
     if (this.platformData === undefined) {
       return false;
     }
 
+    const errorMessageAdditions: string[] = [];
+    this.validatedInput = {};
+
     // ensure all fields are filled
-    if (this.color === undefined) {
-      this.errorMessage = `Platform color cannot be undefined. Please set to a valid value before proceeding.`;
-      return false;
+    if (this.color == null) {
+      errorMessageAdditions.push(
+        `Platform color cannot be undefined. Please set to a valid value before proceeding.`,
+      );
+      this.validatedInput = {
+        ...this.validatedInput,
+        color: 'Invalid',
+      };
     }
-    if (this.name === undefined || this.name === '') {
-      this.errorMessage = `Platform name cannot be undefined. Please set to a valid value before proceeding.`;
-      return false;
+    if (this.name == null || this.name === '') {
+      errorMessageAdditions.push(
+        `Platform name cannot be undefined. Please set to a valid value before proceeding.`,
+      );
+      this.validatedInput = {
+        ...this.validatedInput,
+        name: 'Invalid',
+      };
     }
-    if (
-      this.type === 'AIR' &&
-      (this.maxZ === undefined || Number.isNaN(this.maxZ))
-    ) {
-      this.errorMessage = `Platform color cannot be undefined for an air platform. Please set to a valid value before proceeding.`;
-      return false;
+    if (this.maxSpeed == null || Number.isNaN(this.maxSpeed)) {
+      errorMessageAdditions.push(
+        `Platform speed cannot be undefined. Please set to a valid value before proceeding.`,
+      );
+      this.validatedInput = {
+        ...this.validatedInput,
+        maxSpeed: 'Invalid',
+      };
+    }
+    if (this.type === 'AIR' && (this.maxZ == null || Number.isNaN(this.maxZ))) {
+      errorMessageAdditions.push(
+        `Platform color cannot be undefined for an air platform. Please set to a valid value before proceeding.`,
+      );
+      this.validatedInput = {
+        ...this.validatedInput,
+        maxZ: 'Invalid',
+      };
     }
     if (
       this.type !== 'GROUND' &&
-      (this.maxZ === undefined || Number.isNaN(this.maxZ))
+      (this.maxZ == null || Number.isNaN(this.maxZ))
     ) {
-      this.errorMessage = `Platform ${this.type == 'AIR' ? 'Alt' : 'Depth'} cannot be undefined for a ${this.type} platform. Please set to a valid value before proceeding.`;
-      return false;
+      errorMessageAdditions.push(
+        `Platform ${this.type == 'AIR' ? 'Alt' : 'Depth'} cannot be undefined for a ${this.type} platform. Please set to a valid value before proceeding.`,
+      );
+      this.validatedInput = {
+        ...this.validatedInput,
+        maxZ: 'Invalid',
+      };
     }
     if (
-      this.reportingFrequency === undefined ||
+      this.reportingFrequency == null ||
       Number.isNaN(this.reportingFrequency)
     ) {
-      this.errorMessage = `Platform reporting frequency cannot be undefined. Please set to a valid value before proceeding.`;
-      return false;
+      errorMessageAdditions.push(
+        `Platform reporting frequency cannot be undefined. Please set to a valid value before proceeding.`,
+      );
+      this.validatedInput = {
+        ...this.validatedInput,
+        reportingFrequency: 'Invalid',
+      };
     }
 
-    const invalidWapoint = this.waypoints.find(
-      (waypoint) =>
-        waypoint.lat == undefined ||
-        Number.isNaN(waypoint.lat) ||
-        waypoint.lon == undefined ||
-        Number.isNaN(waypoint.lon) ||
-        waypoint.speedKts == undefined ||
-        Number.isNaN(waypoint.speedKts) ||
-        waypoint.datetime == undefined,
-    );
-
-    if (invalidWapoint) {
-      this.errorMessage = `Waypoint with index ${invalidWapoint.index} has invalid entries. Please fix these before saving.`;
-      return false;
-    }
+    const invalidWapoint = [];
 
     const earliestTime = new Date(this.minDateTime);
     const latestTime = new Date(this.maxDateTime);
 
-    for (let waypoint of this.waypoints) {
-      if (waypoint.datetime < earliestTime) {
-        this.errorMessage = `Waypoint with index ${waypoint.index} has a date that is earlier than the scenario start time.`;
-        return false;
+    for (let i = 0; i < this.waypoints.length; i++) {
+      const waypoint = this.waypoints[i];
+      invalidWapoint.push(this.validateWaypoint(waypoint).validated);
+
+      if (
+        createISODateFromFormString(waypoint.datetime).getTime() <
+        earliestTime.getTime()
+      ) {
+        errorMessageAdditions.push(
+          `Waypoint ${waypoint.index} has a date that is earlier than the scenario start time.`,
+        );
       }
-      if (waypoint.datetime > latestTime) {
-        this.errorMessage = `Waypoint with index ${waypoint.index} has a date that is later than the scenario end time.`;
-        return false;
+      if (
+        createISODateFromFormString(waypoint.datetime).getTime() >
+        latestTime.getTime()
+      ) {
+        errorMessageAdditions.push(
+          `Waypoint ${waypoint.index} has a date that is later than the scenario end time.`,
+        );
       }
+
+      if (i !== 0) {
+        const previousWaypoint = this.waypoints[i - 1];
+
+        if (
+          createISODateFromFormString(waypoint.datetime).getTime() <
+          createISODateFromFormString(previousWaypoint.datetime).getTime()
+        ) {
+          errorMessageAdditions.push(
+            `Waypoint ${waypoint.index} is scheduled before Waypoint ${previousWaypoint.index} but comes after in order.`,
+          );
+        }
+      }
+    }
+
+    if (invalidWapoint.find((message) => message !== undefined)) {
+      this.validatedInput = {
+        ...this.validatedInput,
+        waypoints: invalidWapoint,
+      };
+    }
+
+    console.log(this.validatedInput.waypoints);
+
+    if (errorMessageAdditions.length > 0) {
+      this.errorMessage = errorMessageAdditions.join(', ');
+      return false;
     }
 
     this.errorMessage = undefined;
     return true;
+  }
+
+  validateWaypoint(waypoint: FormWaypoint): {
+    validated: ValidatedWaypoint | undefined;
+    errorFields: string[];
+  } {
+    const errorFields: string[] = [];
+    let validatedWaypoint: ValidatedWaypoint = {};
+
+    if (waypoint.lat == null || isNaN(waypoint.lat)) {
+      errorFields.push('Lat');
+      validatedWaypoint = {
+        ...validatedWaypoint,
+        lat: 'Invalid',
+      };
+    }
+
+    if (waypoint.lon == null || isNaN(waypoint.lon)) {
+      errorFields.push('Lon');
+      validatedWaypoint = {
+        ...validatedWaypoint,
+        lon: 'Invalid',
+      };
+    }
+
+    if (waypoint.speedKts == null || isNaN(waypoint.speedKts)) {
+      errorFields.push('Speed');
+      validatedWaypoint = {
+        ...validatedWaypoint,
+        speedKts: 'Invalid',
+      };
+    }
+
+    if (waypoint.datetime == null) {
+      errorFields.push('Date/Time');
+      validatedWaypoint = {
+        ...validatedWaypoint,
+        datetime: 'Invalid',
+      };
+    } else if (
+      new Date(createISODateFromFormString(waypoint.datetime)) <
+        new Date(createISODateFromFormString(this.minDateTime)) ||
+      new Date(createISODateFromFormString(waypoint.datetime)) >
+        new Date(createISODateFromFormString(this.maxDateTime))
+    ) {
+      validatedWaypoint = {
+        ...validatedWaypoint,
+        datetime: 'Invalid',
+      };
+      this.toastSerivce.popErrorToast(
+        'Add Waypoint Error',
+        `Date/Time cannot be before min date time of ${this.minDateTime} or after ${this.maxDateTime}.` +
+          `Please ensure it is within the required bounds, or change the overall min/max datetimes for the scenario first.`,
+      );
+    }
+
+    if (waypoint.z == null || isNaN(waypoint.z)) {
+      if (this.type === 'MARITIME') errorFields.push('Depth');
+      validatedWaypoint = {
+        ...validatedWaypoint,
+        z: 'Invalid',
+      };
+      if (this.type === 'AIR') {
+        errorFields.push('Alt');
+        validatedWaypoint = {
+          ...validatedWaypoint,
+          z: 'Invalid',
+        };
+      }
+    }
+
+    return {
+      validated: errorFields.length > 0 ? validatedWaypoint : undefined,
+      errorFields: errorFields,
+    };
   }
 
   closeAndSaveModal() {
@@ -551,6 +798,10 @@ export class PlatformDialogComponent
   }
 
   closeModal() {
+    this.platformData = undefined;
+
+    this.validatedInput = {};
+    this.validatedWaypointCreation = {};
     this.drawWaypointControl.deactivate();
     this.drawWaypointControl.setActive(false);
     this.dragWaypointControl.deactivate();

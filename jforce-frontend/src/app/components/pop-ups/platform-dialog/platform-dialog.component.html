@@ -24,7 +24,11 @@
                     id="name"
                     type="text"
                     [(ngModel)]="name"
-                    class="name"
+                    [ngClass]="{
+                      name: true,
+                      'red-outline': validatedInput.name !== undefined,
+                    }"
+                    (blur)="validate()"
                   />
                   <label tooltip="Type" for="type">Type</label>
                   <select [(ngModel)]="type" id="type" size="small">
@@ -39,27 +43,40 @@
                 <div class="col">
                   <label for="reportingFrequency">Reporting Freq</label>
                   <input
-                    class="input-small"
                     id="reportingFrequency"
                     type="number"
                     [(ngModel)]="reportingFrequency"
+                    [ngClass]="{
+                      'input-small': true,
+                      'red-outline':
+                        validatedInput.reportingFrequency !== undefined,
+                    }"
+                    (blur)="validate()"
                   />
                   <label for="maxSpeed">Max Speed</label>
                   <input
-                    class="input-small"
                     id="maxSpeed"
                     type="number"
                     [(ngModel)]="maxSpeed"
+                    [ngClass]="{
+                      'input-small': true,
+                      'red-outline': validatedInput.maxSpeed !== undefined,
+                    }"
+                    (blur)="validate()"
                   />
                   <div *ngIf="type != 'GROUND'" class="col">
                     <label for="maxZ"
                       >Max {{ type == "AIR" ? "Alt" : "Depth" }}</label
                     >
                     <input
-                      class="input-small"
                       id="maxZ"
                       type="number"
                       [(ngModel)]="maxZ"
+                      [ngClass]="{
+                        'input-small': true,
+                        'red-outline': validatedInput.maxZ !== undefined,
+                      }"
+                      (blur)="validate()"
                     />
                   </div>
                 </div>
@@ -69,7 +86,11 @@
                     id="friendly"
                     type="checkbox"
                     [(ngModel)]="friendly"
-                    class="checkbox"
+                    [ngClass]="{
+                      checkbox: true,
+                      'red-outline': validatedInput.friendly !== undefined,
+                    }"
+                    (blur)="validate()"
                   />
 
                   <label for="color">Platform Waypoint Color</label>
@@ -84,7 +105,11 @@
             </app-card>
           </div>
           <div class="col">
-            <app-card header="ELONTs" class="app-card" [fullHeight]="true">
+            <app-card
+              header="Functionality"
+              class="app-card"
+              [fullHeight]="true"
+            >
             </app-card>
           </div>
         </div>
@@ -117,48 +142,71 @@
                           <th></th>
                           <td>
                             <input
-                              class="input-small"
                               id="LatInput"
                               type="number"
                               [(ngModel)]="latInput"
                               required
+                              [ngClass]="{
+                                'input-small': true,
+                                'red-outline':
+                                  validatedWaypointCreation.lat !== undefined,
+                              }"
                             />
                           </td>
                           <td>
                             <input
-                              class="input-small"
                               id="LonInput"
                               type="number"
                               [(ngModel)]="lonInput"
                               required
+                              [ngClass]="{
+                                'input-small': true,
+                                'red-outline':
+                                  validatedWaypointCreation.lon !== undefined,
+                              }"
                             />
                           </td>
-                          <td>
+                          <td *ngIf="type !== 'GROUND'">
                             <input
-                              class="input-small"
-                              id="AltInput"
+                              id="ZInput"
                               type="number"
-                              [(ngModel)]="altInput"
+                              [(ngModel)]="zInput"
                               required
+                              [ngClass]="{
+                                'input-small': true,
+                                'red-outline':
+                                  validatedWaypointCreation.z !== undefined,
+                              }"
                             />
                           </td>
                           <td>
                             <input
-                              class="input-small"
                               id="SpeedInput"
                               type="number"
                               [(ngModel)]="speedInput"
                               required
+                              [ngClass]="{
+                                'input-small': true,
+                                'red-outline':
+                                  validatedWaypointCreation.speedKts !==
+                                  undefined,
+                              }"
                             />
                           </td>
                           <td>
                             <input
-                              class="datetime-dimensions"
                               id="datetimeInput"
                               type="datetime-local"
                               [(ngModel)]="datetimeInput"
                               [max]="maxDateTime"
+                              [min]="minDateTime"
                               required
+                              [ngClass]="{
+                                'datetime-dimensions': true,
+                                'red-outline':
+                                  validatedWaypointCreation.datetime !==
+                                  undefined,
+                              }"
                             />
                           </td>
                           <td>
@@ -186,48 +234,74 @@
                           </th>
                           <td>
                             <input
-                              class="input-small"
-                              id="LatInput"
+                              id="WaypointLatInput-{{ i }}"
                               type="number"
                               [(ngModel)]="waypoint.lat"
                               required
+                              (blur)="validate()"
+                              [ngClass]="{
+                                'input-small': true,
+                                'red-outline': getWaypointInvalid(i, 'lat'),
+                              }"
                             />
                           </td>
                           <td>
                             <input
-                              class="input-small"
-                              id="LonInput"
+                              id="WaypointLonInput-{{ i }}"
                               type="number"
                               [(ngModel)]="waypoint.lon"
                               required
+                              (blur)="validate()"
+                              [ngClass]="{
+                                'input-small': true,
+                                'red-outline': getWaypointInvalid(i, 'lon'),
+                              }"
                             />
                           </td>
                           <td *ngIf="type != 'GROUND'">
                             <input
-                              class="input-small"
-                              id="ZInput"
+                              id="WaypointZInput-{{ i }}"
                               type="number"
                               [(ngModel)]="waypoint.z"
+                              (blur)="validate()"
+                              [ngClass]="{
+                                'input-small': true,
+                                'red-outline': getWaypointInvalid(i, 'z'),
+                              }"
                             />
                           </td>
                           <td>
                             <input
-                              class="input-small"
-                              id="SpeedInput"
+                              id="WaypointSpeedInput-{{ i }}"
                               type="number"
                               [(ngModel)]="waypoint.speedKts"
+                              (blur)="validate()"
                               required
+                              [ngClass]="{
+                                'input-small': true,
+                                'red-outline': getWaypointInvalid(
+                                  i,
+                                  'speedKts'
+                                ),
+                              }"
                             />
                           </td>
                           <td>
                             <input
-                              class="datetime-dimensions"
-                              id="datetimeInput"
+                              id="WaypointDateTimeInput-{{ i }}"
                               type="datetime-local"
                               [(ngModel)]="waypoint.datetime"
                               [max]="maxDateTime"
                               [min]="minDateTime"
                               required
+                              (blur)="validate()"
+                              [ngClass]="{
+                                'datetime-dimensions': true,
+                                'red-outline': getWaypointInvalid(
+                                  i,
+                                  'datetime'
+                                ),
+                              }"
                             />
                           </td>
                           <td class="actions">
@@ -258,6 +332,13 @@
             </app-card>
           </div>
           <div class="col map-div">
+            <div class="mouse-container">
+              <div
+                #platformMousePositionDisplay
+                id="platformMousePositionDisplay"
+                class="mouse-position"
+              ></div>
+            </div>
             <div
               #mapContainerPlatform
               id="mapContainerPlatform"
@@ -268,7 +349,7 @@
       </div>
       <div class="modal-footer">
         <div *ngIf="errorMessage">
-          <p class="error">
+          <p class="error" title="{{ errorMessage }}">
             {{ errorMessage }}
           </p>
         </div>

@@ -7,110 +7,12 @@ import {
   UserInputFormData,
   Waypoint,
 } from '../shared/types';
-import { addHours, minusHours } from '../shared/utils';
+import {
+  BASIC_FORM_DATA,
+  createFormDateString,
+  minusHours,
+} from '../shared/utils';
 import { FormGroup } from '@angular/forms';
-import { createFormDateString } from '../shared/create';
-
-const BASIC_FORM_DATA: UserInputFormData = {
-  metadata: {
-    scenarioAuthor: 'TBD',
-    dateOfCreation: new Date(),
-    details: '',
-  },
-  scenarioInput: {
-    scenarioName: 'Test Scenario',
-    startTime: minusHours(new Date(), 48),
-    endTime: new Date(),
-    aoi: {
-      lat: 0,
-      lon: 0,
-      alt: 0,
-      radius: 450,
-    },
-    platforms: [
-      {
-        name: 'Test',
-        id: 'test',
-        readonly: false,
-        maxSpeed: 0,
-        maxZ: 0,
-        type: 'AIR',
-        reportingFrequency: 0,
-        friendly: true,
-        color: '#6466f1',
-        waypoints: [
-          {
-            id: 'test-waypoint-0',
-            lat: 2,
-            lon: 2,
-            z: 1,
-            datetime: minusHours(new Date(), 22),
-            index: 0,
-            speedKts: 13,
-          },
-          {
-            id: 'test-waypoint-1',
-            lat: 1,
-            lon: 1,
-            z: 1,
-            datetime: minusHours(new Date(), 17),
-            index: 1,
-            speedKts: 13,
-          },
-          {
-            id: 'test-waypoint-2',
-            lat: 1,
-            lon: 0,
-            z: 1,
-            datetime: minusHours(new Date(), 10),
-            index: 2,
-            speedKts: 13,
-          },
-        ],
-      },
-      {
-        name: 'Second Test',
-        id: 'second-test',
-        readonly: false,
-        maxSpeed: 0,
-        maxZ: 0,
-        type: 'GROUND',
-        reportingFrequency: 0,
-        friendly: true,
-        color: '#51e68fff',
-        waypoints: [
-          {
-            id: 'second-test-waypoint-0',
-            lat: 3,
-            lon: 1,
-            z: 1,
-            datetime: new Date(),
-            index: 0,
-            speedKts: 13,
-          },
-          {
-            id: 'second-test-waypoint-1',
-            lat: 2,
-            lon: 3,
-            z: 1,
-            datetime: addHours(new Date(), 10),
-            index: 1,
-            speedKts: 13,
-          },
-          {
-            id: 'second-test-waypoint-2',
-            lat: 2,
-            lon: 4,
-            z: 1,
-            datetime: addHours(new Date(), 4),
-            index: 2,
-            speedKts: 13,
-          },
-        ],
-      },
-    ],
-  },
-};
 
 interface UserStoreState {
   input: UserInputFormData | undefined;
@@ -172,6 +74,10 @@ export class UserStateService {
     return store.value.input?.metadata;
   }
 
+  getPlatform(index: number): Platform | undefined {
+    return store.value.input?.scenarioInput.platforms[index] ?? undefined;
+  }
+
   updateInput(input: UserInputFormData) {
     store.update((state) => ({
       ...state,
@@ -183,6 +89,8 @@ export class UserStateService {
         state.aoi ??
         BASIC_FORM_DATA.scenarioInput.aoi,
     }));
+
+    console.log(store.value.input);
   }
 
   updateMetadata(metadata: METADATA) {

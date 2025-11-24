@@ -1,8 +1,9 @@
 @use "styles" as style;
 @use "../../cards/platform/platform-card.component.scss";
+@use "../../general/base-map.component.scss";
 
 $waypoint-row-height: 280px;
-$table-height: 240px;
+$table-height: 235px;
 
 .app-card {
   width: 100%;
@@ -29,6 +30,9 @@ $table-height: 240px;
 
 .error {
   color: style.$danger;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .flex-modal {
@@ -61,6 +65,10 @@ $table-height: 240px;
   height: 610px;
   width: 1100px;
   min-width: 1100px;
+}
+
+.red-outline {
+  border: 1px solid style.$danger;
 }
 
 .row {

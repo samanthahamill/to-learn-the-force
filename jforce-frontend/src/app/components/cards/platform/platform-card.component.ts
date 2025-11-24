@@ -37,6 +37,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { createNewWaypointId } from '../../../shared/utils';
 import { DialogEditorService } from '../../../services/dialog-editor.service';
+import { UserStateService } from '../../../services/user-state.service';
 
 @UntilDestroy()
 @Component({
@@ -202,10 +203,7 @@ export class PlatformCardComponent implements AfterViewInit {
   }
 
   editPlatformClicked() {
-    this.dialogEditorService.updatePlatformAndOpenDialog(
-      this.platformForm.value,
-      this.index,
-    );
+    this.dialogEditorService.updatePlatformAndOpenDialog(this.index);
   }
 
   shiftWaypoints() {

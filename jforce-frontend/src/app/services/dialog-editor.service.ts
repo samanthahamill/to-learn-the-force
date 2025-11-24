@@ -1,19 +1,20 @@
 import { inject, Injectable, input } from '@angular/core';
 import { createStore, withProps, select } from '@ngneat/elf';
-import { Waypoint, Platform } from '../shared/types';
+import { Platform, FormPlatform } from '../shared/types';
 import { UserStateService } from './user-state.service';
 import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
-import { untilDestroyed } from '@ngneat/until-destroy';
-import { createFormDateString } from '../shared/create';
-import { meta } from '@turf/turf';
+  createFormDateString,
+  createISODateFromFormString,
+} from '../shared/utils';
+import {
+  formPlatformToPlatform,
+  formWaypointToWaypoint,
+  platformToFormPlatform,
+  waypointToFormWaypoint,
+} from '../shared/create';
 
 export interface PlatformEditorInformation {
-  platform: Platform;
+  platform: FormPlatform;
   platformIndex: number;
 }
 
@@ -48,16 +49,21 @@ export class DialogEditorService {
     }));
   }
 
-  updatePlatformAndOpenDialog(platform: Platform, platformIndex: number) {
+  updatePlatformAndOpenDialog(platformIndex: number) {
     const info = {
-      platform: platform,
+      platform: this.userStateService.getPlatform(platformIndex),
       platformIndex: platformIndex,
     };
 
-    store.update((state) => ({
-      ...state,
-      platformInformation: info,
-    }));
+    if (info !== undefined && info.platform !== undefined) {
+      store.update((state) => ({
+        ...state,
+        platformInformation: {
+          platform: platformToFormPlatform(info.platform!),
+          platformIndex: info.platformIndex,
+        },
+      }));
+    }
   }
 
   saveUpdatedInformation() {
@@ -66,7 +72,7 @@ export class DialogEditorService {
     if (platformInfo !== undefined) {
       this.userStateService.updatePlatform(
         platformInfo.platformIndex,
-        platformInfo.platform,
+        formPlatformToPlatform(platformInfo.platform),
       );
     }
   }

@@ -15,12 +15,13 @@ import { UserStateService } from '../../services/user-state.service';
 import { ExternalComponent } from '../panels/external/external.component';
 import { Platform, UserInputFormData } from '../../shared/types';
 import {
-  createFormDateString,
   formGroupPlatformsToPlatformArray,
   getNewPlatformFormGroup,
 } from '../../shared/create';
-import { createISODateFromFormString } from '../../shared/utils';
-import { InfoDialogComponent } from '../pop-ups/info-dialog/info-dialog.component';
+import {
+  createFormDateString,
+  createISODateFromFormString,
+} from '../../shared/utils';
 import { ScenarioInputPanelComponent } from '../panels/scenario-input/scenario-input-panel.component';
 
 @UntilDestroy()
