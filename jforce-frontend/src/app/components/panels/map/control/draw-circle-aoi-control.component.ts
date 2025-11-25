@@ -13,6 +13,7 @@ import { MAP_PROJECTION } from '../../../../shared/utils';
 import { circular } from 'ol/geom/Polygon';
 import { getDistance } from 'ol/sphere';
 import { squaredDistance } from 'ol/coordinate';
+import { COMPASS_DRAFTING_ICON } from '../../../../shared/icons';
 
 export interface DrawAoiCallbacks {
   onDrawEnd: (evt: any) => void;
@@ -36,7 +37,7 @@ export class DrawCircleAoiControl extends Control {
     const button = document.createElement('button');
     button.title = 'Draw New AOI';
     // Dot to circle icon
-    button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M320 576C461.4 576 576 461.4 576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 461.4 178.6 576 320 576zM320 224C373 224 416 267 416 320C416 373 373 416 320 416C267 416 224 373 224 320C224 267 267 224 320 224z"/></svg>`;
+    button.innerHTML = COMPASS_DRAFTING_ICON;
     const element = document.createElement('div');
     element.className = 'ol-zoom-aoi ol-unselectable ol-control';
     element.appendChild(button);

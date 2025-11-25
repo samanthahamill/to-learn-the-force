@@ -21,11 +21,13 @@ $table-height: 235px;
 .custom-table {
   max-height: $table-height !important;
   overflow: hidden;
+  max-width: 510px !important;
 }
 
 .table-custom {
   max-height: $table-height !important;
   overflow-y: auto;
+  max-width: 510px !important;
 }
 
 .error {

@@ -89,6 +89,15 @@ export function createNewWaypointFormGroup(
     speedKts: new FormControl(waypoint?.speedKts ?? 0, {
       validators: Validators.required,
     }),
+    smaj: new FormControl(waypoint?.smaj ?? 0, {
+      validators: Validators.required,
+    }),
+    smin: new FormControl(waypoint?.smin ?? 0, {
+      validators: Validators.required,
+    }),
+    orientation: new FormControl(waypoint?.orientation ?? 0, {
+      validators: Validators.required,
+    }),
   });
 }
 

@@ -18,13 +18,24 @@
             [readonly]="readonly"
             class="name"
           />
+          <div>
+            <input
+              id="friendly"
+              type="checkbox"
+              formControlName="friendly"
+              (change)="onUpdate()"
+              class="checkbox"
+            />
+            <label for="friendly">Is Friendly</label>
+          </div>
 
-          <label tooltip="Type" for="type">Type</label>
-          <select formControlName="type" id="type" size="small">
-            <option *ngFor="let option of platformTypeOptions" [value]="option">
-              {{ option }}
-            </option>
-          </select>
+          <div *ngIf="!shouldShowWaypointTableRows" class="row waypoint-count">
+            <div class="col waypoint-count">
+              <label for="maxDepth"
+                >Waypoint Count: {{ getWaypointCount() }}</label
+              >
+            </div>
+          </div>
         </div>
         <div class="col">
           <label for="reportingFrequency">Reporting Freq</label>
@@ -45,6 +56,14 @@
             (blur)="onUpdate()"
             [readonly]="readonly"
           />
+        </div>
+        <div class="col">
+          <label tooltip="Type" for="type">Type</label>
+          <select formControlName="type" id="type" size="small">
+            <option *ngFor="let option of platformTypeOptions" [value]="option">
+              {{ option }}
+            </option>
+          </select>
           <div class="col-inner" *ngIf="platformType != 'GROUND'">
             <label for="maxZ"
               >Max {{ platformType == "AIR" ? "Alt" : "Depth" }}</label
@@ -57,26 +76,6 @@
               (blur)="onUpdate()"
               [readonly]="readonly"
             />
-          </div>
-        </div>
-        <div class="col">
-          <div>
-            <input
-              id="friendly"
-              type="checkbox"
-              formControlName="friendly"
-              (change)="onUpdate()"
-              class="checkbox"
-            />
-            <label for="friendly">Is Friendly</label>
-          </div>
-
-          <div *ngIf="!shouldShowWaypointTableRows" class="row waypoint-count">
-            <div class="col waypoint-count">
-              <label for="maxDepth"
-                >Waypoint Count: {{ getWaypointCount() }}</label
-              >
-            </div>
           </div>
         </div>
       </div>
@@ -107,15 +106,24 @@
           >
             <thead>
               <tr>
-                <th scope="col" class="actions">#</th>
-                <th scope="col">Lat</th>
-                <th scope="col">Lon</th>
-                <th scope="col" *ngIf="type !== 'GROUND'">
-                  {{ type == "AIR" ? "Altitude" : "Depth" }}
+                <th title="index" scope="col" class="actions">#</th>
+                <th title="latitude" scope="col">Lat</th>
+                <th title="longitude" scope="col">Lon</th>
+                <th
+                  title="z-index in kilometers"
+                  scope="col"
+                  *ngIf="type !== 'GROUND'"
+                >
+                  {{ type == "AIR" ? "Alt (km)" : "Depth (km)" }}
                 </th>
-                <th scope="col">Speed</th>
-                <th scope="col">Date/Time</th>
-                <th scope="col" class="actions">Actions</th>
+                <th title="speed" scope="col">Speed</th>
+                <th title="semi-major in kilometers" scope="col">Smaj (km)</th>
+                <th title="semi-minor in kilometers" scope="col">Smin (km)</th>
+                <th title="orientation in degrees" scope="col">
+                  Orient. (deg)
+                </th>
+                <th title="date/time" scope="col">Date/Time</th>
+                <th title="row actions" scope="col" class="actions">Actions</th>
               </tr>
             </thead>
             <tbody
@@ -141,6 +149,9 @@
                 <td>{{ waypoint.lon }}</td>
                 <td *ngIf="type !== 'GROUND'">{{ waypoint.z }}</td>
                 <td>{{ waypoint.speedKts }}</td>
+                <td>{{ waypoint.smaj }}</td>
+                <td>{{ waypoint.smin }}</td>
+                <td>{{ waypoint.orientation }}</td>
                 <td>{{ waypoint.datetime }}</td>
                 <td class="actions">
                   <div class="table-buttons">
