@@ -712,23 +712,10 @@ export class PlatformDialogComponent
 
     for (let i = 0; i < this.waypoints.length; i++) {
       const waypoint = this.waypoints[i];
-      invalidWapoint.push(this.validateWaypoint(waypoint).validated);
-
-      if (
-        createISODateFromFormString(waypoint.datetime).getTime() <
-        earliestTime.getTime()
-      ) {
-        errorMessageAdditions.push(
-          `Waypoint ${waypoint.index} has a date that is earlier than the scenario start time.`,
-        );
-      }
-      if (
-        createISODateFromFormString(waypoint.datetime).getTime() >
-        latestTime.getTime()
-      ) {
-        errorMessageAdditions.push(
-          `Waypoint ${waypoint.index} has a date that is later than the scenario end time.`,
-        );
+      const waypointValidation = this.validateWaypoint(waypoint);
+      invalidWapoint.push(waypointValidation.validated);
+      if (waypointValidation.errorMessages.length > 0) {
+        errorMessageAdditions.push(...waypointValidation.errorMessages);
       }
 
       if (i !== 0) {
@@ -753,7 +740,7 @@ export class PlatformDialogComponent
     }
 
     if (errorMessageAdditions.length > 0) {
-      this.errorMessage = errorMessageAdditions.join(', ');
+      this.errorMessage = errorMessageAdditions.join(' ');
       return false;
     }
 
@@ -764,9 +751,11 @@ export class PlatformDialogComponent
   validateWaypoint(waypoint: FormWaypoint): {
     validated: ValidatedWaypoint | undefined;
     errorFields: string[];
+    errorMessages: string[];
   } {
     const errorFields: string[] = [];
     let validatedWaypoint: ValidatedWaypoint = {};
+    let errorMessages: string[] = [];
 
     if (waypoint.lat == null || isNaN(waypoint.lat)) {
       errorFields.push('Lat');
@@ -808,6 +797,25 @@ export class PlatformDialogComponent
       };
     }
 
+    if (
+      waypoint.smin != null &&
+      !isNaN(waypoint.smin) &&
+      waypoint.smaj != null &&
+      !isNaN(waypoint.smaj) &&
+      waypoint.smin > waypoint.smaj
+    ) {
+      errorFields.push('smaj');
+      errorFields.push('smin');
+      validatedWaypoint = {
+        ...validatedWaypoint,
+        smin: 'Invalid',
+        smaj: 'Invalid',
+      };
+      errorMessages.push(
+        `Semi-major value cannot be less than semi-minor value for waypoint ${waypoint.index}.`,
+      );
+    }
+
     if (waypoint.orientation == null || isNaN(waypoint.orientation)) {
       errorFields.push('Orientation');
       validatedWaypoint = {
@@ -822,21 +830,6 @@ export class PlatformDialogComponent
         ...validatedWaypoint,
         datetime: 'Invalid',
       };
-    } else if (
-      new Date(createISODateFromFormString(waypoint.datetime)) <
-        new Date(createISODateFromFormString(this.minDateTime)) ||
-      new Date(createISODateFromFormString(waypoint.datetime)) >
-        new Date(createISODateFromFormString(this.maxDateTime))
-    ) {
-      validatedWaypoint = {
-        ...validatedWaypoint,
-        datetime: 'Invalid',
-      };
-      this.toastSerivce.popErrorToast(
-        'Add Waypoint Error',
-        `Date/Time cannot be before min date time of ${this.minDateTime} or after ${this.maxDateTime}.` +
-          `Please ensure it is within the required bounds, or change the overall min/max datetimes for the scenario first.`,
-      );
     }
 
     if (waypoint.z == null || isNaN(waypoint.z)) {
@@ -854,9 +847,27 @@ export class PlatformDialogComponent
       }
     }
 
+    if (
+      createISODateFromFormString(waypoint.datetime).getTime() <
+      new Date(createISODateFromFormString(this.minDateTime)).getTime()
+    ) {
+      errorMessages.push(
+        `Waypoint ${waypoint.index} has a date that is earlier than the scenario start time.`,
+      );
+    }
+    if (
+      createISODateFromFormString(waypoint.datetime).getTime() >
+      new Date(createISODateFromFormString(this.maxDateTime)).getTime()
+    ) {
+      errorMessages.push(
+        `Waypoint ${waypoint.index} has a date that is later than the scenario end time.`,
+      );
+    }
+
     return {
       validated: errorFields.length > 0 ? validatedWaypoint : undefined,
       errorFields: errorFields,
+      errorMessages: errorMessages,
     };
   }
 
