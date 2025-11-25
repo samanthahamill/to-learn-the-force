@@ -125,18 +125,30 @@
                     >
                       <thead>
                         <tr>
-                          <th scope="col" class="actions">#</th>
-                          <th scope="col">Lat</th>
-                          <th scope="col">Lon</th>
-                          <th *ngIf="type != 'GROUND'" scope="col">
-                            {{ type == "AIR" ? "Altitude" : "Depth" }}
+                          <th title="index" scope="col" class="actions">#</th>
+                          <th title="latitude" scope="col">Lat</th>
+                          <th title="longitude" scope="col">Lon</th>
+                          <th
+                            title="z-index in kilometers"
+                            scope="col"
+                            *ngIf="type !== 'GROUND'"
+                          >
+                            {{ type == "AIR" ? "Alt (km)" : "Depth (km)" }}
                           </th>
-                          <th scope="col">Speed</th>
-                          <th scope="col">Smaj</th>
-                          <th scope="col">Smin</th>
-                          <th scope="col">Orientation</th>
-                          <th scope="col">Date/Time</th>
-                          <th scope="col" class="actions">Actions</th>
+                          <th title="speed" scope="col">Speed</th>
+                          <th title="semi-major in kilometers" scope="col">
+                            Smaj (km)
+                          </th>
+                          <th title="semi-minor in kilometers" scope="col">
+                            Smin (km)
+                          </th>
+                          <th title="orientation in degrees" scope="col">
+                            Orient. (deg)
+                          </th>
+                          <th title="date/time" scope="col">Date/Time</th>
+                          <th title="row actions" scope="col" class="actions">
+                            Actions
+                          </th>
                         </tr>
                       </thead>
                       <tbody cdkDropList (cdkDropListDropped)="drop($event)">

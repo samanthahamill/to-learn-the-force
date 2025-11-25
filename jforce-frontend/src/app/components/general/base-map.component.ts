@@ -341,7 +341,7 @@ export class BaseMapComponent implements OnInit, OnDestroy {
         );
         const aoi = circle(pt, this.aoiValue.radius, {
           steps: 180,
-          units: 'nauticalmiles',
+          units: 'kilometers',
         });
         source.addFeature(this.geoJson.readFeature(aoi));
         this.fitExtent = source.getExtent();

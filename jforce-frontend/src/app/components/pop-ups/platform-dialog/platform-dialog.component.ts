@@ -426,7 +426,7 @@ export class PlatformDialogComponent
       );
       const circleType = ellipse(pt, waypoint.smin, waypoint.smaj, {
         steps: 180,
-        units: 'nauticalmiles',
+        units: 'kilometers',
         angle: waypoint.orientation,
         properties: { data: waypoint, id: `ellipse-${waypoint.id}` },
       });
