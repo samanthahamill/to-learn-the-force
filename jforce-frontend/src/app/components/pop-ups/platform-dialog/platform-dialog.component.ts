@@ -376,6 +376,13 @@ export class PlatformDialogComponent
     };
   }
 
+  onPointUpdated() {
+    const validated = this.validate();
+    if (validated) {
+      this.updateMap();
+    }
+  }
+
   renderLocalWaypoints() {
     if (!this.localReportLayer || this.platformData === undefined) return;
 
@@ -411,6 +418,13 @@ export class PlatformDialogComponent
     feature.set('draggable', false);
 
     this.localVectorSource.addFeature(feature);
+  }
+
+  onEllipsisUpdate() {
+    const validated = this.validate();
+    if (validated) {
+      this.renderLocalEllipsis();
+    }
   }
 
   renderLocalEllipsis() {
@@ -707,9 +721,6 @@ export class PlatformDialogComponent
 
     const invalidWapoint = [];
 
-    const earliestTime = new Date(this.minDateTime);
-    const latestTime = new Date(this.maxDateTime);
-
     for (let i = 0; i < this.waypoints.length; i++) {
       const waypoint = this.waypoints[i];
       const waypointValidation = this.validateWaypoint(waypoint);
@@ -773,7 +784,11 @@ export class PlatformDialogComponent
       };
     }
 
-    if (waypoint.speedKts == null || isNaN(waypoint.speedKts)) {
+    if (
+      waypoint.speedKts == null ||
+      isNaN(waypoint.speedKts) ||
+      waypoint.speedKts < 0
+    ) {
       errorFields.push('Speed');
       validatedWaypoint = {
         ...validatedWaypoint,
@@ -781,7 +796,7 @@ export class PlatformDialogComponent
       };
     }
 
-    if (waypoint.smaj == null || isNaN(waypoint.smaj)) {
+    if (waypoint.smaj == null || isNaN(waypoint.smaj) || waypoint.smaj < 0) {
       errorFields.push('smaj');
       validatedWaypoint = {
         ...validatedWaypoint,
@@ -789,7 +804,7 @@ export class PlatformDialogComponent
       };
     }
 
-    if (waypoint.smin == null || isNaN(waypoint.smin)) {
+    if (waypoint.smin == null || isNaN(waypoint.smin) || waypoint.smin < 0) {
       errorFields.push('smin');
       validatedWaypoint = {
         ...validatedWaypoint,
@@ -832,7 +847,7 @@ export class PlatformDialogComponent
       };
     }
 
-    if (waypoint.z == null || isNaN(waypoint.z)) {
+    if (waypoint.z == null || isNaN(waypoint.z) || waypoint.z < 0) {
       if (this.type === 'MARITIME') errorFields.push('Depth');
       validatedWaypoint = {
         ...validatedWaypoint,

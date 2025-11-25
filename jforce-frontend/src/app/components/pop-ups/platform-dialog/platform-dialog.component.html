@@ -294,7 +294,7 @@
                               type="number"
                               [(ngModel)]="waypoint.lat"
                               required
-                              (blur)="validate()"
+                              (blur)="onPointUpdated()"
                               [ngClass]="{
                                 'input-small': true,
                                 'red-outline': getWaypointInvalid(i, 'lat'),
@@ -307,7 +307,7 @@
                               type="number"
                               [(ngModel)]="waypoint.lon"
                               required
-                              (blur)="validate()"
+                              (blur)="onPointUpdated()"
                               [ngClass]="{
                                 'input-small': true,
                                 'red-outline': getWaypointInvalid(i, 'lon'),
@@ -347,7 +347,7 @@
                               id="waypointSmajInput-{{ i }}"
                               type="number"
                               [(ngModel)]="waypoint.smaj"
-                              (blur)="validate()"
+                              (blur)="onEllipsisUpdate()"
                               required
                               [ngClass]="{
                                 'input-small': true,
@@ -360,7 +360,7 @@
                               id="waypointSminInput-{{ i }}"
                               type="number"
                               [(ngModel)]="waypoint.smin"
-                              (blur)="validate()"
+                              (blur)="onEllipsisUpdate()"
                               required
                               [ngClass]="{
                                 'input-small': true,
@@ -373,7 +373,7 @@
                               id="waypointOrientationInput-{{ i }}"
                               type="number"
                               [(ngModel)]="waypoint.orientation"
-                              (blur)="validate()"
+                              (blur)="onEllipsisUpdate()"
                               required
                               [ngClass]="{
                                 'input-small': true,
