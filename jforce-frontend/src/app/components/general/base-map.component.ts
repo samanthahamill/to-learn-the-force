@@ -25,13 +25,14 @@ import { createStringYX, MAP_PROJECTION } from '../../shared/utils';
 import Feature from 'ol/Feature';
 import { TerraDraw, TerraDrawPointMode } from 'terra-draw';
 import { TerraDrawOpenLayersAdapter } from 'terra-draw-openlayers-adapter';
-import { point, circle, polygon, lineString } from '@turf/turf';
+import { point, polygon, lineString, circle, ellipse } from '@turf/turf';
 import { Extent } from 'ol/extent';
 import BaseLayer from 'ol/layer/Base';
 import { Coordinate } from 'ol/coordinate';
 import Toggle from 'ol-ext/control/Toggle';
-import { RULER_ICON, TRACK_ICON } from '../../shared/icons';
+import { DOT_CIRCLE_ICON, RULER_ICON, TRACK_ICON } from '../../shared/icons';
 import { MeasurementToolControl } from '../panels/map/control/measurement-tool.component';
+import { Geometry } from 'ol/geom';
 
 // import { FeatureId } from 'terra-draw/dist/store/store';
 export type FeatureId = string | number;
@@ -42,6 +43,10 @@ const aoiStyle = new Style({
 
 const vectorStyle = new Style({
   stroke: new Styled.Stroke({ color: 'white', width: 2 }),
+});
+
+const ellipseStyle = new Style({
+  stroke: new Styled.Stroke({ color: '#e9e8c2ff', width: 2 }),
 });
 
 @UntilDestroy()
@@ -64,6 +69,8 @@ export class BaseMapComponent implements OnInit, OnDestroy {
   platformWaypointLayer: VectorLayer;
   platformVectorSource: VectorSource = new VectorSource();
   platformVectorLayer: VectorLayer;
+  waypointEllipsisSource: VectorSource = new VectorSource();
+  waypointEllipsisLayer: VectorLayer;
 
   terraDraw: TerraDraw | undefined;
   terraDrawOpenLayerAdapter: TerraDrawOpenLayersAdapter | undefined;
@@ -74,12 +81,14 @@ export class BaseMapComponent implements OnInit, OnDestroy {
 
   showTrackLabels: boolean;
   platformVectorVisible: boolean;
+  waypointEllipseVisible: boolean;
 
   constructor(target: string, mouseTarget: string) {
     this.target = target;
     this.mouseTarget = mouseTarget;
     this.showTrackLabels = true;
     this.platformVectorVisible = true;
+    this.waypointEllipseVisible = false;
 
     this.measureToolControl = new MeasurementToolControl({
       className: 'ol-measure-tool',
@@ -114,6 +123,13 @@ export class BaseMapComponent implements OnInit, OnDestroy {
       visible: this.platformVectorVisible,
       source: this.platformVectorSource,
       style: vectorStyle,
+    });
+
+    this.waypointEllipsisSource = new VectorSource();
+    this.waypointEllipsisLayer = new VectorLayer({
+      visible: this.waypointEllipseVisible,
+      source: this.waypointEllipsisSource,
+      style: ellipseStyle,
     });
 
     this.olMapView = new View({
@@ -160,6 +176,7 @@ export class BaseMapComponent implements OnInit, OnDestroy {
         }),
         this.drawingLayer,
         this.aoiLayer,
+        this.waypointEllipsisLayer,
         this.platformVectorLayer,
         this.platformWaypointLayer,
         ...this.customLayers(),
@@ -200,10 +217,27 @@ export class BaseMapComponent implements OnInit, OnDestroy {
       }),
     );
 
+    btnBar.addControl(
+      new Toggle({
+        title: 'Toggle Ellipsis',
+        className: 'ol-ellipse-toggle',
+        html: DOT_CIRCLE_ICON,
+        active: this.waypointEllipseVisible,
+        onToggle: (activate) => {
+          this.toggleEllipsis(activate);
+        },
+      }),
+    );
+
     btnBar.addControl(this.measureToolControl);
 
     this.addButtonsToBar().forEach((control) => btnBar.addControl(control));
     this.map?.addControl(btnBar);
+  }
+
+  toggleEllipsis(activate: boolean) {
+    this.waypointEllipseVisible = activate;
+    this.waypointEllipsisLayer.setVisible(this.waypointEllipseVisible);
   }
 
   initTerraDraw() {
@@ -322,6 +356,7 @@ export class BaseMapComponent implements OnInit, OnDestroy {
   updateMap() {
     this.updateVectors();
     this.updateTracks();
+    this.updateEllipses();
   }
 
   updateVectors() {
@@ -428,6 +463,47 @@ export class BaseMapComponent implements OnInit, OnDestroy {
     feature.set('label', label);
 
     return feature;
+  }
+
+  updateEllipses() {
+    if (!this.waypointEllipsisLayer) return;
+
+    this.waypointEllipsisSource.clear();
+
+    const features = this.displayData.flatMap((platform) => {
+      return platform.waypoints.flatMap((waypoint) => {
+        const pt = point(
+          [waypoint.lon, waypoint.lat] as Coordinate,
+          {},
+          { id: `point-${waypoint.id}` },
+        );
+        const circleType = ellipse(pt, waypoint.smin, waypoint.smaj, {
+          steps: 180,
+          units: 'nauticalmiles',
+          angle: waypoint.orientation,
+          properties: { data: waypoint, id: `ellipse-${waypoint.id}` },
+        });
+
+        const feature = this.geoJson.readFeature(
+          circleType,
+        ) as Feature<Geometry>;
+        feature.setStyle(
+          new Styled.Style({
+            stroke: new Styled.Stroke({ color: '#e9e8c2ff', width: 1 }),
+            image: new Styled.Circle({
+              radius: 120,
+              fill: new Styled.Fill({ color: '#e9e8c2ff' }),
+            }),
+          }),
+        );
+
+        feature.set('draggable', false);
+
+        return feature;
+      });
+    });
+
+    this.waypointEllipsisSource.addFeatures(features);
   }
 
   destroyMap() {

@@ -57,14 +57,14 @@ import {
   formPlatformToPlatform,
   formWaypointToWaypoint,
 } from '../../../shared/create';
-import { lineString } from '@turf/turf';
+import { ellipse, lineString, point } from '@turf/turf';
 import { Feature } from 'ol';
 import { FeatureLike } from 'ol/Feature';
-import { MapContextMenu } from '../../panels/map/menu/map-context-menu.component';
-import { ContextMenu } from '../../panels/map/menu/context-menu.component';
+import * as Styled from 'ol/style';
 import { FeatureContextMenu } from '../../panels/map/menu/feature-context-menu.component';
 import { DRAW_WAYPOINT_ICON, HEXAGON_NODE_ICON } from '../../../shared/icons';
 import { ToastService } from '../../../services/toast.service';
+import { Geometry } from 'ol/geom';
 
 declare var $: any;
 
@@ -109,10 +109,12 @@ export class PlatformDialogComponent
   allowDraw: boolean;
   errorMessage: string | undefined;
 
-  private reportSource: VectorSource = new VectorSource();
-  private reportLayer: VectorLayer;
-  private vectorSource: VectorSource = new VectorSource();
-  private vectorLayer: VectorLayer;
+  private localReportSource: VectorSource;
+  private localReportLayer: VectorLayer;
+  private localVectorSource: VectorSource;
+  private localVectorLayer: VectorLayer;
+  private localEllipsisSource: VectorSource;
+  private localEllipsisLayer: VectorLayer;
   private drawWaypointControl: DrawWaypointsControl;
   private dragWaypointControl: DragWaypointsControl;
   private featureContextMenu: FeatureContextMenu;
@@ -183,13 +185,18 @@ export class PlatformDialogComponent
       },
     });
 
-    this.reportSource = new VectorSource();
-    this.reportLayer = new VectorLayer({
-      source: this.reportSource,
+    this.localReportSource = new VectorSource();
+    this.localReportLayer = new VectorLayer({
+      source: this.localReportSource,
     });
-    this.vectorSource = new VectorSource();
-    this.vectorLayer = new VectorLayer({
-      source: this.vectorSource,
+    this.localVectorSource = new VectorSource();
+    this.localVectorLayer = new VectorLayer({
+      source: this.localVectorSource,
+    });
+    this.localEllipsisSource = new VectorSource();
+    this.localEllipsisLayer = new VectorLayer({
+      source: this.localEllipsisSource,
+      visible: this.waypointEllipseVisible,
     });
 
     this.allowDraw = false;
@@ -205,6 +212,7 @@ export class PlatformDialogComponent
         this.updateToggles(true, 'DRAW');
       },
     });
+
     this.dragWaypointControl = new DragWaypointsControl({
       className: 'ol-drag-waypoint-control',
       // TODO possibly find a better svg - this is hexagon nodes icon
@@ -300,13 +308,18 @@ export class PlatformDialogComponent
 
   override updateMap() {
     super.updateMap();
-    this.renderWaypoints();
-    this.renderVector();
+    this.renderLocalEllipsis();
+    this.renderLocalWaypoints();
+    this.renderLocalVector();
     this.updateData();
   }
 
   override customLayers() {
-    return [this.vectorLayer, this.reportLayer];
+    return [
+      this.localEllipsisLayer,
+      this.localVectorLayer,
+      this.localReportLayer,
+    ];
   }
 
   override addButtonsToBar() {
@@ -326,6 +339,11 @@ export class PlatformDialogComponent
       platform.id !== this.platformData?.platform.id
       ? 'gray'
       : this.platform?.color;
+  }
+
+  override toggleEllipsis(activated: boolean) {
+    super.toggleEllipsis(activated);
+    this.localEllipsisLayer.setVisible(activated);
   }
 
   ////////////// GET METHODS \\\\\\\\\\\\\\\\
@@ -358,10 +376,10 @@ export class PlatformDialogComponent
     };
   }
 
-  renderWaypoints() {
-    if (!this.reportLayer || this.platformData === undefined) return;
+  renderLocalWaypoints() {
+    if (!this.localReportLayer || this.platformData === undefined) return;
 
-    this.reportSource.clear();
+    this.localReportSource.clear();
 
     const features = this.waypoints.map((waypoint) => {
       const feature = this.createWaypointFeature(
@@ -375,13 +393,13 @@ export class PlatformDialogComponent
       return feature;
     });
 
-    this.reportSource.addFeatures(features);
+    this.localReportSource.addFeatures(features);
   }
 
-  renderVector() {
-    if (!this.vectorLayer || this.waypoints.length < 2) return;
+  renderLocalVector() {
+    if (!this.localVectorLayer || this.waypoints.length < 2) return;
 
-    this.vectorSource.clear();
+    this.localVectorSource.clear();
 
     const feature = this.geoJson.readFeature(
       lineString(
@@ -392,7 +410,44 @@ export class PlatformDialogComponent
     ) as Feature;
     feature.set('draggable', false);
 
-    this.vectorSource.addFeature(feature);
+    this.localVectorSource.addFeature(feature);
+  }
+
+  renderLocalEllipsis() {
+    if (!this.localEllipsisLayer) return;
+
+    this.localEllipsisSource.clear();
+
+    const features = this.waypoints.flatMap((waypoint) => {
+      const pt = point(
+        [waypoint.lon, waypoint.lat] as Coordinate,
+        {},
+        { id: `point-${waypoint.id}` },
+      );
+      const circleType = ellipse(pt, waypoint.smin, waypoint.smaj, {
+        steps: 180,
+        units: 'nauticalmiles',
+        angle: waypoint.orientation,
+        properties: { data: waypoint, id: `ellipse-${waypoint.id}` },
+      });
+
+      const feature = this.geoJson.readFeature(circleType) as Feature<Geometry>;
+      feature.setStyle(
+        new Styled.Style({
+          stroke: new Styled.Stroke({ color: '#c2e5e9ff', width: 1 }),
+          image: new Styled.Circle({
+            radius: 120,
+            fill: new Styled.Fill({ color: '#c2e5e9ff' }),
+          }),
+        }),
+      );
+
+      feature.set('draggable', false);
+
+      return feature;
+    });
+
+    this.localEllipsisSource.addFeatures(features);
   }
 
   onDrawEnd() {
@@ -428,7 +483,7 @@ export class PlatformDialogComponent
     });
 
     this.waypoints.push(...newCoordinates);
-    this.renderVector();
+    this.renderLocalVector();
   }
 
   dragPointOnMap(coord: Coordinate, waypointId: string) {
@@ -452,12 +507,12 @@ export class PlatformDialogComponent
         },
       };
 
-      this.renderVector();
+      this.renderLocalVector();
     }
   }
 
   ngModelChange(event: any) {
-    this.renderWaypoints();
+    this.renderLocalWaypoints();
   }
 
   ////////////// NON-MAP METHODS \\\\\\\\\\\\\\\\
@@ -851,7 +906,7 @@ export class PlatformDialogComponent
     this.dragWaypointControl.onDestroy();
 
     super.destroyMap();
-    this.reportSource.dispose();
-    this.reportLayer.dispose();
+    this.localReportSource.dispose();
+    this.localReportLayer.dispose();
   }
 }
