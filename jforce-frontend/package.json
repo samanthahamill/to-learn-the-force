@@ -1,13 +1,13 @@
 {
   "name": "jforce-frontend",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "/jforce",
   "main": "main.js",
   "scripts": {
     "ng": "ng",
     "start": "electron .",
     "pack": "electron-builder --dir",
-    "dist": "ng build --base-href ./ && electron-builder",
+    "dist": "ng build --configuration production --base-href ./ && electron-builder",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "jest",

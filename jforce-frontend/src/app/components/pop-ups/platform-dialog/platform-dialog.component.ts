@@ -16,7 +16,6 @@ import {
   createFormDateString,
   createISODateFromFormString,
   createNewWaypointId,
-  deepClone,
   minusHours,
 } from '../../../shared/utils';
 import {
@@ -34,7 +33,6 @@ import {
   FormPlatform,
   ValidatedPlatform,
   ValidatedWaypoint,
-  Waypoint,
   FormWaypoint,
 } from '../../../shared/types';
 import { CardComponent } from '../../cards/card.component';
@@ -467,6 +465,7 @@ export class PlatformDialogComponent
   onDrawEnd() {
     this.updateToggles(false, 'DRAW');
     this.updateMap();
+    this.validate();
   }
 
   onDrawNewWaypoint(points: Coordinate[]) {
@@ -485,6 +484,9 @@ export class PlatformDialogComponent
         lat: point[0],
         lon: point[1],
         z: 0,
+        smaj: 100,
+        smin: 40,
+        orientation: 0,
         speedKts: lastPoint?.speedKts ?? 0,
         datetime: !lastPoint?.datetime
           ? createFormDateString(new Date())
@@ -538,9 +540,12 @@ export class PlatformDialogComponent
       const validatedResults = this.validateWaypoint({
         lat: this.latInput,
         lon: this.lonInput,
-        datetime: this.datetimeInput,
-        speedKts: this.speedInput,
         z: this.zInput,
+        smaj: this.smajInput,
+        smin: this.sminInput,
+        orientation: this.orientationInput,
+        speedKts: this.speedInput,
+        datetime: this.datetimeInput,
       } as FormWaypoint);
 
       this.validatedWaypointCreation = validatedResults.validated ?? {};
@@ -591,6 +596,7 @@ export class PlatformDialogComponent
     this.waypoints?.splice(index, 1);
     this.shiftWaypoints();
     this.updateMap();
+    this.validate();
   }
 
   drop(event: CdkDragDrop<string[]>) {
@@ -604,6 +610,7 @@ export class PlatformDialogComponent
 
   shiftWaypoints() {
     this.waypoints?.forEach((waypoint, i) => (waypoint.index = i));
+    this.validate();
   }
 
   duplicateWaypoint(index: number) {

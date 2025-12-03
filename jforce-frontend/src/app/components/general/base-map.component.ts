@@ -33,7 +33,7 @@ import Toggle from 'ol-ext/control/Toggle';
 import { DOT_CIRCLE_ICON, RULER_ICON, TRACK_ICON } from '../../shared/icons';
 import { MeasurementToolControl } from '../panels/map/control/measurement-tool.component';
 import { Geometry } from 'ol/geom';
-import { backendEnv } from '../../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 // import { FeatureId } from 'terra-draw/dist/store/store';
 export type FeatureId = string | number;
@@ -169,16 +169,15 @@ export class BaseMapComponent implements OnInit, OnDestroy {
         }),
       ]),
       layers: [
-        // backendEnv.production
-        //   ? new TileLayer({ source: new OSM() })
-        //   :
-        new TileLayer({
-          source: new StadiaMaps({
-            layer: 'alidade_smooth_dark',
-            retina: true,
-            apiKey: '1650f66a-49a7-4c14-a8ec-abb7370294f1',
-          }),
-        }),
+        !environment.production || environment.apiKey === ''
+          ? new TileLayer({ source: new OSM() })
+          : new TileLayer({
+              source: new StadiaMaps({
+                layer: 'alidade_smooth_dark',
+                retina: true,
+                apiKey: environment.apiKey,
+              }),
+            }),
         this.drawingLayer,
         this.aoiLayer,
         this.waypointEllipsisLayer,
@@ -347,7 +346,7 @@ export class BaseMapComponent implements OnInit, OnDestroy {
         );
         const aoi = circle(pt, this.aoiValue.radius, {
           steps: 180,
-          units: 'kilometers',
+          units: 'nauticalmiles',
         });
         source.addFeature(this.geoJson.readFeature(aoi));
         this.fitExtent = source.getExtent();

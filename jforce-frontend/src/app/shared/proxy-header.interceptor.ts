@@ -1,6 +1,6 @@
 import { HttpRequest, HttpHandlerFn, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { backendEnv } from '../../environments/environment';
+import { environment } from '../../environments/environment';
 
 /**
  * An interceptor to handle http requests that are being set out (not received)
