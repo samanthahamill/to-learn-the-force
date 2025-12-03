@@ -24,6 +24,7 @@ export class MapContextMenu extends ContextMenu {
         },
         {
           label: 'Add New Platform',
+          disabled: true,
           action: () => {
             this.userStateService.addPlatform(
               getNewPlatformFormGroup(

@@ -37,6 +37,10 @@ $table-height: 235px;
   overflow: hidden;
 }
 
+.error-div {
+  overflow: hidden;
+}
+
 .flex-modal {
   height: 100%;
   width: 100%;
@@ -61,6 +65,10 @@ $table-height: 235px;
   width: 100vw;
   height: 100vh;
   z-index: 2000;
+}
+
+.modal-footer {
+  flex-wrap: nowrap;
 }
 
 .modal-dimensions {

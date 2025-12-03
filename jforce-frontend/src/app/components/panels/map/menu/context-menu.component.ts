@@ -3,6 +3,7 @@ import { FeatureLike } from 'ol/Feature';
 export interface ContextMenuElement {
   action: () => void;
   label: string;
+  disabled?: boolean;
 }
 
 export interface ContextMenuBaseProps {
@@ -80,10 +81,17 @@ export class ContextMenu {
     const element = document.createElement('button');
     element.classList.add('context-menu');
     element.textContent = contextMenuElement.label;
+    element.disabled = contextMenuElement.disabled ?? false;
     element.style.display = 'block';
     element.style.width = '100%';
     element.style.textAlign = 'left';
     element.style.cursor = 'pointer';
+
+    if (contextMenuElement.disabled) {
+      element.title = `\'${contextMenuElement.label}\' is currently disabled`;
+      element.style.cursor = 'default';
+    }
+
     element.setAttribute('role', 'menuitem');
 
     element.addEventListener('click', () => {

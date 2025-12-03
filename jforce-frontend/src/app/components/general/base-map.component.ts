@@ -15,7 +15,7 @@ import {
   ScaleLine,
 } from 'ol/control.js';
 import TileLayer from 'ol/layer/Tile';
-import { StadiaMaps } from 'ol/source';
+import { OSM, StadiaMaps } from 'ol/source';
 import { UserStateService } from '../../services/user-state.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { AOIType, Platform, Waypoint } from '../../shared/types';
@@ -33,6 +33,7 @@ import Toggle from 'ol-ext/control/Toggle';
 import { DOT_CIRCLE_ICON, RULER_ICON, TRACK_ICON } from '../../shared/icons';
 import { MeasurementToolControl } from '../panels/map/control/measurement-tool.component';
 import { Geometry } from 'ol/geom';
+import { environment } from '../../../environments/environment';
 
 // import { FeatureId } from 'terra-draw/dist/store/store';
 export type FeatureId = string | number;
@@ -168,12 +169,15 @@ export class BaseMapComponent implements OnInit, OnDestroy {
         }),
       ]),
       layers: [
-        new TileLayer({
-          source: new StadiaMaps({
-            layer: 'alidade_smooth_dark',
-            retina: true,
-          }),
-        }),
+        !environment.production || environment.apiKey === ''
+          ? new TileLayer({ source: new OSM() })
+          : new TileLayer({
+              source: new StadiaMaps({
+                layer: 'alidade_smooth_dark',
+                retina: true,
+                apiKey: environment.apiKey,
+              }),
+            }),
         this.drawingLayer,
         this.aoiLayer,
         this.waypointEllipsisLayer,
@@ -198,6 +202,7 @@ export class BaseMapComponent implements OnInit, OnDestroy {
 
   toggleTrackLabels(): void {
     this.showTrackLabels = !this.showTrackLabels;
+    this.updateTracks();
   }
 
   initButtonBar() {
@@ -341,7 +346,7 @@ export class BaseMapComponent implements OnInit, OnDestroy {
         );
         const aoi = circle(pt, this.aoiValue.radius, {
           steps: 180,
-          units: 'kilometers',
+          units: 'nauticalmiles',
         });
         source.addFeature(this.geoJson.readFeature(aoi));
         this.fitExtent = source.getExtent();

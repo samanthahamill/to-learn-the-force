@@ -9,7 +9,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DrawCircleAoiControl } from './control/draw-circle-aoi-control.component';
 import { BaseMapComponent } from '../../general/base-map.component';
 import { MapContextMenu } from './menu/map-context-menu.component';
-import { ContextMenu } from './menu/context-menu.component';
 
 export type FeatureId = string | number;
 
