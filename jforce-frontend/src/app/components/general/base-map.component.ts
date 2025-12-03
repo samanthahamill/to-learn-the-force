@@ -15,7 +15,7 @@ import {
   ScaleLine,
 } from 'ol/control.js';
 import TileLayer from 'ol/layer/Tile';
-import { OSM, StadiaMaps, XYZ } from 'ol/source';
+import { OSM, StadiaMaps } from 'ol/source';
 import { UserStateService } from '../../services/user-state.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { AOIType, Platform, Waypoint } from '../../shared/types';
