@@ -1,2 +1,2 @@
-# J-FORCE MVP
-Frontend development for J-FORCE simulator
+# SITH MVP
+Frontend development for SITH simulator
