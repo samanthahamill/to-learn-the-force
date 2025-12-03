@@ -2,9 +2,12 @@
   "name": "jforce-frontend",
   "version": "0.0.1",
   "homepage": "/jforce",
+  "main": "main.js",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "ng build --base-href ./ && electron-builder",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "jest",
@@ -12,6 +15,17 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "lint": "ng lint"
+  },
+  "build": {
+    "appId": "com.jforce.angularapp",
+    "productName": "J-FORCE Desktop App",
+    "files": [
+      "dist/**/*",
+      "main.js"
+    ],
+    "win": {
+      "target": "nsis"
+    }
   },
   "private": true,
   "dependencies": {
@@ -82,6 +96,8 @@
     "angular-eslint": "19.0.2",
     "autoprefixer": "10.4.21",
     "css-loader": "7.1.2",
+    "electron": "^39.2.4",
+    "electron-builder": "^26.0.12",
     "eslint": "9.16.0",
     "eslint-config-prettier": "10.1.1",
     "jasmine-core": "~5.5.0",

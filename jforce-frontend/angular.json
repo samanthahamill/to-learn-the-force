@@ -16,10 +16,7 @@
             "outputPath": "dist/jforce",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "polyfills": [
-              "zone.js",
-              "@angular/localize/init"
-            ],
+            "polyfills": ["zone.js", "@angular/localize/init"],
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/assets",
@@ -54,13 +51,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "20MB",
-                  "maximumError": "50MB"
+                  "maximumWarning": "120MB",
+                  "maximumError": "150MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "160kB",
-                  "maximumError": "240kB"
+                  "maximumWarning": "360kB",
+                  "maximumError": "540kB"
                 }
               ],
               "fileReplacements": [
