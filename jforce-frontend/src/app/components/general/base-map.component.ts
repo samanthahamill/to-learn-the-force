@@ -34,6 +34,7 @@ import { DOT_CIRCLE_ICON, RULER_ICON, TRACK_ICON } from '../../shared/icons';
 import { MeasurementToolControl } from '../panels/map/control/measurement-tool.component';
 import { Geometry } from 'ol/geom';
 import { environment } from '../../../environments/environment';
+import { defaults } from 'ol/interaction';
 
 // import { FeatureId } from 'terra-draw/dist/store/store';
 export type FeatureId = string | number;
@@ -159,6 +160,9 @@ export class BaseMapComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.map = new Map({
       target: this.target,
+      interactions: defaults({
+        doubleClickZoom: false, // Set to false to disable double-click zoom
+      }),
       controls: defaultControls({ attribution: false }).extend([
         new ScaleLine({ units: 'nautical' }),
         new MousePosition({
@@ -169,7 +173,7 @@ export class BaseMapComponent implements OnInit, OnDestroy {
         }),
       ]),
       layers: [
-        !environment.production || environment.apiKey === ''
+        environment.production && environment.apiKey === ''
           ? new TileLayer({ source: new OSM() })
           : new TileLayer({
               source: new StadiaMaps({

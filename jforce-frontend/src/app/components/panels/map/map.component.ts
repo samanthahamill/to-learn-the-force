@@ -1,14 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import { Control } from 'ol/control.js';
-import { ChangeAOIRequest } from '../../../services/user-state.service';
+import {
+  ChangeAOIRequest,
+  UserStateService,
+} from '../../../services/user-state.service';
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DrawCircleAoiControl } from './control/draw-circle-aoi-control.component';
 import { BaseMapComponent } from '../../general/base-map.component';
 import { MapContextMenu } from './menu/map-context-menu.component';
+import { MapBrowserEvent } from 'ol';
+import { getPlatformIdFromWaypointId } from '../../../shared/utils';
+import { ToastService } from '../../../services/toast.service';
+import { DialogEditorService } from '../../../services/dialog-editor.service';
 
 export type FeatureId = string | number;
 
@@ -24,6 +31,9 @@ export class MapComponent extends BaseMapComponent {
   private mapContextMenu: MapContextMenu;
   vectorSource: VectorSource;
   vectorLayer: VectorLayer;
+
+  private toastService = inject(ToastService);
+  private dialogEditorService = inject(DialogEditorService);
 
   constructor() {
     super('mapContainer', 'mapMousePositionDisplay');
@@ -56,6 +66,40 @@ export class MapComponent extends BaseMapComponent {
         event.clientY,
       );
     });
+
+    this.map?.on(
+      'dblclick',
+      (event: MapBrowserEvent<PointerEvent | KeyboardEvent | WheelEvent>) => {
+        event.preventDefault();
+        const feature =
+          this.map!.forEachFeatureAtPixel(event.pixel, (feature) => feature) ||
+          undefined;
+
+        if (feature !== undefined && feature.getId() !== undefined) {
+          const platforms = this.userStateService.platforms;
+
+          const platformId = getPlatformIdFromWaypointId(
+            feature.getId() as string,
+          );
+
+          const platformIndex = platforms.findIndex(
+            (platform) => platform.id == platformId,
+          );
+
+          if (platformIndex !== undefined) {
+            this.dialogEditorService.updatePlatformAndOpenDialog(platformIndex);
+          } else {
+            this.toastService.showErrorMessage(
+              'Cannot Edit Platform',
+              `The selected waypoint could not be associated with a valid platform`,
+            );
+            console.log(
+              `Platform id: ${platformId}; Platform index: ${platformIndex}; Feature id: ${feature.getId()}`,
+            );
+          }
+        }
+      },
+    );
   }
 
   override customLayers() {

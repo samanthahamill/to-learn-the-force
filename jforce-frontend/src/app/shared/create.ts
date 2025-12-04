@@ -8,7 +8,7 @@ import { Platform, Waypoint, FormWaypoint, FormPlatform } from './types';
 import {
   createFormDateString,
   createISODateFromFormString,
-  getPlatformIdFormat,
+  getWaypointIdFormat,
 } from './utils';
 
 export function getNewPlatformFormGroup(
@@ -65,7 +65,7 @@ export function createNewWaypointFormGroup(
   waypoint?: Waypoint,
 ): FormGroup {
   return fb.group({
-    id: new FormControl(getPlatformIdFormat(platformId, waypointIndex ?? 0), {
+    id: new FormControl(getWaypointIdFormat(platformId, waypointIndex ?? 0), {
       validators: Validators.required,
     }),
     lat: new FormControl(waypoint?.lat ?? 0, {
