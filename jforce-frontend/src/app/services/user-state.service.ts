@@ -74,6 +74,10 @@ export class UserStateService {
     return store.value.input?.metadata;
   }
 
+  get platforms() {
+    return store.value.input?.scenarioInput.platforms ?? [];
+  }
+
   getPlatform(index: number): Platform | undefined {
     return store.value.input?.scenarioInput.platforms[index] ?? undefined;
   }

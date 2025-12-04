@@ -164,8 +164,12 @@ export function createFormDateString(date: Date): string {
   return (date as Date).toISOString().substring(0, 16);
 }
 
-export function getPlatformIdFormat(platformId: string, index: number): string {
+export function getWaypointIdFormat(platformId: string, index: number): string {
   return `${platformId}-waypoint-${index}`;
+}
+
+export function getPlatformIdFromWaypointId(waypointId: string): string {
+  return waypointId.split('-waypoint')[0];
 }
 
 export function createNewWaypointId(
@@ -174,14 +178,14 @@ export function createNewWaypointId(
 ): string {
   let newIndex = waypoints.length ?? 0;
   let foundId = false;
-  let newId = getPlatformIdFormat(platformId, newIndex);
+  let newId = getWaypointIdFormat(platformId, newIndex);
 
   if (waypoints === undefined || waypoints.length == 0) {
     return newId;
   }
 
   while (!foundId) {
-    newId = getPlatformIdFormat(platformId, newIndex);
+    newId = getWaypointIdFormat(platformId, newIndex);
     if (!waypoints.map((waypoint) => waypoint.id).includes(newId)) {
       foundId = true;
     } else {
