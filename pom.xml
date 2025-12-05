@@ -1,0 +1,115 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.1</version>
+    </parent>
+
+    <groupId>com.metsci.sith</groupId>
+    <artifactId>parent</artifactId>
+    <version>0.0.2-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>SITH</name>
+    <description>SITH MVP</description>
+    <organization>
+        <name>Metron, Inc.</name>
+        <url>http://www.metsci.com</url>
+    </organization>
+
+    <properties>
+        <rootdir>${basedir}</rootdir>
+        <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.target>1.21</maven.compiler.target>
+        <maven.compiler.source>1.21</maven.compiler.source>
+        <springdoc.version>2.6.0</springdoc.version>
+        <gpb.version>3.21.9</gpb.version>
+        <mvn.surefire.plugin.version>2.22.0</mvn.surefire.plugin.version>
+        <spring.boot.version>3.3.1</spring.boot.version>
+        <slf4j.version>2.0.9</slf4j.version>
+        <apache.logging.version>2.19.0</apache.logging.version>
+        <logback.version>1.5.16</logback.version>
+        <!-- all arguments that should be included in the VM arguments when running something with glimpse -->
+    </properties>
+
+    <modules>
+        <module>gpb</module>
+        <module>web</module>
+    </modules>
+
+    <profiles>
+        <profile>
+            <id>include-frontend</id>
+            <modules>
+                <module>frontend</module>
+            </modules>
+        </profile>
+    </profiles>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.metsci.sith</groupId>
+                <artifactId>web</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.metsci.sith</groupId>
+                <artifactId>gpb</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>${gpb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java-util</artifactId>
+                <version>${gpb.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.hubspot.jackson</groupId>
+                <artifactId>jackson-datatype-protobuf</artifactId>
+                <version>0.9.15</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.github.os72</groupId>
+                    <artifactId>protoc-jar-maven-plugin</artifactId>
+                    <version>3.11.1</version>
+                    <executions>
+                        <execution>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <protocVersion>3.11.1</protocVersion>
+                                <inputDirectories>
+                                    <include>src/main/proto</include>
+                                </inputDirectories>
+                                <includeStdTypes>true</includeStdTypes>
+                                <cleanOutputFolder>true</cleanOutputFolder>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

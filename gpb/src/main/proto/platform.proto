@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package sith.codec;
+
+option java_package = "com.metsci.gpb.sith.codec";
+option java_multiple_files = true;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+enum PlatformTypeEnum {
+  UNKNOWN_PLATFORM = 0;
+  GROUND = 1;
+  SURFACE = 2;
+  AIR = 3;
+}
+
+message PlatformId {
+  string hex_string = 1;
+}
+
+message Platform {
+  PlatformId _id = 1;
+  string name = 2;
+  PlatformTypeEnum type = 3;
+}
