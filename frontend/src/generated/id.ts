@@ -2,66 +2,19 @@
 // versions:
 //   protoc-gen-ts_proto  v2.8.3
 //   protoc               v6.33.2
-// source: gpb/src/main/proto/platform.proto
+// source: id.proto
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 
-export const protobufPackage = "sith.codec";
-
-export enum PlatformTypeEnum {
-  UNKNOWN_PLATFORM = 0,
-  GROUND = 1,
-  SURFACE = 2,
-  AIR = 3,
-  UNRECOGNIZED = -1,
-}
-
-export function platformTypeEnumFromJSON(object: any): PlatformTypeEnum {
-  switch (object) {
-    case 0:
-    case "UNKNOWN_PLATFORM":
-      return PlatformTypeEnum.UNKNOWN_PLATFORM;
-    case 1:
-    case "GROUND":
-      return PlatformTypeEnum.GROUND;
-    case 2:
-    case "SURFACE":
-      return PlatformTypeEnum.SURFACE;
-    case 3:
-    case "AIR":
-      return PlatformTypeEnum.AIR;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return PlatformTypeEnum.UNRECOGNIZED;
-  }
-}
-
-export function platformTypeEnumToJSON(object: PlatformTypeEnum): string {
-  switch (object) {
-    case PlatformTypeEnum.UNKNOWN_PLATFORM:
-      return "UNKNOWN_PLATFORM";
-    case PlatformTypeEnum.GROUND:
-      return "GROUND";
-    case PlatformTypeEnum.SURFACE:
-      return "SURFACE";
-    case PlatformTypeEnum.AIR:
-      return "AIR";
-    case PlatformTypeEnum.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
-}
+export const protobufPackage = "id";
 
 export interface PlatformId {
   hexString: string;
 }
 
-export interface Platform {
-  Id: PlatformId | undefined;
-  name: string;
-  type: PlatformTypeEnum;
+export interface WaypointId {
+  hexString: string;
 }
 
 function createBasePlatformId(): PlatformId {
@@ -122,28 +75,22 @@ export const PlatformId: MessageFns<PlatformId> = {
   },
 };
 
-function createBasePlatform(): Platform {
-  return { Id: undefined, name: "", type: 0 };
+function createBaseWaypointId(): WaypointId {
+  return { hexString: "" };
 }
 
-export const Platform: MessageFns<Platform> = {
-  encode(message: Platform, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.Id !== undefined) {
-      PlatformId.encode(message.Id, writer.uint32(10).fork()).join();
-    }
-    if (message.name !== "") {
-      writer.uint32(18).string(message.name);
-    }
-    if (message.type !== 0) {
-      writer.uint32(24).int32(message.type);
+export const WaypointId: MessageFns<WaypointId> = {
+  encode(message: WaypointId, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.hexString !== "") {
+      writer.uint32(10).string(message.hexString);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): Platform {
+  decode(input: BinaryReader | Uint8Array, length?: number): WaypointId {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasePlatform();
+    const message = createBaseWaypointId();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -152,23 +99,7 @@ export const Platform: MessageFns<Platform> = {
             break;
           }
 
-          message.Id = PlatformId.decode(reader, reader.uint32());
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
-
-          message.name = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 24) {
-            break;
-          }
-
-          message.type = reader.int32() as any;
+          message.hexString = reader.string();
           continue;
         }
       }
@@ -180,36 +111,24 @@ export const Platform: MessageFns<Platform> = {
     return message;
   },
 
-  fromJSON(object: any): Platform {
-    return {
-      Id: isSet(object.Id) ? PlatformId.fromJSON(object.Id) : undefined,
-      name: isSet(object.name) ? globalThis.String(object.name) : "",
-      type: isSet(object.type) ? platformTypeEnumFromJSON(object.type) : 0,
-    };
+  fromJSON(object: any): WaypointId {
+    return { hexString: isSet(object.hexString) ? globalThis.String(object.hexString) : "" };
   },
 
-  toJSON(message: Platform): unknown {
+  toJSON(message: WaypointId): unknown {
     const obj: any = {};
-    if (message.Id !== undefined) {
-      obj.Id = PlatformId.toJSON(message.Id);
-    }
-    if (message.name !== "") {
-      obj.name = message.name;
-    }
-    if (message.type !== 0) {
-      obj.type = platformTypeEnumToJSON(message.type);
+    if (message.hexString !== "") {
+      obj.hexString = message.hexString;
     }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Platform>, I>>(base?: I): Platform {
-    return Platform.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<WaypointId>, I>>(base?: I): WaypointId {
+    return WaypointId.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Platform>, I>>(object: I): Platform {
-    const message = createBasePlatform();
-    message.Id = (object.Id !== undefined && object.Id !== null) ? PlatformId.fromPartial(object.Id) : undefined;
-    message.name = object.name ?? "";
-    message.type = object.type ?? 0;
+  fromPartial<I extends Exact<DeepPartial<WaypointId>, I>>(object: I): WaypointId {
+    const message = createBaseWaypointId();
+    message.hexString = object.hexString ?? "";
     return message;
   },
 };

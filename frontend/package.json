@@ -6,10 +6,10 @@
   "scripts": {
     "ng": "ng",
     "start": "electron .",
-    "generate-sources": "mkdirp ./src/generated && protoc --proto_path=../ --plugin=./node_modules/.bin/protoc-gen-ts_proto.cmd --ts_proto_out=./src/generated --ts_proto_opt=esModuleInterop=true ../gpb/src/main/proto/platform.proto",
+    "generate-sources": "mkdirp ./src/generated && protoc --proto_path=../gpb/src/main/proto/ --plugin=./node_modules/.bin/protoc-gen-ts_proto.cmd --ts_proto_out=./src/generated --ts_proto_opt=esModuleInterop=true ../gpb/src/main/proto/*.proto",
     "pack": "electron-builder --dir",
     "dist": "ng build --configuration production --base-href ./ && electron-builder",
-    "build": "ng build",
+    "build": "npm run generate-sources && ng build",
     "watch": "ng build --watch --configuration development",
     "test": "jest",
     "test:pipeline": "jest --collectCoverage --coverageDirectory=**/TESTS",
