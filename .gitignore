@@ -3,6 +3,9 @@
 # Code
 .env
 
+# Generated
+*/target
+
 # Compiled output
 /dist
 /tmp

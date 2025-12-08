@@ -1,11 +1,15 @@
 syntax = "proto3";
 
-package sith.codec.id;
+package id;
 
 option java_package = "com.metsci.gpb.sith.codec";
 option java_multiple_files = true;
 
 
 message PlatformId {
+  string hex_string = 1;
+}
+
+message WaypointId {
   string hex_string = 1;
 }
