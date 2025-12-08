@@ -4,7 +4,9 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## Dependencies
 
-In order to build this locally, you will need to run the command `npm install -g pbjs` to generate the proper protobuf files.
+<!-- In order to build this locally, you will need to run the command `npm install -g pbjs` to generate the proper protobuf files. -->
+
+In order to build this locally, you will need to run the command `winget install protobuf` and add `C:/Program Files/Protobuf/bin` to your path in order to generate the proper protobuf files.
 
 ## Development server
 

@@ -6,7 +6,7 @@
   "scripts": {
     "ng": "ng",
     "start": "electron .",
-    "generate-sources": "rm -r ./src/generated && mkdirp ./src/generated && pbts --target static --out ./src/generated/platform.d.ts ../gpb/src/main/proto/platform.proto",
+    "generate-sources": "mkdirp ./src/generated && protoc --proto_path=../ --plugin=./node_modules/.bin/protoc-gen-ts_proto.cmd --ts_proto_out=./src/generated --ts_proto_opt=esModuleInterop=true ../gpb/src/main/proto/platform.proto",
     "pack": "electron-builder --dir",
     "dist": "ng build --configuration production --base-href ./ && electron-builder",
     "build": "ng build",
@@ -112,6 +112,7 @@
     "sass": "1.90.0",
     "sass-loader": "16.0.5",
     "style-loader": "4.0.0",
+    "ts-proto": "2.8.3",
     "ts-node": "10.9.2",
     "typescript": "~5.7.2",
     "typescript-eslint": "8.26.0"
