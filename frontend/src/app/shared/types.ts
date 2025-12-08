@@ -1,4 +1,5 @@
 import { Platform, PlatformTypeEnum } from '../../generated/platform';
+import { platformTypeEnumToString } from './utils';
 
 export interface AOIType {
   lat: number;
@@ -19,9 +20,9 @@ export interface Emitters {
 }
 
 export const PLATFORM_TYPE_OPTIONS: Array<string> = [
-  PlatformTypeEnum.AIR.toString(),
-  PlatformTypeEnum.GROUND.toString(),
-  PlatformTypeEnum.MARITIME.toString(),
+  platformTypeEnumToString(PlatformTypeEnum.AIR),
+  platformTypeEnumToString(PlatformTypeEnum.GROUND),
+  platformTypeEnumToString(PlatformTypeEnum.MARITIME),
 ];
 
 export type METADATA = {

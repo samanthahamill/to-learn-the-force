@@ -17,6 +17,7 @@ import {
   createISODateFromFormString,
   createNewWaypointId,
   minusHours,
+  platformTypeEnumToString,
 } from '../../../shared/utils';
 import {
   CdkDragDrop,
@@ -156,7 +157,7 @@ export class PlatformDialogComponent
     this.maxZ = this.platformData?.platform.maxZ;
     this.friendly = this.platformData?.platform.friendly;
     this.color = this.platformData?.platform.color;
-    this.type = this.platformData?.platform.type.toString();
+    this.type = platformTypeEnumToString(this.platformData?.platform.type);
     this.reportingFrequency = this.platformData?.platform.reportingFrequency;
 
     this.featureContextMenu = new FeatureContextMenu({
@@ -267,7 +268,7 @@ export class PlatformDialogComponent
     this.maxZ = this.platformData?.platform.maxZ;
     this.friendly = this.platformData?.platform.friendly;
     this.color = this.platformData?.platform.color;
-    this.type = this.platformData?.platform.type.toString();
+    this.type = platformTypeEnumToString(this.platformData?.platform.type);
     this.reportingFrequency = this.platformData?.platform.reportingFrequency;
   }
 

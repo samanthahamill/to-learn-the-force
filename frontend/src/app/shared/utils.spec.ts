@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { stringToPlatformTypeEnum } from './utils';
+import { platformTypeEnumToString, stringToPlatformTypeEnum } from './utils';
 import { PlatformTypeEnum } from '../../generated/platform';
 
 describe('Utils.ts', () => {
@@ -11,9 +11,23 @@ describe('Utils.ts', () => {
 
   it('stringToPlatformTypeEnum', () => {
     expect(stringToPlatformTypeEnum('GROUND')).toBe(PlatformTypeEnum.GROUND);
+    expect(stringToPlatformTypeEnum('AIR')).toBe(PlatformTypeEnum.AIR);
+    expect(stringToPlatformTypeEnum('MARITIME')).toBe(
+      PlatformTypeEnum.MARITIME,
+    );
+    expect(stringToPlatformTypeEnum('T')).toBe(
+      PlatformTypeEnum.UNKNOWN_PLATFORM,
+    );
   });
 
   it('platformTypeEnum to string', () => {
-    expect(PlatformTypeEnum.GROUND).toBe(stringToPlatformTypeEnum('GROUND'));
+    expect(platformTypeEnumToString(PlatformTypeEnum.GROUND)).toBe('GROUND');
+    expect(platformTypeEnumToString(PlatformTypeEnum.AIR)).toBe('AIR');
+    expect(platformTypeEnumToString(PlatformTypeEnum.MARITIME)).toBe(
+      'MARITIME',
+    );
+    expect(platformTypeEnumToString(PlatformTypeEnum.UNKNOWN_PLATFORM)).toBe(
+      'UNKNOWN',
+    );
   });
 });

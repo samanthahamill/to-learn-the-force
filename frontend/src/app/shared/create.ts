@@ -8,6 +8,8 @@ import {
   createFormDateString,
   createISODateFromFormString,
   getWaypointIdFormat,
+  platformTypeEnumToString,
+  stringToPlatformTypeEnum,
 } from './utils';
 import { Waypoint, Platform } from '../../generated/platform';
 
@@ -35,9 +37,12 @@ export function getNewPlatformFormGroup(
     maxZ: new FormControl(platform?.maxZ ?? '', {
       validators: Validators.required,
     }),
-    type: new FormControl(platform?.type?.toString() ?? 'AIR', {
-      validators: Validators.required,
-    }),
+    type: new FormControl(
+      platform?.type ? platformTypeEnumToString(platform.type) : 'AIR',
+      {
+        validators: Validators.required,
+      },
+    ),
     color: new FormControl(platform?.color ?? '#6BAED6', {
       validators: Validators.required,
     }),
@@ -112,6 +117,7 @@ export function formGroupPlatformsToPlatformArray(platforms: any): Platform[] {
 export function formGroupPlatformToPlatformType(platform: any): Platform {
   return {
     ...platform,
+    type: stringToPlatformTypeEnum(platform.type),
     waypoints: formGroupWaypointToWaypointArray(platform.waypoints),
   };
 }

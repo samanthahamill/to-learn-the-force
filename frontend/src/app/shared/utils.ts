@@ -271,3 +271,18 @@ export function stringToPlatformTypeEnum(type: string) {
       return PlatformTypeEnum.UNKNOWN_PLATFORM;
   }
 }
+
+export function platformTypeEnumToString(
+  type: PlatformTypeEnum | undefined,
+): string {
+  switch (type) {
+    case PlatformTypeEnum.GROUND:
+      return 'GROUND';
+    case PlatformTypeEnum.AIR:
+      return 'AIR';
+    case PlatformTypeEnum.MARITIME:
+      return 'MARITIME';
+    default:
+      return 'UNKNOWN';
+  }
+}
