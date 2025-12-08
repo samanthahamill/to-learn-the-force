@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package platform;
+
+option java_package = "com.metsci.gpb.sith.codec";
+option java_multiple_files = true;
+
+enum PlatformTypeEnum {
+  UNKNOWN_PLATFORM = 0;
+  GROUND = 1;
+  MARITIME = 2;
+  AIR = 3;
+}
+
+message Platform {
+  string id = 1;
+  string name = 2;
+  PlatformTypeEnum type = 3;
+  int32 max_speed = 4;
+  int32 max_z = 5;
+  bool friendly = 6;
+
+  string color = 7;
+
+  double reporting_frequency = 8;
+  bool readonly = 9;
+  repeated Waypoint waypoints = 10;
+}
+
+message Waypoint {
+  string id = 1;
+
+  int32 index = 2;
+  double lat = 3;
+  double lon = 4;
+  double z = 5;
+  int32 speedKts = 6;
+  double smaj = 7;
+  double smin = 8;
+  int32 orientation = 9;
+
+  string datetime_UTC = 10;
+}
