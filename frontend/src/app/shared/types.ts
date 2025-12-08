@@ -1,3 +1,5 @@
+import { Platform, PlatformTypeEnum } from '../../generated/platform';
+
 export interface AOIType {
   lat: number;
   lon: number;
@@ -16,31 +18,10 @@ export interface Emitters {
   type: 'A/A' | 'S/A';
 }
 
-interface PlatformBase {
-  id: string;
-  name: string;
-  type: PLATFORM_TYPE;
-  maxSpeed: number;
-  maxZ: number;
-  friendly: boolean;
-  color: string; // hex
-
-  reportingFrequency: number; // likely not a number
-  readonly: boolean; // backend value
-}
-export interface Platform extends PlatformBase {
-  waypoints: Array<Waypoint>;
-}
-// A waypoint that utilizes a form-compliant string instead of a date for Datetime
-export interface FormPlatform extends PlatformBase {
-  waypoints: Array<FormWaypoint>;
-}
-
-export type PLATFORM_TYPE = 'GROUND' | 'MARITIME' | 'AIR';
-export const PLATFORM_TYPE_OPTIONS: Array<PLATFORM_TYPE> = [
-  'AIR',
-  'GROUND',
-  'MARITIME',
+export const PLATFORM_TYPE_OPTIONS: Array<string> = [
+  PlatformTypeEnum.AIR.toString(),
+  PlatformTypeEnum.GROUND.toString(),
+  PlatformTypeEnum.MARITIME.toString(),
 ];
 
 export type METADATA = {
@@ -89,26 +70,6 @@ export interface VesselInfo {
   id: string;
   emitter: Array<Emitters>;
   // TODO add other
-}
-
-interface WaypointBase {
-  id: string; // for frontend us only - utilized to allow dragging on map feature
-  index: number; // backend variable only to ensure proper ordering
-
-  lat: number;
-  lon: number;
-  z: number; // altitude or depth
-  speedKts: number;
-  smaj: number;
-  smin: number;
-  orientation: number;
-}
-export interface Waypoint extends WaypointBase {
-  datetime: Date;
-}
-// A waypoint that utilizes a form-compliant string instead of a date for Datetime
-export interface FormWaypoint extends WaypointBase {
-  datetime: string;
 }
 
 export interface ValidatedPlatform {

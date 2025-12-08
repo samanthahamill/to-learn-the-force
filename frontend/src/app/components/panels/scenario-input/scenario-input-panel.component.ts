@@ -16,7 +16,6 @@ import {
   faUpload,
 } from '@fortawesome/free-solid-svg-icons';
 import { ButtonModule } from 'primeng/button';
-import { Platform } from '../../../shared/types';
 import { CardComponent, ICON_FUNCTION } from '../../cards/card.component';
 import { PlatformCardComponent } from '../../cards/platform/platform-card.component';
 import { DialogConfirmationService } from '../../../services/dialog-confirmation.service';
@@ -27,6 +26,7 @@ import {
 } from '../../../shared/create';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DialogEditorService } from '../../../services/dialog-editor.service';
+import { Platform } from '../../../../generated/platform';
 
 @UntilDestroy()
 @Component({

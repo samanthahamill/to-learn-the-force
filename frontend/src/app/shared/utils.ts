@@ -1,5 +1,6 @@
 import { Coordinate, format } from 'ol/coordinate';
-import { UserInputFormData, Waypoint } from './types';
+import { UserInputFormData } from './types';
+import { PlatformTypeEnum, Waypoint } from '../../generated/platform';
 
 export const MAP_PROJECTION = 'EPSG:4326';
 
@@ -56,7 +57,7 @@ export const BASIC_FORM_DATA: UserInputFormData = {
         readonly: false,
         maxSpeed: 0,
         maxZ: 0,
-        type: 'AIR',
+        type: PlatformTypeEnum.AIR,
         reportingFrequency: 0,
         friendly: true,
         color: '#6466f1',
@@ -66,7 +67,7 @@ export const BASIC_FORM_DATA: UserInputFormData = {
             lat: 2,
             lon: 2,
             z: 1,
-            datetime: minusHours(new Date(), 22),
+            datetimeUTC: createFormDateString(minusHours(new Date(), 22)),
             index: 0,
             speedKts: 13,
             smaj: 96,
@@ -78,7 +79,7 @@ export const BASIC_FORM_DATA: UserInputFormData = {
             lat: 1,
             lon: 1,
             z: 1,
-            datetime: minusHours(new Date(), 17),
+            datetimeUTC: createFormDateString(minusHours(new Date(), 17)),
             index: 1,
             speedKts: 13,
             smaj: 133,
@@ -90,7 +91,7 @@ export const BASIC_FORM_DATA: UserInputFormData = {
             lat: 1,
             lon: 0,
             z: 1,
-            datetime: minusHours(new Date(), 10),
+            datetimeUTC: createFormDateString(minusHours(new Date(), 10)),
             index: 2,
             speedKts: 13,
             smaj: 189,
@@ -105,7 +106,7 @@ export const BASIC_FORM_DATA: UserInputFormData = {
         readonly: false,
         maxSpeed: 0,
         maxZ: 0,
-        type: 'GROUND',
+        type: PlatformTypeEnum.GROUND,
         reportingFrequency: 0,
         friendly: true,
         color: '#51e68fff',
@@ -115,7 +116,7 @@ export const BASIC_FORM_DATA: UserInputFormData = {
             lat: 3,
             lon: 1,
             z: 1,
-            datetime: minusHours(new Date(), 12),
+            datetimeUTC: createFormDateString(minusHours(new Date(), 12)),
             index: 0,
             speedKts: 13,
             smaj: 101,
@@ -127,7 +128,7 @@ export const BASIC_FORM_DATA: UserInputFormData = {
             lat: 2,
             lon: 3,
             z: 1,
-            datetime: minusHours(new Date(), 10),
+            datetimeUTC: createFormDateString(minusHours(new Date(), 10)),
             index: 1,
             speedKts: 13,
             smaj: 120,
@@ -139,7 +140,7 @@ export const BASIC_FORM_DATA: UserInputFormData = {
             lat: 2,
             lon: 4,
             z: 1,
-            datetime: minusHours(new Date(), 4),
+            datetimeUTC: createFormDateString(minusHours(new Date(), 4)),
             index: 2,
             speedKts: 13,
             smaj: 105,
@@ -256,4 +257,17 @@ export function rgbToHex(rgb: RGB_TYPE) {
   return (
     '#' + componentToHex(rgb.r) + componentToHex(rgb.g) + componentToHex(rgb.b)
   );
+}
+
+export function stringToPlatformTypeEnum(type: string) {
+  switch (type) {
+    case 'GROUND':
+      return PlatformTypeEnum.GROUND;
+    case 'AIR':
+      return PlatformTypeEnum.AIR;
+    case 'MARITIME':
+      return PlatformTypeEnum.MARITIME;
+    default:
+      return PlatformTypeEnum.UNKNOWN_PLATFORM;
+  }
 }

@@ -27,13 +27,9 @@ import { CommonModule, NgClass } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
-  Platform,
-  PLATFORM_TYPE,
   PLATFORM_TYPE_OPTIONS,
-  FormPlatform,
   ValidatedPlatform,
   ValidatedWaypoint,
-  FormWaypoint,
 } from '../../../shared/types';
 import { CardComponent } from '../../cards/card.component';
 import { BaseMapComponent } from '../../general/base-map.component';
@@ -50,11 +46,7 @@ import VectorSource from 'ol/source/Vector';
 import { DragWaypointsControl } from '../../panels/map/control/drag-waypoint-control.component';
 import { DrawWaypointsControl } from '../../panels/map/control/draw-waypoints-control.component';
 import { ColorPickerModule } from 'primeng/colorpicker';
-import {
-  formGroupWaypointToWaypointArray,
-  formPlatformToPlatform,
-  formWaypointToWaypoint,
-} from '../../../shared/create';
+import { formGroupWaypointToWaypointArray } from '../../../shared/create';
 import { ellipse, lineString, point } from '@turf/turf';
 import { Feature } from 'ol';
 import { FeatureLike } from 'ol/Feature';
@@ -63,6 +55,11 @@ import { FeatureContextMenu } from '../../panels/map/menu/feature-context-menu.c
 import { DRAW_WAYPOINT_ICON, HEXAGON_NODE_ICON } from '../../../shared/icons';
 import { ToastService } from '../../../services/toast.service';
 import { Geometry } from 'ol/geom';
+import {
+  Platform,
+  Waypoint,
+  PlatformTypeEnum,
+} from '../../../../generated/platform';
 
 declare var $: any;
 
@@ -117,7 +114,7 @@ export class PlatformDialogComponent
   private dragWaypointControl: DragWaypointsControl;
   private featureContextMenu: FeatureContextMenu;
 
-  type: PLATFORM_TYPE | undefined = undefined;
+  type: string | undefined = undefined;
   maxSpeed: number | undefined = undefined;
   maxZ: number | undefined = undefined;
   friendly: boolean | undefined = undefined;
@@ -159,7 +156,7 @@ export class PlatformDialogComponent
     this.maxZ = this.platformData?.platform.maxZ;
     this.friendly = this.platformData?.platform.friendly;
     this.color = this.platformData?.platform.color;
-    this.type = this.platformData?.platform.type;
+    this.type = this.platformData?.platform.type.toString();
     this.reportingFrequency = this.platformData?.platform.reportingFrequency;
 
     this.featureContextMenu = new FeatureContextMenu({
@@ -270,7 +267,7 @@ export class PlatformDialogComponent
     this.maxZ = this.platformData?.platform.maxZ;
     this.friendly = this.platformData?.platform.friendly;
     this.color = this.platformData?.platform.color;
-    this.type = this.platformData?.platform.type;
+    this.type = this.platformData?.platform.type.toString();
     this.reportingFrequency = this.platformData?.platform.reportingFrequency;
   }
 
@@ -346,11 +343,11 @@ export class PlatformDialogComponent
 
   ////////////// GET METHODS \\\\\\\\\\\\\\\\
 
-  get platform(): FormPlatform | undefined {
+  get platform(): Platform | undefined {
     return this.platformData?.platform;
   }
 
-  get platformType(): PLATFORM_TYPE {
+  get platformType(): PlatformTypeEnum {
     return this.platformData!.platform.type;
   }
 
@@ -358,7 +355,7 @@ export class PlatformDialogComponent
     return this.platformData?.platform.name ?? '';
   }
 
-  get waypoints(): FormWaypoint[] {
+  get waypoints(): Waypoint[] {
     return this.platformData?.platform.waypoints ?? [];
   }
 
@@ -388,8 +385,8 @@ export class PlatformDialogComponent
 
     const features = this.waypoints.map((waypoint) => {
       const feature = this.createWaypointFeature(
-        formWaypointToWaypoint(waypoint),
-        formPlatformToPlatform(this.platformData!.platform),
+        waypoint,
+        this.platformData!.platform,
         this.name,
         this.color,
       );
@@ -470,16 +467,14 @@ export class PlatformDialogComponent
 
   onDrawNewWaypoint(points: Coordinate[]) {
     const waypoints = this.waypoints;
-    const lastPoint: FormWaypoint | undefined =
+    const lastPoint: Waypoint | undefined =
       this.waypoints[waypoints.length - 1];
 
-    const newCoordinates: FormWaypoint[] = points.map((point) => {
+    const newCoordinates: Waypoint[] = points.map((point) => {
       return {
         id: createNewWaypointId(
           this.platformData?.platform.id ?? this.platformName ?? 'platform',
-          this.waypoints?.map((waypoint) => {
-            return formWaypointToWaypoint(waypoint);
-          }) ?? [],
+          this.waypoints ?? [],
         ),
         lat: point[0],
         lon: point[1],
@@ -488,14 +483,14 @@ export class PlatformDialogComponent
         smin: 40,
         orientation: 0,
         speedKts: lastPoint?.speedKts ?? 0,
-        datetime: !lastPoint?.datetime
+        datetimeUTC: !lastPoint?.datetimeUTC
           ? createFormDateString(new Date())
-          : new Date(lastPoint.datetime).getTime() <
+          : new Date(lastPoint.datetimeUTC).getTime() <
               minusHours(new Date(this.maxDateTime), 1).getTime()
-            ? createFormDateString(addHours(new Date(lastPoint.datetime), 1))
-            : lastPoint.datetime,
+            ? createFormDateString(addHours(new Date(lastPoint.datetimeUTC), 1))
+            : lastPoint.datetimeUTC,
         index: waypoints.length,
-      } as FormWaypoint;
+      } as Waypoint;
     });
 
     this.waypoints.push(...newCoordinates);
@@ -510,7 +505,7 @@ export class PlatformDialogComponent
             ...point,
             lat: toFixed(coord[1], 3),
             lon: toFixed(coord[0], 3),
-          } as FormWaypoint;
+          } as Waypoint;
         }
         return point;
       });
@@ -545,8 +540,8 @@ export class PlatformDialogComponent
         smin: this.sminInput,
         orientation: this.orientationInput,
         speedKts: this.speedInput,
-        datetime: this.datetimeInput,
-      } as FormWaypoint);
+        datetimeUTC: this.datetimeInput,
+      } as Waypoint);
 
       this.validatedWaypointCreation = validatedResults.validated ?? {};
 
@@ -559,13 +554,13 @@ export class PlatformDialogComponent
         const newWaypoint = {
           id: createNewWaypointId(
             this.platformData?.platform.id ?? this.platformName ?? 'platform',
-            this.waypoints.map((waypoint) => formWaypointToWaypoint(waypoint)),
+            this.waypoints,
           ),
           lat: this.latInput!,
           lon: this.lonInput!,
           z: this.zInput!,
           speedKts: this.speedInput!,
-          datetime: this.datetimeInput!,
+          datetimeUTC: this.datetimeInput!,
           smaj: this.smajInput!,
           smin: this.sminInput!,
           orientation: this.orientationInput!,
@@ -740,8 +735,8 @@ export class PlatformDialogComponent
         const previousWaypoint = this.waypoints[i - 1];
 
         if (
-          createISODateFromFormString(waypoint.datetime).getTime() <
-          createISODateFromFormString(previousWaypoint.datetime).getTime()
+          createISODateFromFormString(waypoint.datetimeUTC).getTime() <
+          createISODateFromFormString(previousWaypoint.datetimeUTC).getTime()
         ) {
           errorMessageAdditions.push(
             `Waypoint ${waypoint.index} is scheduled before Waypoint ${previousWaypoint.index} but comes after in order.`,
@@ -766,7 +761,7 @@ export class PlatformDialogComponent
     return true;
   }
 
-  validateWaypoint(waypoint: FormWaypoint): {
+  validateWaypoint(waypoint: Waypoint): {
     validated: ValidatedWaypoint | undefined;
     errorFields: string[];
     errorMessages: string[];
@@ -846,7 +841,7 @@ export class PlatformDialogComponent
       };
     }
 
-    if (waypoint.datetime == null) {
+    if (waypoint.datetimeUTC == null) {
       errorFields.push('Date/Time');
       validatedWaypoint = {
         ...validatedWaypoint,
@@ -870,7 +865,7 @@ export class PlatformDialogComponent
     }
 
     if (
-      createISODateFromFormString(waypoint.datetime).getTime() <
+      createISODateFromFormString(waypoint.datetimeUTC).getTime() <
       new Date(createISODateFromFormString(this.minDateTime)).getTime()
     ) {
       errorMessages.push(
@@ -878,7 +873,7 @@ export class PlatformDialogComponent
       );
     }
     if (
-      createISODateFromFormString(waypoint.datetime).getTime() >
+      createISODateFromFormString(waypoint.datetimeUTC).getTime() >
       new Date(createISODateFromFormString(this.maxDateTime)).getTime()
     ) {
       errorMessages.push(

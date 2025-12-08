@@ -23,11 +23,7 @@ import {
   faLockOpen,
   faRemove,
 } from '@fortawesome/free-solid-svg-icons';
-import {
-  PLATFORM_TYPE,
-  PLATFORM_TYPE_OPTIONS,
-  Waypoint,
-} from '../../../shared/types';
+import { PLATFORM_TYPE_OPTIONS } from '../../../shared/types';
 import {
   CdkDragDrop,
   moveItemInArray,
@@ -37,6 +33,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { createNewWaypointId } from '../../../shared/utils';
 import { DialogEditorService } from '../../../services/dialog-editor.service';
+import { PlatformTypeEnum, Waypoint } from '../../../../generated/platform';
 
 @UntilDestroy()
 @Component({
@@ -73,7 +70,7 @@ export class PlatformCardComponent implements AfterViewInit {
 
   waypointsLocked: boolean = false;
 
-  type: PLATFORM_TYPE | undefined = undefined;
+  type: string | undefined = undefined;
   platformTypeOptions = PLATFORM_TYPE_OPTIONS;
   icons: Array<ICON_FUNCTION>;
   defaultColor: string | undefined = undefined; // default color at the time the platform was made
@@ -117,7 +114,7 @@ export class PlatformCardComponent implements AfterViewInit {
     return this.platformForm?.get('name')?.value ?? 'Unknown';
   }
 
-  get platformType(): PLATFORM_TYPE {
+  get platformType(): string {
     return this.platformForm?.get('type')?.value;
   }
 
@@ -132,7 +129,8 @@ export class PlatformCardComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.platformForm?.valueChanges.pipe(untilDestroyed(this)).subscribe(() => {
-      const type = this.platformForm?.controls['type'].value as PLATFORM_TYPE;
+      const type = this.platformForm?.controls['type']
+        .value as PlatformTypeEnum;
 
       this.platformForm.controls['maxZ'].clearValidators();
 
@@ -145,11 +143,11 @@ export class PlatformCardComponent implements AfterViewInit {
         this.defaultColor = color;
       }
 
-      if (type != 'GROUND') {
+      if (type != PlatformTypeEnum.GROUND) {
         this.platformForm.controls['maxZ'].setValidators(Validators.required);
       }
 
-      this.type = type;
+      this.type = type.toString();
     });
 
     this.platformForm

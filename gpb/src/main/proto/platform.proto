@@ -5,17 +5,15 @@ package platform;
 option java_package = "com.metsci.gpb.sith.codec";
 option java_multiple_files = true;
 
-import "id.proto";
-
 enum PlatformTypeEnum {
   UNKNOWN_PLATFORM = 0;
   GROUND = 1;
-  SURFACE = 2;
+  MARITIME = 2;
   AIR = 3;
 }
 
 message Platform {
-  id.PlatformId _id = 1;
+  string id = 1;
   string name = 2;
   PlatformTypeEnum type = 3;
   int32 max_speed = 4;
@@ -30,7 +28,7 @@ message Platform {
 }
 
 message Waypoint {
-  id.WaypointId _id = 1;
+  string id = 1;
 
   int32 index = 2;
   double lat = 3;

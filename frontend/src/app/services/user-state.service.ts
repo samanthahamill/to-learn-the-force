@@ -1,18 +1,13 @@
 import { Injectable } from '@angular/core';
 import { createStore, select, withProps } from '@ngneat/elf';
-import {
-  AOIType,
-  METADATA,
-  Platform,
-  UserInputFormData,
-  Waypoint,
-} from '../shared/types';
+import { AOIType, METADATA, UserInputFormData } from '../shared/types';
 import {
   BASIC_FORM_DATA,
   createFormDateString,
   minusHours,
 } from '../shared/utils';
 import { FormGroup } from '@angular/forms';
+import { Platform, Waypoint } from '../../generated/platform';
 
 interface UserStoreState {
   input: UserInputFormData | undefined;

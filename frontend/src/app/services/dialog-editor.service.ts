@@ -1,20 +1,10 @@
 import { inject, Injectable, input } from '@angular/core';
 import { createStore, withProps, select } from '@ngneat/elf';
-import { Platform, FormPlatform } from '../shared/types';
 import { UserStateService } from './user-state.service';
-import {
-  createFormDateString,
-  createISODateFromFormString,
-} from '../shared/utils';
-import {
-  formPlatformToPlatform,
-  formWaypointToWaypoint,
-  platformToFormPlatform,
-  waypointToFormWaypoint,
-} from '../shared/create';
+import { Platform } from '../../generated/platform';
 
 export interface PlatformEditorInformation {
-  platform: FormPlatform;
+  platform: Platform;
   platformIndex: number;
 }
 
@@ -59,7 +49,7 @@ export class DialogEditorService {
       store.update((state) => ({
         ...state,
         platformInformation: {
-          platform: platformToFormPlatform(info.platform!),
+          platform: info.platform!,
           platformIndex: info.platformIndex,
         },
       }));
@@ -72,7 +62,7 @@ export class DialogEditorService {
     if (platformInfo !== undefined) {
       this.userStateService.updatePlatform(
         platformInfo.platformIndex,
-        formPlatformToPlatform(platformInfo.platform),
+        platformInfo.platform,
       );
     }
   }

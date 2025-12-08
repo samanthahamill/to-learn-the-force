@@ -4,12 +4,12 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { Platform, Waypoint, FormWaypoint, FormPlatform } from './types';
 import {
   createFormDateString,
   createISODateFromFormString,
   getWaypointIdFormat,
 } from './utils';
+import { Waypoint, Platform } from '../../generated/platform';
 
 export function getNewPlatformFormGroup(
   fb: FormBuilder,
@@ -23,19 +23,19 @@ export function getNewPlatformFormGroup(
 
   // TODO implement
   return fb.group({
-    name: new FormControl(platform?.name ?? platformName, {
-      validators: Validators.required,
-    }),
     id: new FormControl(compliantPlatformId, {
       validators: Validators.required,
     }), // TODO make better id,
+    name: new FormControl(platform?.name ?? platformName, {
+      validators: Validators.required,
+    }),
     maxSpeed: new FormControl(platform?.maxSpeed ?? '', {
       validators: Validators.required,
     }),
     maxZ: new FormControl(platform?.maxZ ?? '', {
       validators: Validators.required,
     }),
-    type: new FormControl(platform?.type ?? 'AIR', {
+    type: new FormControl(platform?.type?.toString() ?? 'AIR', {
       validators: Validators.required,
     }),
     color: new FormControl(platform?.color ?? '#6BAED6', {
@@ -65,7 +65,7 @@ export function createNewWaypointFormGroup(
   waypoint?: Waypoint,
 ): FormGroup {
   return fb.group({
-    id: new FormControl(getWaypointIdFormat(platformId, waypointIndex ?? 0), {
+    Id: new FormControl(getWaypointIdFormat(platformId, waypointIndex ?? 0), {
       validators: Validators.required,
     }),
     lat: new FormControl(waypoint?.lat ?? 0, {
@@ -77,8 +77,8 @@ export function createNewWaypointFormGroup(
     z: new FormControl(waypoint?.z ?? 0, {
       validators: Validators.required,
     }),
-    datetime: new FormControl(
-      createFormDateString(waypoint?.datetime ?? new Date()),
+    datetimeUTC: new FormControl(
+      waypoint?.datetimeUTC ?? createFormDateString(new Date()),
       {
         validators: Validators.required,
       },
@@ -128,34 +128,5 @@ export function formGroupWaypointToWaypointType(waypoint: any): Waypoint {
   return {
     ...waypoint,
     datetime: new Date(createISODateFromFormString(waypoint.datetime)),
-  };
-}
-
-export function formWaypointToWaypoint(formWaypoint: FormWaypoint): Waypoint {
-  return {
-    ...formWaypoint,
-    datetime: createISODateFromFormString(formWaypoint.datetime),
-  };
-}
-export function waypointToFormWaypoint(waypoint: Waypoint): FormWaypoint {
-  return {
-    ...waypoint,
-    datetime: createFormDateString(waypoint.datetime),
-  };
-}
-export function formPlatformToPlatform(formPlatform: FormPlatform): Platform {
-  return {
-    ...formPlatform,
-    waypoints: formPlatform.waypoints.map((waypoint) => {
-      return formWaypointToWaypoint(waypoint);
-    }),
-  };
-}
-export function platformToFormPlatform(platform: Platform): FormPlatform {
-  return {
-    ...platform,
-    waypoints: platform.waypoints.map((waypoint) => {
-      return waypointToFormWaypoint(waypoint);
-    }),
   };
 }

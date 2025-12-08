@@ -13,7 +13,7 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ToastService } from '../../services/toast.service';
 import { UserStateService } from '../../services/user-state.service';
 import { ExternalComponent } from '../panels/external/external.component';
-import { Platform, UserInputFormData } from '../../shared/types';
+import { UserInputFormData } from '../../shared/types';
 import {
   formGroupPlatformsToPlatformArray,
   getNewPlatformFormGroup,
@@ -23,6 +23,7 @@ import {
   createISODateFromFormString,
 } from '../../shared/utils';
 import { ScenarioInputPanelComponent } from '../panels/scenario-input/scenario-input-panel.component';
+import { Platform } from '../../../generated/platform';
 
 @UntilDestroy()
 @Component({

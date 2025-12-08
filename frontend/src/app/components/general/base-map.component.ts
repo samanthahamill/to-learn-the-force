@@ -18,7 +18,7 @@ import TileLayer from 'ol/layer/Tile';
 import { OSM, StadiaMaps } from 'ol/source';
 import { UserStateService } from '../../services/user-state.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { AOIType, Platform, Waypoint } from '../../shared/types';
+import { AOIType } from '../../shared/types';
 import { fromLonLat, getUserProjection, Projection, toLonLat } from 'ol/proj';
 import GeoJSON from 'ol/format/GeoJSON';
 import { createStringYX, MAP_PROJECTION } from '../../shared/utils';
@@ -35,6 +35,7 @@ import { MeasurementToolControl } from '../panels/map/control/measurement-tool.c
 import { Geometry } from 'ol/geom';
 import { environment } from '../../../environments/environment';
 import { defaults } from 'ol/interaction';
+import { Platform, Waypoint } from '../../../generated/platform';
 
 // import { FeatureId } from 'terra-draw/dist/store/store';
 export type FeatureId = string | number;
