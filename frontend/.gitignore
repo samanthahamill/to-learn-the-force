@@ -2,7 +2,8 @@
 
 # Code
 .env
-./generated/*
+/generated/*
+*/generated/*
 
 # Compiled output
 /dist

@@ -2,6 +2,8 @@
 
 # Code
 .env
+*/generated
+*/generated/*
 
 # Generated
 */target
@@ -12,6 +14,10 @@
 /tmp
 /out-tsc
 /bazel-out
+
+# Maven
+*/.mvn
+*/.mvn/*
 
 # Node
 /node_modules
