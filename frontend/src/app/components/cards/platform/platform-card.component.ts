@@ -33,7 +33,9 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { createNewWaypointId } from '../../../shared/utils';
 import { DialogEditorService } from '../../../services/dialog-editor.service';
-import { PlatformTypeEnum, Waypoint } from '../../../../generated/platform';
+import { Waypoint } from '../../../../generated/platform';
+import { UserStateService } from '../../../services/user-state.service';
+import { formGroupPlatformToPlatformType } from '../../../shared/create';
 
 @UntilDestroy()
 @Component({
@@ -59,6 +61,8 @@ export class PlatformCardComponent implements AfterViewInit {
   editIcon = faEdit;
   lockIcon = faLock;
   lockOpenIcon = faLockOpen;
+
+  private userState = inject(UserStateService);
 
   @Input() platformForm!: FormGroup;
   @Input() index!: number;
@@ -123,14 +127,12 @@ export class PlatformCardComponent implements AfterViewInit {
   }
 
   getDateTimeString(date: Date) {
-    console.log(date);
     return date?.toISOString() ?? '';
   }
 
   ngAfterViewInit(): void {
     this.platformForm?.valueChanges.pipe(untilDestroyed(this)).subscribe(() => {
-      const type = this.platformForm?.controls['type']
-        .value as PlatformTypeEnum;
+      const type: string = this.platformForm?.controls['type'].value;
 
       this.platformForm.controls['maxZ'].clearValidators();
 
@@ -143,11 +145,18 @@ export class PlatformCardComponent implements AfterViewInit {
         this.defaultColor = color;
       }
 
-      if (type != PlatformTypeEnum.GROUND) {
+      if (type != 'GROUND') {
         this.platformForm.controls['maxZ'].setValidators(Validators.required);
       }
 
-      this.type = type.toString();
+      if (this.type !== undefined && this.type != type) {
+        this.userState.updatePlatform(
+          this.index,
+          formGroupPlatformToPlatformType(this.platformForm.value),
+        );
+      }
+
+      this.type = type;
     });
 
     this.platformForm

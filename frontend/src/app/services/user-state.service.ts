@@ -88,8 +88,6 @@ export class UserStateService {
         state.aoi ??
         BASIC_FORM_DATA.scenarioInput.aoi,
     }));
-
-    console.log(store.value.input);
   }
 
   updateMetadata(metadata: METADATA) {
