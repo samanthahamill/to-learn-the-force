@@ -21,6 +21,7 @@ import {
 import {
   createFormDateString,
   createISODateFromFormString,
+  stringToPlatformTypeEnum,
 } from '../../shared/utils';
 import { ScenarioInputPanelComponent } from '../panels/scenario-input/scenario-input-panel.component';
 import { Platform } from '../../../generated/platform';
@@ -48,13 +49,14 @@ export class MainContentComponent {
   private toastService = inject(ToastService);
 
   constructor(private fb: FormBuilder) {
-    this.userStateService.input$
-      .pipe(untilDestroyed(this))
-      .subscribe((data: UserInputFormData | undefined) => {
+    const initialSetup = this.userStateService.input$.subscribe({
+      next: (data: UserInputFormData | undefined) => {
         if (data !== undefined && data != this.formGroup?.value) {
           this.updateInput(data);
+          initialSetup.unsubscribe();
         }
-      });
+      },
+    });
   }
 
   ngOnInit(): void {
@@ -153,6 +155,25 @@ export class MainContentComponent {
         }),
         tools: this.fb.group({
           isTool: new FormControl(input.tool ?? 'true', {
+            validators: Validators.required,
+          }),
+        }),
+        metadata: this.fb.group({
+          dateOfCreation: new FormControl(
+            input.metadata.dateOfCreation
+              ? createFormDateString(input.metadata.dateOfCreation)
+              : new Date(),
+            {
+              validators: Validators.required,
+            },
+          ),
+          scenarioAuthor: new FormControl(
+            input.metadata.scenarioAuthor ?? 'TBD',
+            {
+              validators: Validators.required,
+            },
+          ),
+          details: new FormControl(input.metadata.details, {
             validators: Validators.required,
           }),
         }),

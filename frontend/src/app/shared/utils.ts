@@ -259,7 +259,7 @@ export function rgbToHex(rgb: RGB_TYPE) {
   );
 }
 
-export function stringToPlatformTypeEnum(type: string) {
+export function stringToPlatformTypeEnum(type: string): PlatformTypeEnum {
   switch (type) {
     case 'GROUND':
       return PlatformTypeEnum.GROUND;
