@@ -1,11 +1,12 @@
 {
-  "name": "jforce-frontend",
+  "name": "sith",
   "version": "0.0.2",
-  "homepage": "/jforce",
+  "homepage": "/sith",
   "main": "main.js",
   "scripts": {
     "ng": "ng",
-    "start": "electron .",
+    "start": "ng serve --proxy-config src/proxy.conf.json",
+    "start:electro": "electron .",
     "generate-sources": "mkdirp ./src/generated && protoc --proto_path=../gpb/src/main/proto/ --plugin=./node_modules/.bin/protoc-gen-ts_proto.cmd --ts_proto_out=./src/generated --ts_proto_opt=esModuleInterop=true ../gpb/src/main/proto/*.proto",
     "pack": "electron-builder --dir",
     "dist": "ng build --configuration production --base-href ./ && electron-builder",
@@ -17,9 +18,9 @@
     "test:coverage": "jest --coverage",
     "lint": "ng lint"
   },
-  "build": {
-    "appId": "com.jforce.angularapp",
-    "productName": "J-FORCE Desktop App",
+  "sith": {
+    "appId": "com.sith.angularapp",
+    "productName": "SITH Desktop App",
     "files": [
       "dist/**/*",
       "main.js"

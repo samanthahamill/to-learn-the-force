@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "JForce": {
+    "SITH": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser-esbuild",
           "options": {
-            "outputPath": "dist/jforce",
+            "outputPath": "dist/sith",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": ["zone.js", "@angular/localize/init"],
@@ -79,14 +79,17 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "proxyConfig": "src/proxy.conf.json"
+            "proxyConfig": "src/proxy.conf.json",
+            "buildTarget": "SITH:build"
           },
           "configurations": {
             "production": {
-              "buildTarget": "JForce:build:production"
+              "proxyConfig": "src/proxy.conf.json",
+              "buildTarget": "SITH:build:production"
             },
             "development": {
-              "buildTarget": "JForce:build:development"
+              "proxyConfig": "src/proxy.conf.json",
+              "buildTarget": "SITH:build:development"
             }
           },
           "defaultConfiguration": "development"

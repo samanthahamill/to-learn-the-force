@@ -6,6 +6,7 @@ import { DialogConfirmationComponent } from './components/pop-ups/dialog-confirm
 import { ToastComponent } from './components/pop-ups/toast/toast.component';
 import { PlatformDialogComponent } from './components/pop-ups/platform-dialog/platform-dialog.component';
 import { InfoDialogComponent } from './components/pop-ups/info-dialog/info-dialog.component';
+import { LoadingScreenComponent } from './components/pop-ups/loading-screen/loading-screen.component';
 
 @Component({
   selector: 'app-root',
@@ -17,11 +18,12 @@ import { InfoDialogComponent } from './components/pop-ups/info-dialog/info-dialo
     ClassificationBannerComponent,
     PlatformDialogComponent,
     InfoDialogComponent,
+    LoadingScreenComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   schemas: [NO_ERRORS_SCHEMA],
 })
 export class AppComponent {
-  title = 'jforce-frontend';
+  title = 'sith';
 }
