@@ -106,7 +106,6 @@ export class ExternalComponent implements OnInit {
   }
 
   onDateTimeChange(newValue: string): void {
-    console.log(new Date(newValue).toISOString());
     const subscription = this.conversionRepository
       .putNewStartDate(new Date(newValue).toISOString())
       .subscribe({
@@ -143,14 +142,14 @@ export class ExternalComponent implements OnInit {
         .then((observable) => {
           const subscription = observable.subscribe({
             next: (fileContent) => {
-              // TODO convert
               this.fileState = 'COMPLETE';
-
               const blob = new Blob([fileContent], {
                 type: 'text/csv;charset=utf-8;',
               });
-              console.log(this.selectedFile!.name);
-              saveAs(blob, '2-' + this.selectedFile!.name);
+
+              const newFileName = `${this.selectedFile!.name.split('.csv')[0]}-modified-${this.newStartTimeFile}`;
+
+              saveAs(blob, newFileName);
             },
             error: (error: HttpErrorResponse) => {
               console.log(error);
