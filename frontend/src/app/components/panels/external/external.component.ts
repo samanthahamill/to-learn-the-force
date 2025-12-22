@@ -22,6 +22,8 @@ import { ConversionRepository } from '../../../state/conversion.repository';
 import { ToastService } from '../../../services/toast.service';
 import { ConnectionRepository } from '../../../state/connection.repository';
 import { LoadingService } from '../../../services/loading.service';
+import saveAs from 'file-saver';
+import { HttpErrorResponse } from '@angular/common/http';
 
 type FileConversionState =
   | 'WAITING_FOR_CONVERSION'
@@ -71,12 +73,15 @@ export class ExternalComponent implements OnInit {
 
   backendConnected: boolean = false;
 
+  newStartTimeFile: string;
+
   // TODO set up actual connections
 
   constructor() {
     this.fileState = 'NOT_LOADED';
     this.importData = false;
     this.maxDateTime = this.systemStateService.maxDate;
+    this.newStartTimeFile = new Date().toISOString().substring(0, 16);
   }
 
   ngOnInit(): void {
@@ -100,15 +105,30 @@ export class ExternalComponent implements OnInit {
     this.importData = !this.importData;
   }
 
+  onDateTimeChange(newValue: string): void {
+    console.log(new Date(newValue).toISOString());
+    const subscription = this.conversionRepository
+      .putNewStartDate(new Date(newValue).toISOString())
+      .subscribe({
+        error: (error) => {
+          console.log(error);
+          this.toastService.popErrorToast(
+            'Failed to set new start date',
+            error.error,
+          );
+        },
+        complete: () => subscription && subscription.unsubscribe(),
+      });
+  }
+
   selectedFile: File | null = null;
 
   onFileSelected(event: any): void {
     const fileList: FileList = event.target.files;
     if (fileList.length > 0) {
       this.selectedFile = fileList[0];
-      this.fileState = this.selectedFile?.name.endsWith('.csv')
-        ? 'VALID'
-        : 'INVALID';
+      this.fileState =
+        this.selectedFile?.type == 'text/csv' ? 'VALID' : 'INVALID';
     }
   }
 
@@ -118,32 +138,34 @@ export class ExternalComponent implements OnInit {
 
       this.loadingService.initiateLoadingScreen('Converting File...');
 
-      const subscription = this.conversionRepository
-        .postConvertFile(this.selectedFile, 0)
-        .subscribe({
-          next: (fileContent) => {
-            // TODO convert
-            this.fileState = 'COMPLETE';
+      this.conversionRepository
+        .postConvertFile(this.selectedFile)
+        .then((observable) => {
+          const subscription = observable.subscribe({
+            next: (fileContent) => {
+              // TODO convert
+              this.fileState = 'COMPLETE';
 
-            const blob = new Blob([fileContent], {
-              type: 'text/csv;charset=utf-8;',
-            });
-          },
-          error: (error) => {
-            console.log(error);
-            this.fileState = 'ERROR_CONVERTING';
-            this.toastService.popErrorToast('Failed to convert file', error);
-          },
-          complete: () => {
-            this.loadingService.closeLoadingScrean();
-            subscription && subscription.unsubscribe();
-          },
+              const blob = new Blob([fileContent], {
+                type: 'text/csv;charset=utf-8;',
+              });
+              console.log(this.selectedFile!.name);
+              saveAs(blob, '2-' + this.selectedFile!.name);
+            },
+            error: (error: HttpErrorResponse) => {
+              console.log(error);
+              this.fileState = 'ERROR_CONVERTING';
+              this.toastService.popErrorToast(
+                'Failed to convert file',
+                error.error,
+              );
+            },
+            complete: () => {
+              this.loadingService.closeLoadingScrean();
+              subscription && subscription.unsubscribe();
+            },
+          });
         });
-
-      // setTimeout(() => {
-      //   this.fileState = 'ERROR_CONVERTING';
-      //   this.loadingService.closeLoadingScrean();
-      // }, 5000);
     }
   }
 }
