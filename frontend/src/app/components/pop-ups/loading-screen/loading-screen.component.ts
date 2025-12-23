@@ -21,7 +21,6 @@ export class LoadingScreenComponent {
 
   private loadingService = inject(LoadingService);
 
-  dialog: ConfirmationServiceOptions | null = null;
   initialized = false;
   message: string | undefined = '';
 
