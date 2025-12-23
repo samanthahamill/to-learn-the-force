@@ -135,9 +135,19 @@
     <ng-template #uploadData>
       <div class="row">
         <app-card header="Upload External Input">
+          <!-- TODO either add back in or remove -->
+          <!-- <select [(ngModel)]="timeZone" name="timeZone" size="small">
+            <option
+              *ngFor="let option of timeZoneOptions"
+              [value]="option.value"
+            >
+              {{ option.name }}
+            </option>
+          </select> -->
+
           <div class="labelAndTooltip">
             <label name="ogStartTime" for="newStartTime">
-              New Start Time
+              New Start Time (UTC)
             </label>
             <i
               class="bi bi-info-circle info"
@@ -146,9 +156,15 @@
           </div>
           <input
             type="datetime-local"
-            [(ngModel)]="newStartTimeFile"
-            (ngModelChange)="onDateTimeChange($event)"
+            [value]="localInputValue"
+            (blur)="onDateTimeChange($event)"
           />
+          <!-- TODO either add back in or remove -->
+          <!-- <input
+            type="datetime-local"
+            [value]="localInputValue"
+            (blur)="dateTimeUpdated($event)"
+          /> -->
 
           <label for="uploadFromFile">Upload From CSV</label>
           <input

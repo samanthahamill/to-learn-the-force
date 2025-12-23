@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.Getter;
@@ -41,11 +40,16 @@ public class ConversionController
 
     @PutMapping( "/newStartDate" )
     public ResponseEntity<Void> setConversionOffsetMillis(
-            @RequestParam( "newStartDate" )
+            @RequestBody
             String newStartDate )
     {
         LOGGER.debug( "Setting new start date: {}", newStartDate );
+        if ( !newStartDate.endsWith( "Z" ) )
+        {
+            newStartDate = newStartDate + 'Z';
+        }
         this.newFileTime = Instant.parse( newStartDate );
+        LOGGER.info( "Setting new start date: {}", this.newFileTime );
         return ResponseEntity.ok( ).build( );
     }
 
@@ -77,7 +81,6 @@ public class ConversionController
                 for ( int i = 0; i < headers.size( ); i++ )
                 {
                     String header = headers.get( i );
-                    System.out.println( header );
                     if ( Objects.equals( header, "TIMESTAMP" ) )
                     {
                         timestampColumnIndex = i;
@@ -101,7 +104,6 @@ public class ConversionController
                 {
                     String[] rawRecord = record.stream( ).toArray( String[]::new );
 
-                    // need to skip first row
                     Instant instant = Instant.parse( rawRecord[timestampColumnIndex] );
 
                     if ( timeOffsetMillis == 0 )
@@ -121,12 +123,14 @@ public class ConversionController
                                 .filename( "modified.csv" )
                                 .build( ) );
 
+                LOGGER.info( "File successfully converted" );
+
                 return new ResponseEntity<>( sb.toString( ).getBytes( StandardCharsets.UTF_8 ), httpHeader, HttpStatus.OK );
             }
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Could not transform file", e );
+            LOGGER.error( "Could not modify file", e );
             return ResponseEntity.badRequest( ).build( );
         }
     }

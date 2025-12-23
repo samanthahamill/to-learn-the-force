@@ -8,7 +8,7 @@ import {
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { CardComponent } from '../../cards/card.component';
-import { NgClass, NgIf } from '@angular/common';
+import { CommonModule, NgClass, NgIf } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { ButtonGroupModule } from 'primeng/buttongroup';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
@@ -37,6 +37,7 @@ type FileConversionState =
 @Component({
   selector: 'app-external-card',
   imports: [
+    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     CardComponent,
@@ -74,14 +75,73 @@ export class ExternalComponent implements OnInit {
   backendConnected: boolean = false;
 
   newStartTimeFile: string;
-
-  // TODO set up actual connections
+  timeZone: string = 'UTC';
+  timeZoneOptions: Array<any> = [
+    { name: 'Zulu', value: 'UTC' },
+    { name: 'Denver', value: 'America/Denver' },
+    { name: 'New York', value: 'America/New_York' },
+    { name: 'Los Angeles', value: 'America/Los_Angeles' },
+    { name: 'Hawaii', value: 'US/Hawaii' },
+    { name: 'Japan', value: 'Japan' },
+    { name: 'Bahrain', value: 'Asia/Bahrain' },
+  ];
 
   constructor() {
     this.fileState = 'NOT_LOADED';
     this.importData = false;
     this.maxDateTime = this.systemStateService.maxDate;
     this.newStartTimeFile = new Date().toISOString().substring(0, 16);
+  }
+
+  utcDate = new Date();
+
+  // Method to format the UTC date as a string for the <input type="datetime-local">
+  get localInputValue(): string {
+    return new Date(
+      this.utcDate.toLocaleString('en-US', { timeZone: this.timeZone }),
+    )
+      .toISOString()
+      .slice(0, 16);
+  }
+
+  dateTimeUpdated(event: Event | string): void {
+    let date: string;
+    if (typeof event !== 'string') {
+      const target = event.target as HTMLInputElement;
+      date = target.value;
+    } else {
+      date = event;
+    }
+
+    // account for daylight savings later
+    switch (this.timeZone) {
+      case 'America/Denver':
+        date += ':00.000-0700';
+        break;
+      case 'America/New_York':
+        date += ':00.000-0500';
+        break;
+      case 'America/Los_Angeles':
+        date += ':00.000-0800';
+        break;
+      case 'US/Hawaii':
+        date += ':00.000-1000';
+        break;
+      case 'Japan':
+        date += ':00.000+0900';
+        break;
+      case 'Asia/Bahrain':
+        date += ':00.000+0300';
+        break;
+      case 'UTC':
+      default:
+        date += ':00.000';
+        break;
+    }
+
+    console.log(date);
+
+    this.utcDate = new Date(date);
   }
 
   ngOnInit(): void {
@@ -105,13 +165,25 @@ export class ExternalComponent implements OnInit {
     this.importData = !this.importData;
   }
 
-  onDateTimeChange(newValue: string): void {
+  onDateTimeChange(event: Event | string): void {
+    let newValue: string;
+    if (typeof event !== 'string') {
+      const target = event.target as HTMLInputElement;
+      newValue = target.value;
+    } else {
+      newValue = event;
+    }
+
+    const stringDate = new Date(newValue).toISOString().slice(0, 23);
+    console.log(stringDate);
     const subscription = this.conversionRepository
-      .putNewStartDate(new Date(newValue).toISOString())
+      .putNewStartDate(stringDate)
       .subscribe({
-        error: (error) => {
+        next: () =>
+          this.toastService.showSuccessMessage('New start date updated'),
+        error: (error: HttpErrorResponse) => {
           console.log(error);
-          this.toastService.popErrorToast(
+          this.toastService.showErrorMessage(
             'Failed to set new start date',
             error.error,
           );
