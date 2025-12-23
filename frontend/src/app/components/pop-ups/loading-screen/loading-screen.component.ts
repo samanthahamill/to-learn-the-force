@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 import { Component, inject, NO_ERRORS_SCHEMA } from '@angular/core';
 import { faCircleNotch } from '@fortawesome/free-solid-svg-icons';
 import { LoadingService } from '../../../services/loading.service';
@@ -31,6 +31,7 @@ export class LoadingScreenComponent {
       .subscribe((message) => {
         this.message = message;
         if (!this.initialized) {
+          this.initialized = true;
           return;
         }
 

@@ -9,8 +9,15 @@
   z-index: 2000;
 }
 
-.modal-dimensions {
-  height: 610px;
-  width: 1100px;
-  min-width: 1100px;
+.modal-header {
+  font-size: 20px;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+p {
+  margin-bottom: 0px;
+  margin-right: 4px;
 }
