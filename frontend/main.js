@@ -14,7 +14,7 @@ function createWindow() {
     },
   });
 
-  win.loadFile(path.join(__dirname, "dist/jforce/index.html"));
+  win.loadFile(path.join(__dirname, "dist/sith/index.html"));
 }
 
 app.whenReady().then(createWindow);

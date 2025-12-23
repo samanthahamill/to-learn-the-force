@@ -1,7 +1,20 @@
 <div class="panel-style external-panel">
   <div class="content">
     <div class="title">
-      <h1>External Input</h1>
+      <h1>
+        External Input
+
+        <fa-icon
+          *ngIf="!backendConnected"
+          [icon]="errorIcon"
+          [ngClass]="{
+            'icon-button': true,
+            'non-hover-icon': true,
+            'red-icon': true,
+          }"
+          title="Could not connect to backend. Converting files unavailable"
+        ></fa-icon>
+      </h1>
 
       <div class="right-buttons">
         <p-buttongroup>
@@ -14,6 +27,8 @@
             (click)="toggleImportData()"
             variant="outlined"
             [ngClass]="{ selected: !importData }"
+            disabled
+            title="(Disabled) Only Uploading Data is Currently Available"
           ></button>
           <button
             pButton
@@ -24,6 +39,8 @@
             (click)="toggleImportData()"
             variant="outlined"
             [ngClass]="{ selected: importData }"
+            disabled
+            title="(Disabled) Only Uploading Data is Currently Available"
           ></button>
         </p-buttongroup>
       </div>
@@ -102,18 +119,6 @@
               </div>
             </div>
           </div>
-        </app-card>
-
-        <ng-template #uploadData formGroupName="upload">
-          <div class="row">
-            <app-card header="Upload External Input">
-              <label for="uploadFromFile">Upload From CSV</label>
-              <input class="form-control" type="file" id="uploadFromFile" />
-            </app-card>
-          </div>
-        </ng-template>
-
-        <app-card header="External Input Modifications">
           <div class="labelAndTooltip">
             <label name="ogStartTime" for="ogStartTime">New Start Time</label>
             <i
@@ -126,5 +131,81 @@
         </app-card>
       </div>
     </form>
+
+    <ng-template #uploadData>
+      <div class="row">
+        <app-card header="Upload External Input">
+          <!-- TODO either add back in or remove -->
+          <!-- <select [(ngModel)]="timeZone" name="timeZone" size="small">
+            <option
+              *ngFor="let option of timeZoneOptions"
+              [value]="option.value"
+            >
+              {{ option.name }}
+            </option>
+          </select> -->
+
+          <div class="labelAndTooltip">
+            <label name="ogStartTime" for="newStartTime">
+              New Start Time (UTC)
+            </label>
+            <i
+              class="bi bi-info-circle info"
+              title="All times will be modified based on the difference between 'Original Start Time' and 'New Start Time'"
+            ></i>
+          </div>
+          <input
+            type="datetime-local"
+            [value]="localInputValue"
+            (blur)="onDateTimeChange($event)"
+          />
+          <!-- TODO either add back in or remove -->
+          <!-- <input
+            type="datetime-local"
+            [value]="localInputValue"
+            (blur)="dateTimeUpdated($event)"
+          /> -->
+
+          <label for="uploadFromFile">Upload From CSV</label>
+          <input
+            [ngClass]="{
+              'form-control': true,
+              'red-outline': fileState === 'INVALID',
+            }"
+            type="file"
+            id="uploadFromFile"
+            (change)="onFileSelected($event)"
+            accept=".csv"
+            [disabled]="
+              fileState == 'WAITING_FOR_CONVERSION' || !backendConnected
+            "
+          />
+          <span *ngIf="fileState === 'INVALID'" class="red-text">
+            File can only be of type CSV
+          </span>
+          <br />
+          <button
+            [disabled]="!selectedFile || fileState === 'INVALID'"
+            (click)="uploadAndConvert()"
+          >
+            Convert File
+            <fa-icon
+              *ngIf="
+                fileState === 'WAITING_FOR_CONVERSION' ||
+                fileState === 'ERROR_CONVERTING'
+              "
+              [icon]="
+                fileState === 'WAITING_FOR_CONVERSION' ? spinnerIcon : errorIcon
+              "
+              [ngClass]="{
+                'icon-button': true,
+                'fa-spin': fileState === 'WAITING_FOR_CONVERSION',
+                'red-icon': fileState === 'ERROR_CONVERTING',
+              }"
+            ></fa-icon>
+          </button>
+        </app-card>
+      </div>
+    </ng-template>
   </div>
 </div>

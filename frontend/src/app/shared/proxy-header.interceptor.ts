@@ -13,10 +13,12 @@ export function ProxyHeaderInterceptor(
   req: HttpRequest<any>,
   next: HttpHandlerFn,
 ): Observable<HttpEvent<any>> {
-  const append = ''; //backendEnv.production ? '/jforce' : '';
+  console.debug(
+    `Request \'${req.url}\' intercepted and appended with \'${environment.backendUrl}/api\'`,
+  );
 
   const newReq = req.clone({
-    url: `${append}/api${req.url}`,
+    url: `${environment.backendUrl}/api${req.url}`,
     setHeaders: {
       'X-Requested-With': 'XMLHttpRequest',
     },

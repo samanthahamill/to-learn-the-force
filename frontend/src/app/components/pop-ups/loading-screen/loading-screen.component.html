@@ -1,0 +1,21 @@
+<div
+  class="modal fade modal-custom"
+  tabindex="-1"
+  role="dialog"
+  #confirmationDialog
+  id="loadingScreen"
+  aria-labelledby="loadingScreenLabel"
+  aria-hidden="true"
+  data-bs-backdrop="static"
+>
+  <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <p>
+          {{ message }}
+        </p>
+        <fa-icon [icon]="spinnerIcon" class="fa-spin"></fa-icon>
+      </div>
+    </div>
+  </div>
+</div>

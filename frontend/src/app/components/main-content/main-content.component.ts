@@ -9,7 +9,6 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { ToastService } from '../../services/toast.service';
 import { UserStateService } from '../../services/user-state.service';
 import { ExternalComponent } from '../panels/external/external.component';
@@ -21,12 +20,10 @@ import {
 import {
   createFormDateString,
   createISODateFromFormString,
-  stringToPlatformTypeEnum,
 } from '../../shared/utils';
 import { ScenarioInputPanelComponent } from '../panels/scenario-input/scenario-input-panel.component';
 import { Platform } from '../../../generated/platform';
 
-@UntilDestroy()
 @Component({
   selector: 'app-main-content',
   imports: [
@@ -43,7 +40,7 @@ import { Platform } from '../../../generated/platform';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class MainContentComponent {
-  formGroup: FormGroup | undefined;
+  formGroup: FormGroup | undefined = undefined;
 
   private userStateService = inject(UserStateService);
   private toastService = inject(ToastService);
@@ -53,6 +50,10 @@ export class MainContentComponent {
       next: (data: UserInputFormData | undefined) => {
         if (data !== undefined && data != this.formGroup?.value) {
           this.updateInput(data);
+        }
+      },
+      complete: () => {
+        if (this.formGroup !== undefined) {
           initialSetup.unsubscribe();
         }
       },

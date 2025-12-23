@@ -14,6 +14,11 @@ h1 {
   border-color: style.$secondary-dark;
 }
 
+.form-control:disabled {
+  background-color: style.$disabled;
+  color: style.$medium-grey;
+}
+
 .button-background {
   background-color: style.$secondary-dark;
   border-color: style.$light;
@@ -61,6 +66,14 @@ h1 {
   width: calc(100% - 4px);
 }
 
+.non-hover-icon {
+  cursor: default;
+}
+.non-hover-icon:hover {
+  cursor: default;
+  color: style.$danger;
+}
+
 .p-button {
   padding: 2px;
   background-color: style.$primary-dark;
@@ -87,6 +100,14 @@ h1 {
 .primary {
   background-color: transparent;
   color: white;
+}
+
+.red-outline {
+  border: 1px solid style.$danger;
+}
+
+.red-text {
+  color: style.$danger;
 }
 
 .right-buttons {

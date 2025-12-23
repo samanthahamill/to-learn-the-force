@@ -1,11 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  ElementRef,
-  inject,
-  NO_ERRORS_SCHEMA,
-  ViewChild,
-} from '@angular/core';
+import { Component, inject, NO_ERRORS_SCHEMA } from '@angular/core';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import {
   ConfirmationServiceOptions,

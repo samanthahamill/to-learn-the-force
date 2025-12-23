@@ -23,7 +23,6 @@ export function getNewPlatformFormGroup(
     .replace(' ', '-')
     .toLowerCase();
 
-  // TODO implement
   return fb.group({
     id: new FormControl(compliantPlatformId, {
       validators: Validators.required,

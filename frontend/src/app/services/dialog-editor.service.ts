@@ -1,4 +1,4 @@
-import { inject, Injectable, input } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { createStore, withProps, select } from '@ngneat/elf';
 import { UserStateService } from './user-state.service';
 import { Platform } from '../../generated/platform';

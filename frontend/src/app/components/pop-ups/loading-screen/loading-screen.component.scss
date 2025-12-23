@@ -1,0 +1,23 @@
+@use "../../cards/card.component.scss" as card;
+@use "styles" as style;
+@use "variables" as customVars;
+
+.modal-custom {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2000;
+}
+
+.modal-header {
+  font-size: 20px;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+p {
+  margin-bottom: 0px;
+  margin-right: 4px;
+}
